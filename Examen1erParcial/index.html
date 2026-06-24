@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruta para Asistir al Partido</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>🏟️ Ruta al Estadio</h1>
+        <p>Encuentra a tu equipo, descubre promociones y genera tu ruta.</p>
+    </header>
+
+    <main class="container">
+        <section class="controls-panel">
+            <div class="form-group">
+                <label for="select-equipo">Selecciona un Equipo/Estadio:</label>
+                <select id="select-equipo">
+                    <option value="" disabled selected>Cargando equipos...</option>
+                </select>
+                <button id="btn-trazar-ruta" disabled>📍 Trazar Ruta desde mi Ubicación</button>
+            </div>
+
+            <div id="info-equipo" class="card hidden">
+                <h2 id="equipo-nombre">Nombre</h2>
+                <p><strong>📍 Ciudad:</strong> <span id="equipo-ciudad"></span></p>
+                <p><strong>📖 Historia:</strong> <span id="equipo-historia"></span></p>
+            </div>
+
+            <div id="info-promocion" class="card promo hidden">
+                <h3>🎟️ Promoción Exclusiva</h3>
+                <p id="promo-texto"></p>
+            </div>
+
+            <div id="info-geo" class="card geo hidden">
+                <h3>📡 Datos de tu Ubicación</h3>
+                <p id="geo-datos"></p>
+            </div>
+
+            <div id="share-buttons" class="hidden">
+                <button id="btn-twitter" class="btn-social x">Compartir en X (Twitter)</button>
+                <button id="btn-whatsapp" class="btn-social wa">Compartir en WhatsApp</button>
+            </div>
+        </section>
+
+        <section class="map-panel">
+            <div id="map"></div>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

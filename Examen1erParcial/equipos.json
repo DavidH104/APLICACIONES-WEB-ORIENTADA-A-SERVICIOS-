@@ -1,0 +1,128 @@
+{
+    "NFL": [
+        {
+            "id": "nfl1",
+            "nombre": "Dallas Cowboys",
+            "ciudad": "Arlington, TX",
+            "historia": "Franquicia icónica de la NFL, conocidos como 'El Equipo de América'. Juegan en el AT&T Stadium.",
+            "latitud": 32.747284,
+            "longitud": -97.094494
+        },
+        {
+            "id": "nfl2",
+            "nombre": "New England Patriots",
+            "ciudad": "Foxborough, MA",
+            "historia": "Han ganado múltiples Super Bowls en el siglo XXI. Juegan en el Gillette Stadium.",
+            "latitud": 42.090945,
+            "longitud": -71.264346
+        },
+        {
+            "id": "nfl3",
+            "nombre": "Kansas City Chiefs",
+            "ciudad": "Kansas City, MO",
+            "historia": "Actuales potencias de la NFL, conocidos por su ruidosa afición. Juegan en el Arrowhead Stadium.",
+            "latitud": 39.048939,
+            "longitud": -94.483916
+        },
+        {
+            "id": "nfl4",
+            "nombre": "San Francisco 49ers",
+            "ciudad": "Santa Clara, CA",
+            "historia": "Uno de los equipos más legendarios con una dinastía en los 80s. Juegan en el Levi's Stadium.",
+            "latitud": 37.403200,
+            "longitud": -121.969800
+        },
+        {
+            "id": "nfl5",
+            "nombre": "Green Bay Packers",
+            "ciudad": "Green Bay, WI",
+            "historia": "Único equipo propiedad de sus aficionados. Juegan en la histórica tundra helada del Lambeau Field.",
+            "latitud": 44.501300,
+            "longitud": -88.062200
+        }
+    ],
+    "Mundial": [
+        {
+            "id": "mun1",
+            "nombre": "Estadio Azteca (Mundial 2026)",
+            "ciudad": "Ciudad de México",
+            "historia": "El Coloso de Santa Úrsula. Único estadio en albergar tres inauguraciones de Copas del Mundo.",
+            "latitud": 19.302861,
+            "longitud": -99.150527
+        },
+        {
+            "id": "mun2",
+            "nombre": "MetLife Stadium (Mundial 2026)",
+            "ciudad": "New Jersey, NY",
+            "historia": "Sede designada para la final de la Copa del Mundo 2026. Casa de los Giants y Jets.",
+            "latitud": 40.812840,
+            "longitud": -74.074208
+        },
+        {
+            "id": "mun3",
+            "nombre": "Estadio Akron (Mundial 2026)",
+            "ciudad": "Guadalajara, Jalisco",
+            "historia": "Hogar de las Chivas y sede clave para la fase de grupos del Mundial en México.",
+            "latitud": 20.681600,
+            "longitud": -103.462600
+        },
+        {
+            "id": "mun4",
+            "nombre": "BMO Field (Mundial 2026)",
+            "ciudad": "Toronto, Canadá",
+            "historia": "Principal estadio de fútbol en Canadá, ampliado especialmente para recibir la Copa del Mundo.",
+            "latitud": 43.633200,
+            "longitud": -79.418600
+        },
+        {
+            "id": "mun5",
+            "nombre": "SoFi Stadium (Mundial 2026)",
+            "ciudad": "Los Ángeles, CA",
+            "historia": "Uno de los estadios más tecnológicos del mundo, sede de múltiples e importantes partidos en 2026.",
+            "latitud": 33.953400,
+            "longitud": -118.338700
+        }
+    ],
+    "NBA": [
+        {
+            "id": "nba1",
+            "nombre": "Los Angeles Lakers",
+            "ciudad": "Los Angeles, CA",
+            "historia": "Una de las franquicias más exitosas de la historia de la NBA. Juegan en el Crypto.com Arena.",
+            "latitud": 34.043017,
+            "longitud": -118.267254
+        },
+        {
+            "id": "nba2",
+            "nombre": "Chicago Bulls",
+            "ciudad": "Chicago, IL",
+            "historia": "El equipo que dominó los 90s con Michael Jordan. Juegan en el United Center.",
+            "latitud": 41.880690,
+            "longitud": -87.674176
+        },
+        {
+            "id": "nba3",
+            "nombre": "Boston Celtics",
+            "ciudad": "Boston, MA",
+            "historia": "Rival histórico de los Lakers y la franquicia con más campeonatos. Juegan en el TD Garden.",
+            "latitud": 42.366200,
+            "longitud": -71.062100
+        },
+        {
+            "id": "nba4",
+            "nombre": "Miami Heat",
+            "ciudad": "Miami, FL",
+            "historia": "Símbolo del baloncesto en la Florida con múltiples campeonatos. Juegan en el Kaseya Center.",
+            "latitud": 25.781400,
+            "longitud": -80.187000
+        },
+        {
+            "id": "nba5",
+            "nombre": "Golden State Warriors",
+            "ciudad": "San Francisco, CA",
+            "historia": "Revolucionaron el juego moderno con sus triples y dinastía reciente. Juegan en el Chase Center.",
+            "latitud": 37.768000,
+            "longitud": -122.387700
+        }
+    ]
+}

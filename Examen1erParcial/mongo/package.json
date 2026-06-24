@@ -1,0 +1,17 @@
+{
+  "name": "examen-mongo-setup",
+  "version": "1.0.0",
+  "description": "MongoDB local relational-style schema setup for Mundial 2026",
+  "type": "module",
+  "main": "setup.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "seed": "node seed.js",
+    "view": "node view.js",
+    "test-insert": "node insert-test.js",
+    "queries": "node queries.js"
+  },
+  "dependencies": {
+    "mongodb": "^7.3.0"
+  }
+}
