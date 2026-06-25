@@ -173,6 +173,35 @@ async function run() {
       }
     ]).toArray());
 
+    console.log('\n9. Top 5 estadios donde las selecciones locales metieron más goles');
+    console.log(await db.collection('partidos').aggregate([
+      {
+        $group: {
+          _id: '$estadioId',
+          golesLocalTotales: { $sum: '$goles_local' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'estadios',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'estadio'
+        }
+      },
+      { $unwind: '$estadio' },
+      {
+        $project: {
+          estadio: '$estadio.nombre',
+          ciudad: '$estadio.ciudad',
+          pais: '$estadio.pais',
+          golesLocalTotales: 1
+        }
+      },
+      { $sort: { golesLocalTotales: -1 } },
+      { $limit: 5 }
+    ]).toArray());
+
     console.log('\nConsultas adicionales ejecutadas correctamente.');
   } catch (error) {
     console.error('Error al ejecutar consultas:', error);

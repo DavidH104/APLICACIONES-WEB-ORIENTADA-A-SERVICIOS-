@@ -29,6 +29,8 @@ npm run setup
 npm run seed
 ```
 
+> El script `seed.js` carga selecciones reales de fútbol, estadios, resultados de fase de grupos y clasificaciones parciales.
+
 5. Ver el estado actual de la base de datos:
 
 ```bash
@@ -56,5 +58,5 @@ Ver `queries.md` para la lista de consultas solicitadas, explicaciones y resulta
 ## Estructura
 
 - `setup.js`: crea las colecciones y configura validación de JSON Schema + índices.
-- `seed.js`: inserta datos de ejemplo en las colecciones.
+- `seed.js`: inserta datos reales de selecciones, estadios, partidos, asignación de grupos y resultados parciales de fase de grupos.
 - `schema-design.md`: explica el modelo relacional y las relaciones entre colecciones.

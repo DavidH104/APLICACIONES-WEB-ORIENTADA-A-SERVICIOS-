@@ -62,6 +62,9 @@ let equipoSeleccionado = null; // Instancia del equipo actual
 // Elementos del DOM
 const selectEquipo = document.getElementById('select-equipo');
 const btnTrazarRuta = document.getElementById('btn-trazar-ruta');
+const btnToggleInstructions = document.getElementById('btn-toggle-instructions');
+
+let instructionsVisible = true;
 
 /**
  * INICIALIZACIÓN DEL MAPA (Leaflet)
@@ -272,6 +275,30 @@ function trazarRutaLeaflet(uLat, uLng, dLat, dLng) {
     // Ajustar el mapa para que se vean ambos puntos
     const group = new L.featureGroup([userMarker, stadiumMarker]);
     map.fitBounds(group.getBounds(), { padding: [50, 50] });
+
+    // Mostrar el botón para ocultar/mostrar el panel de instrucciones
+    if (btnToggleInstructions) {
+        btnToggleInstructions.classList.remove('hidden');
+        btnToggleInstructions.textContent = '⬇️ Minimizar instrucciones';
+        instructionsVisible = true;
+        btnToggleInstructions.onclick = toggleRouteInstructions;
+    }
+}
+
+function toggleRouteInstructions() {
+    if (!routingControl) return;
+    const container = routingControl.getContainer();
+    if (!container) return;
+
+    if (instructionsVisible) {
+        container.style.display = 'none';
+        btnToggleInstructions.textContent = '⬆️ Mostrar instrucciones';
+    } else {
+        container.style.display = 'block';
+        btnToggleInstructions.textContent = '⬇️ Minimizar instrucciones';
+    }
+
+    instructionsVisible = !instructionsVisible;
 }
 
 // Inicializar la app
