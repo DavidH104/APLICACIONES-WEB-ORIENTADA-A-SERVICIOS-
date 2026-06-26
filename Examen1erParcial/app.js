@@ -66,6 +66,197 @@ const btnToggleInstructions = document.getElementById('btn-toggle-instructions')
 
 let instructionsVisible = true;
 
+const datosPosiciones = [
+    {
+        nombre: 'Grupo A',
+        estado: 'Grupos Finalizados',
+        equipos: [
+            { equipo: 'México', pts: 9, pj: 3, v: 3, e: 0, d: 0, gf: 6, gc: 0, dif: 6 },
+            { equipo: 'Sudáfrica', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 2, gc: 3, dif: -1 },
+            { equipo: 'Corea del Sur', pts: 3, pj: 3, v: 1, e: 0, d: 2, gf: 2, gc: 3, dif: -1 },
+            { equipo: 'República Checa', pts: 1, pj: 3, v: 0, e: 1, d: 2, gf: 2, gc: 6, dif: -4 }
+        ]
+    },
+    {
+        nombre: 'Grupo B',
+        estado: 'Grupos Finalizados',
+        equipos: [
+            { equipo: 'Suiza', pts: 7, pj: 3, v: 2, e: 1, d: 0, gf: 7, gc: 3, dif: 4 },
+            { equipo: 'Canadá', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 8, gc: 3, dif: 5 },
+            { equipo: 'Bosnia y Herzegovina', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 5, gc: 6, dif: -1 },
+            { equipo: 'Qatar', pts: 1, pj: 3, v: 0, e: 1, d: 2, gf: 2, gc: 10, dif: -8 }
+        ]
+    },
+    {
+        nombre: 'Grupo C',
+        estado: 'Grupos Finalizados',
+        equipos: [
+            { equipo: 'Brasil', pts: 7, pj: 3, v: 2, e: 1, d: 0, gf: 7, gc: 1, dif: 6 },
+            { equipo: 'Marruecos', pts: 7, pj: 3, v: 2, e: 1, d: 0, gf: 6, gc: 3, dif: 3 },
+            { equipo: 'Escocia', pts: 3, pj: 3, v: 1, e: 0, d: 2, gf: 2, gc: 4, dif: -2 },
+            { equipo: 'Haití', pts: 0, pj: 3, v: 0, e: 0, d: 3, gf: 0, gc: 8, dif: -8 }
+        ]
+    },
+    {
+        nombre: 'Grupo D',
+        estado: 'Grupos Finalizados',
+        equipos: [
+            { equipo: 'Estados Unidos', pts: 6, pj: 3, v: 2, e: 0, d: 1, gf: 8, gc: 4, dif: 4 },
+            { equipo: 'Australia', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 2, gc: 2, dif: 0 },
+            { equipo: 'Paraguay', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 2, gc: 4, dif: -2 },
+            { equipo: 'Turquía', pts: 3, pj: 3, v: 1, e: 0, d: 2, gf: 3, gc: 5, dif: -2 }
+        ]
+    },
+    {
+        nombre: 'Grupo E',
+        estado: 'Grupos Finalizados',
+        equipos: [
+            { equipo: 'Alemania', pts: 6, pj: 3, v: 2, e: 0, d: 1, gf: 10, gc: 4, dif: 6 },
+            { equipo: 'Costa de Marfil', pts: 6, pj: 3, v: 2, e: 0, d: 1, gf: 4, gc: 2, dif: 2 },
+            { equipo: 'Ecuador', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 2, gc: 2, dif: 0 },
+            { equipo: 'Curazao', pts: 1, pj: 3, v: 0, e: 1, d: 2, gf: 1, gc: 9, dif: -8 }
+        ]
+    },
+    {
+        nombre: 'Grupo F',
+        estado: 'Grupos Finalizados',
+        equipos: [
+            { equipo: 'Países Bajos', pts: 7, pj: 3, v: 2, e: 1, d: 0, gf: 10, gc: 4, dif: 6 },
+            { equipo: 'Japón', pts: 5, pj: 3, v: 1, e: 2, d: 0, gf: 7, gc: 3, dif: 4 },
+            { equipo: 'Suecia', pts: 4, pj: 3, v: 1, e: 1, d: 1, gf: 7, gc: 7, dif: 0 },
+            { equipo: 'Túnez', pts: 0, pj: 3, v: 0, e: 0, d: 3, gf: 2, gc: 12, dif: -10 }
+        ]
+    },
+    {
+        nombre: 'Grupo G',
+        estado: 'Grupos en Curso',
+        equipos: [
+            { equipo: 'Egipto', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, gc: 2, dif: 2 },
+            { equipo: 'Irán', pts: 2, pj: 2, v: 0, e: 2, d: 0, gf: 2, gc: 2, dif: 0 },
+            { equipo: 'Bélgica', pts: 2, pj: 2, v: 0, e: 2, d: 0, gf: 1, gc: 1, dif: 0 },
+            { equipo: 'Nueva Zelanda', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 3, gc: 5, dif: -2 }
+        ]
+    },
+    {
+        nombre: 'Grupo H',
+        estado: 'Grupos en Curso',
+        equipos: [
+            { equipo: 'España', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, gc: 0, dif: 4 },
+            { equipo: 'Uruguay', pts: 2, pj: 2, v: 0, e: 2, d: 0, gf: 3, gc: 3, dif: 0 },
+            { equipo: 'Cabo Verde', pts: 2, pj: 2, v: 0, e: 2, d: 0, gf: 2, gc: 2, dif: 0 },
+            { equipo: 'Arabia Saudita', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, gc: 5, dif: -4 }
+        ]
+    },
+    {
+        nombre: 'Grupo I',
+        estado: 'Grupos en Curso',
+        equipos: [
+            { equipo: 'Francia', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 6, gc: 1, dif: 5 },
+            { equipo: 'Noruega', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 7, gc: 3, dif: 4 },
+            { equipo: 'Senegal', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 3, gc: 6, dif: -3 },
+            { equipo: 'Irak', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 1, gc: 7, dif: -6 }
+        ]
+    },
+    {
+        nombre: 'Grupo J',
+        estado: 'Grupos en Curso',
+        equipos: [
+            { equipo: 'Argentina', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 5, gc: 0, dif: 5 },
+            { equipo: 'Austria', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, gc: 3, dif: 0 },
+            { equipo: 'Argelia', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 2, gc: 4, dif: -2 },
+            { equipo: 'Jordania', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 2, gc: 5, dif: -3 }
+        ]
+    },
+    {
+        nombre: 'Grupo K',
+        estado: 'Grupos en Curso',
+        equipos: [
+            { equipo: 'Colombia', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 4, gc: 1, dif: 3 },
+            { equipo: 'Portugal', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 6, gc: 1, dif: 5 },
+            { equipo: 'RD Congo', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 2, gc: 4, dif: -2 },
+            { equipo: 'Uzbekistán', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 1, gc: 8, dif: -7 }
+        ]
+    },
+    {
+        nombre: 'Grupo L',
+        estado: 'Grupos en Curso',
+        equipos: [
+            { equipo: 'Inglaterra', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, gc: 2, dif: 2 },
+            { equipo: 'Ghana', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 1, gc: 0, dif: 1 },
+            { equipo: 'Croacia', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, gc: 4, dif: -1 },
+            { equipo: 'Panamá', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 0, gc: 2, dif: -2 }
+        ]
+    }
+];
+
+const resultadosRecientes = [
+    { grupo: 'Grupo A', local: 'Sudáfrica', visitante: 'Corea del Sur', resultado: '1 - 0', estadio: 'Monterrey Stadium (Nuevo León)' },
+    { grupo: 'Grupo A', local: 'República Checa', visitante: 'México', resultado: '0 - 3', estadio: 'Mexico City Stadium (CDMX)' },
+    { grupo: 'Grupo E', local: 'Curazao', visitante: 'Costa de Marfil', resultado: '0 - 2', estadio: 'Philadelphia Stadium (Pensilvania)' },
+    { grupo: 'Grupo E', local: 'Ecuador', visitante: 'Alemania', resultado: '2 - 1', estadio: 'New York New Jersey Stadium (Nueva Jersey)' },
+    { grupo: 'Grupo F', local: 'Túnez', visitante: 'Países Bajos', resultado: '1 - 3', estadio: 'Kansas City Stadium (Misuri)' },
+    { grupo: 'Grupo F', local: 'Japón', visitante: 'Suecia', resultado: '1 - 1', estadio: 'Dallas Stadium (Texas)' },
+    { grupo: 'Grupo D', local: 'Turquía', visitante: 'Estados Unidos', resultado: '3 - 2', estadio: 'Los Angeles Stadium (California)' },
+    { grupo: 'Grupo D', local: 'Paraguay', visitante: 'Australia', resultado: '0 - 0', estadio: 'San Francisco Bay Area Stadium (California)' }
+];
+
+function renderResultadosRecientes() {
+    const container = document.getElementById('resultados-recientes');
+    if (!container) return;
+
+    container.innerHTML = resultadosRecientes.map((partido) => `
+        <article class="result-card">
+            <p class="match-group">${partido.grupo}</p>
+            <p class="match-score">${partido.local} <strong>${partido.resultado}</strong> ${partido.visitante}</p>
+            <p class="match-stadium">Estadio: ${partido.estadio}</p>
+        </article>
+    `).join('');
+}
+
+function renderTablasPosiciones() {
+    const container = document.getElementById('tabla-posiciones');
+    if (!container) return;
+
+    container.innerHTML = datosPosiciones.map((grupo) => `
+        <article class="group-card">
+            <h3>${grupo.nombre}</h3>
+            <p class="group-status">${grupo.estado}</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Equipo</th>
+                            <th>PTS</th>
+                            <th>PJ</th>
+                            <th>V</th>
+                            <th>E</th>
+                            <th>D</th>
+                            <th>GF</th>
+                            <th>GC</th>
+                            <th>DIF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${grupo.equipos.map((equipo) => `
+                            <tr>
+                                <td>${equipo.equipo}</td>
+                                <td>${equipo.pts}</td>
+                                <td>${equipo.pj}</td>
+                                <td>${equipo.v}</td>
+                                <td>${equipo.e}</td>
+                                <td>${equipo.d}</td>
+                                <td>${equipo.gf}</td>
+                                <td>${equipo.gc}</td>
+                                <td>${equipo.dif}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    `).join('');
+}
+
 /**
  * INICIALIZACIÓN DEL MAPA (Leaflet)
  */
@@ -304,5 +495,7 @@ function toggleRouteInstructions() {
 // Inicializar la app
 window.onload = () => {
     initMap();
+    renderTablasPosiciones();
+    renderResultadosRecientes();
     cargarServicios();
 };
