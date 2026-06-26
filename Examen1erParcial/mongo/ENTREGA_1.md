@@ -687,6 +687,37 @@ npm run queries
 
 ---
 
+## 9.2 Backend — MongoDB
+
+### Evidencia 5 — Ejecución de setup.js (Creación de Colecciones)
+
+[INSERTAR CAPTURA: Terminal mostrando la salida de npm run setup]
+
+Descripción: Salida del script setup.js confirmando la creación exitosa de las 9 colecciones con validación de esquema JSON e índices en la base de datos mundial2026.
+
+Comando ejecutado:
+```bash
+npm run setup
+```
+
+Salida esperada:
+```text
+Conectado a mongodb://localhost:27017/mundial2026
+Creando colección continentes...
+Creando colección grupos...
+Creando colección selecciones...
+Creando colección estadios...
+Creando colección fase_final...
+Creando colección partidos...
+Creando colección clasificaciones...
+Creando colección usuarios...
+Creando colección boletos...
+Índices creados.
+Estructura de la base de datos creada correctamente.
+```
+
+---
+
 ## Archivos entregados
 
 - `setup.js` - Crea las colecciones con validación
