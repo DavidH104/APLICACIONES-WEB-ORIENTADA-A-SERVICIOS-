@@ -319,7 +319,7 @@ db.partidos.aggregate([
       localField: 'estadioId',
       foreignField: '_id',
       as: 'estadio'
-    }
+    }xl
   },
   { $unwind: '$estadio' },
   {
