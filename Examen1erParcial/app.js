@@ -190,14 +190,59 @@ const datosPosiciones = [
 ];
 
 const resultadosRecientes = [
-    { grupo: 'Grupo A', local: 'Sudáfrica', visitante: 'Corea del Sur', resultado: '1 - 0', estadio: 'Monterrey Stadium (Nuevo León)' },
-    { grupo: 'Grupo A', local: 'República Checa', visitante: 'México', resultado: '0 - 3', estadio: 'Mexico City Stadium (CDMX)' },
-    { grupo: 'Grupo E', local: 'Curazao', visitante: 'Costa de Marfil', resultado: '0 - 2', estadio: 'Philadelphia Stadium (Pensilvania)' },
-    { grupo: 'Grupo E', local: 'Ecuador', visitante: 'Alemania', resultado: '2 - 1', estadio: 'New York New Jersey Stadium (Nueva Jersey)' },
-    { grupo: 'Grupo F', local: 'Túnez', visitante: 'Países Bajos', resultado: '1 - 3', estadio: 'Kansas City Stadium (Misuri)' },
-    { grupo: 'Grupo F', local: 'Japón', visitante: 'Suecia', resultado: '1 - 1', estadio: 'Dallas Stadium (Texas)' },
-    { grupo: 'Grupo D', local: 'Turquía', visitante: 'Estados Unidos', resultado: '3 - 2', estadio: 'Los Angeles Stadium (California)' },
-    { grupo: 'Grupo D', local: 'Paraguay', visitante: 'Australia', resultado: '0 - 0', estadio: 'San Francisco Bay Area Stadium (California)' }
+    { fecha: '11 de junio', grupo: 'Grupo A', local: 'México', visitante: 'Sudáfrica', resultado: '2 - 0', estadio: 'Mexico City Stadium' },
+    { fecha: '11 de junio', grupo: 'Grupo A', local: 'Corea del Sur', visitante: 'Chequia', resultado: '2 - 1', estadio: 'Guadalajara Stadium' },
+    { fecha: '13 de junio', grupo: 'Grupo B', local: 'Qatar', visitante: 'Suiza', resultado: '1 - 1', estadio: 'San Francisco Bay Area Stadium' },
+    { fecha: '13 de junio', grupo: 'Grupo C', local: 'Brasil', visitante: 'Marruecos', resultado: '1 - 1', estadio: 'New York New Jersey Stadium' },
+    { fecha: '13 de junio', grupo: 'Grupo C', local: 'Escocia', visitante: 'Haití', resultado: '1 - 0', estadio: 'Boston Stadium' },
+    { fecha: '13 de junio', grupo: 'Grupo D', local: 'Australia', visitante: 'Turquía', resultado: '2 - 0', estadio: 'BC Place Vancouver' },
+    { fecha: '14 de junio', grupo: 'Grupo E', local: 'Alemania', visitante: 'Curazao', resultado: '7 - 1', estadio: 'Houston Stadium' },
+    { fecha: '14 de junio', grupo: 'Grupo F', local: 'Países Bajos', visitante: 'Japón', resultado: '2 - 2', estadio: 'Dallas Stadium' },
+    { fecha: '14 de junio', grupo: 'Grupo E', local: 'Costa de Marfil', visitante: 'Ecuador', resultado: '1 - 0', estadio: 'Philadelphia Stadium' },
+    { fecha: '15 de junio', grupo: 'Grupo H', local: 'España', visitante: 'Cabo Verde', resultado: '0 - 0', estadio: 'Atlanta Stadium' },
+    { fecha: '15 de junio', grupo: 'Grupo G', local: 'Bélgica', visitante: 'Egipto', resultado: '1 - 1', estadio: 'Seattle Stadium' },
+    { fecha: '15 de junio', grupo: 'Grupo H', local: 'Arabia Saudita', visitante: 'Uruguay', resultado: '1 - 1', estadio: 'Miami Stadium' },
+    { fecha: '15 de junio', grupo: 'Grupo G', local: 'Irán', visitante: 'Nueva Zelanda', resultado: '2 - 2', estadio: 'Los Angeles Stadium' },
+    { fecha: '16 de junio', grupo: 'Grupo I', local: 'Francia', visitante: 'Senegal', resultado: '3 - 1', estadio: 'New York New Jersey Stadium' },
+    { fecha: '16 de junio', grupo: 'Grupo I', local: 'Noruega', visitante: 'Irak', resultado: '4 - 1', estadio: 'Boston Stadium' },
+    { fecha: '16 de junio', grupo: 'Grupo J', local: 'Argentina', visitante: 'Argelia', resultado: '3 - 0', estadio: 'Kansas City Stadium' },
+    { fecha: '16 de junio', grupo: 'Grupo J', local: 'Austria', visitante: 'Jordania', resultado: '3 - 1', estadio: 'San Francisco Bay Area Stadium' },
+    { fecha: '17 de junio', grupo: 'Grupo K', local: 'Portugal', visitante: 'RD Congo', resultado: '1 - 1', estadio: 'Houston Stadium' },
+    { fecha: '17 de junio', grupo: 'Grupo L', local: 'Inglaterra', visitante: 'Croacia', resultado: '4 - 2', estadio: 'Dallas Stadium' },
+    { fecha: '17 de junio', grupo: 'Grupo L', local: 'Ghana', visitante: 'Panamá', resultado: '1 - 0', estadio: 'Toronto Stadium' },
+    { fecha: '17 de junio', grupo: 'Grupo K', local: 'Colombia', visitante: 'Uzbekistán', resultado: '3 - 1', estadio: 'Mexico City Stadium' },
+    { fecha: '18 de junio', grupo: 'Grupo A', local: 'Chequia', visitante: 'Sudáfrica', resultado: '1 - 1', estadio: 'Atlanta Stadium' },
+    { fecha: '18 de junio', grupo: 'Grupo B', local: 'Suiza', visitante: 'Bosnia y Herzegovina', resultado: '4 - 1', estadio: 'Los Angeles Stadium' },
+    { fecha: '18 de junio', grupo: 'Grupo B', local: 'Canadá', visitante: 'Qatar', resultado: '6 - 0', estadio: 'BC Place Vancouver' },
+    { fecha: '18 de junio', grupo: 'Grupo A', local: 'México', visitante: 'Corea del Sur', resultado: '1 - 0', estadio: 'Guadalajara Stadium' },
+    { fecha: '19 de junio', grupo: 'Grupo D', local: 'EE. UU.', visitante: 'Australia', resultado: '2 - 0', estadio: 'Seattle Stadium' },
+    { fecha: '19 de junio', grupo: 'Grupo C', local: 'Marruecos', visitante: 'Escocia', resultado: '1 - 0', estadio: 'Boston Stadium' },
+    { fecha: '19 de junio', grupo: 'Grupo C', local: 'Brasil', visitante: 'Haití', resultado: '3 - 0', estadio: 'Philadelphia Stadium' },
+    { fecha: '19 de junio', grupo: 'Grupo D', local: 'Paraguay', visitante: 'Turquía', resultado: '1 - 0', estadio: 'San Francisco Bay Area Stadium' },
+    { fecha: '21 de junio', grupo: 'Grupo H', local: 'España', visitante: 'Arabia Saudita', resultado: '4 - 0', estadio: 'Atlanta Stadium' },
+    { fecha: '21 de junio', grupo: 'Grupo G', local: 'Bélgica', visitante: 'Irán', resultado: '0 - 0', estadio: 'Los Angeles Stadium' },
+    { fecha: '21 de junio', grupo: 'Grupo H', local: 'Uruguay', visitante: 'Cabo Verde', resultado: '2 - 2', estadio: 'Miami Stadium' },
+    { fecha: '21 de junio', grupo: 'Grupo G', local: 'Egipto', visitante: 'Nueva Zelanda', resultado: '3 - 1', estadio: 'BC Place Vancouver' },
+    { fecha: '22 de junio', grupo: 'Grupo J', local: 'Argentina', visitante: 'Austria', resultado: '1 - 0', estadio: 'Dallas Stadium' },
+    { fecha: '22 de junio', grupo: 'Grupo I', local: 'Francia', visitante: 'Irak', resultado: '3 - 0', estadio: 'Philadelphia Stadium' },
+    { fecha: '22 de junio', grupo: 'Grupo I', local: 'Noruega', visitante: 'Senegal', resultado: '3 - 2', estadio: 'New York New Jersey Stadium' },
+    { fecha: '22 de junio', grupo: 'Grupo J', local: 'Argelia', visitante: 'Jordania', resultado: '3 - 1', estadio: 'San Francisco Bay Area Stadium' },
+    { fecha: '23 de junio', grupo: 'Grupo K', local: 'Portugal', visitante: 'Uzbekistán', resultado: '5 - 0', estadio: 'Houston Stadium' },
+    { fecha: '23 de junio', grupo: 'Grupo L', local: 'Inglaterra', visitante: 'Ghana', resultado: '0 - 0', estadio: 'Boston Stadium' },
+    { fecha: '23 de junio', grupo: 'Grupo L', local: 'Croacia', visitante: 'Panamá', resultado: '1 - 0', estadio: 'Toronto Stadium' },
+    { fecha: '23 de junio', grupo: 'Grupo K', local: 'Colombia', visitante: 'RD Congo', resultado: '1 - 0', estadio: 'Guadalajara Stadium' },
+    { fecha: '24 de junio', grupo: 'Grupo B', local: 'Suiza', visitante: 'Canadá', resultado: '2 - 1', estadio: 'BC Place Vancouver' },
+    { fecha: '24 de junio', grupo: 'Grupo B', local: 'Bosnia y Herzegovina', visitante: 'Qatar', resultado: '3 - 1', estadio: 'Seattle Stadium' },
+    { fecha: '24 de junio', grupo: 'Grupo C', local: 'Brasil', visitante: 'Escocia', resultado: '3 - 0', estadio: 'Miami Stadium' },
+    { fecha: '24 de junio', grupo: 'Grupo C', local: 'Marruecos', visitante: 'Haití', resultado: '4 - 2', estadio: 'Atlanta Stadium' },
+    { fecha: '24 de junio', grupo: 'Grupo A', local: 'México', visitante: 'Chequia', resultado: '3 - 0', estadio: 'Mexico City Stadium' },
+    { fecha: '24 de junio', grupo: 'Grupo A', local: 'Sudáfrica', visitante: 'Corea del Sur', resultado: '1 - 0', estadio: 'Monterrey Stadium' },
+    { fecha: '25 de junio', grupo: 'Grupo D', local: 'Turquía', visitante: 'EE. UU.', resultado: '3 - 2', estadio: 'Los Angeles Stadium' },
+    { fecha: '25 de junio', grupo: 'Grupo D', local: 'Paraguay', visitante: 'Australia', resultado: '0 - 0', estadio: 'San Francisco Bay Area Stadium' },
+    { fecha: '25 de junio', grupo: 'Grupo E', local: 'Curazao', visitante: 'Costa de Marfil', resultado: '0 - 2', estadio: 'Philadelphia Stadium' },
+    { fecha: '25 de junio', grupo: 'Grupo E', local: 'Ecuador', visitante: 'Alemania', resultado: '2 - 1', estadio: 'New York New Jersey Stadium' },
+    { fecha: '25 de junio', grupo: 'Grupo F', local: 'Túnez', visitante: 'Países Bajos', resultado: '1 - 3', estadio: 'Kansas City Stadium' },
+    { fecha: '25 de junio', grupo: 'Grupo F', local: 'Japón', visitante: 'Suecia', resultado: '1 - 1', estadio: 'Dallas Stadium' }
 ];
 
 function renderResultadosRecientes() {
@@ -206,6 +251,7 @@ function renderResultadosRecientes() {
 
     container.innerHTML = resultadosRecientes.map((partido) => `
         <article class="result-card">
+            <p class="match-date">${partido.fecha}</p>
             <p class="match-group">${partido.grupo}</p>
             <p class="match-score">${partido.local} <strong>${partido.resultado}</strong> ${partido.visitante}</p>
             <p class="match-stadium">Estadio: ${partido.estadio}</p>
