@@ -1,0 +1,46 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="140" y1="90" x2="660" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F4F98"/>
+      <stop offset="0.5" stop-color="#1E88E5"/>
+      <stop offset="1" stop-color="#00C2A8"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="180" y1="180" x2="620" y2="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD34D"/>
+      <stop offset="1" stop-color="#FF8A00"/>
+    </linearGradient>
+    <filter id="shadow" x="90" y="70" width="620" height="660" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="16"/>
+      <feGaussianBlur stdDeviation="18"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.02 0 0 0 0 0.08 0 0 0 0 0.2 0 0 0 0.32 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_2"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_2" result="shape"/>
+    </filter>
+  </defs>
+
+  <circle cx="400" cy="400" r="310" fill="url(#bg)"/>
+  <circle cx="400" cy="400" r="278" fill="#071D3D" fill-opacity="0.16"/>
+  <g filter="url(#shadow)">
+    <circle cx="400" cy="400" r="260" fill="white"/>
+    <circle cx="400" cy="400" r="220" fill="url(#ring)"/>
+    <path d="M400 210C333.5 210 280 263.5 280 330C280 396.5 333.5 450 400 450C466.5 450 520 396.5 520 330C520 263.5 466.5 210 400 210Z" fill="#082E5C"/>
+    <path d="M400 240C353.2 240 315 278.2 315 325C315 371.8 353.2 410 400 410C446.8 410 485 371.8 485 325C485 278.2 446.8 240 400 240Z" fill="#FFFFFF"/>
+    <path d="M400 260C367.9 260 341 286.9 341 319C341 351.1 367.9 378 400 378C432.1 378 459 351.1 459 319C459 286.9 432.1 260 400 260Z" fill="#0F4F98"/>
+    <path d="M370 270L400 300L430 270" stroke="#FFD34D" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M330 350C352 323 378 308 400 308C422 308 448 323 470 350" stroke="#FFD34D" stroke-width="18" stroke-linecap="round"/>
+    <path d="M328 379C350 404 375 418 400 418C425 418 450 404 472 379" stroke="#FFD34D" stroke-width="18" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(400 150)">
+    <path d="M-180 0L-140 60L-200 70L-120 120L-150 190L-80 150L-20 220L0 150L80 190L50 120L130 70L70 60L110 0L30 -40L0 -120L-30 -40L-110 0Z" fill="#FFD34D"/>
+  </g>
+
+  <g transform="translate(400 650)">
+    <path d="M-140 -10L-110 40L-160 45L-95 85L-125 145L-60 115L0 175L60 115L125 145L95 85L160 45L110 40L140 -10L60 -50L0 -120L-60 -50L-140 -10Z" fill="#FFD34D"/>
+  </g>
+
+  <rect x="180" y="590" width="440" height="88" rx="44" fill="#071D3D" fill-opacity="0.92"/>
+  <text x="400" y="650" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="4" fill="white">2026</text>
+</svg>

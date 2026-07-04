@@ -67,6 +67,36 @@ const btnToggleInstructions = document.getElementById('btn-toggle-instructions')
 
 let instructionsVisible = true;
 
+const paisesDestacados = [
+    // Use simplified rectangular-ish polygons (contiguous/mainland areas) to avoid extreme tails
+    {
+        nombre: 'México',
+        color: '#ff5a5f',
+        coords: [
+            [32.7, -117.1], [32.7, -86.7], [14.5, -86.7], [14.5, -117.1]
+        ],
+        zIndex: 300
+    },
+    {
+        nombre: 'Estados Unidos',
+        color: '#4dabf7',
+        // Contiguous US bbox (excludes Alaska/Hawaii) to avoid overlap with Canada
+        coords: [
+            [49.5, -124.8], [49.5, -66.9], [24.5, -66.9], [24.5, -124.8]
+        ],
+        zIndex: 200
+    },
+    {
+        nombre: 'Canadá',
+        color: '#51cf66',
+        // Mainland Canada top area limited to avoid Greenland overflow
+        coords: [
+            [83.1, -141.0], [83.1, -52.6], [49.0, -52.6], [49.0, -141.0]
+        ],
+        zIndex: 100
+    }
+];
+
 const datosPosiciones = [
     {
         nombre: 'Grupo A',
@@ -364,6 +394,41 @@ function initMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+
+    resaltarPaisesPrincipales();
+}
+
+function resaltarPaisesPrincipales() {
+    if (!map) return;
+
+    // draw polygons with controlled stacking: Canada (back), USA (middle), Mexico (front)
+    // Use explicit draw order to minimize heavy overlaps
+    const order = ['Canadá', 'Estados Unidos', 'México'];
+
+    order.forEach(name => {
+        const pais = paisesDestacados.find(p => p.nombre === name);
+        if (!pais) return;
+
+        const polygon = L.polygon(pais.coords, {
+            color: pais.color,
+            weight: 1.6,
+            dashArray: '6,6',
+            fillColor: pais.color,
+            fillOpacity: 0.10,
+            opacity: 0.9,
+            interactive: true
+        }).addTo(map);
+
+        polygon.on('mouseover', function () {
+            this.setStyle({ fillOpacity: 0.28, weight: 2.6 });
+            this.bringToFront();
+        });
+        polygon.on('mouseout', function () {
+            this.setStyle({ fillOpacity: 0.10, weight: 1.6 });
+        });
+
+        polygon.bindTooltip(pais.nombre, { permanent: false, direction: 'top' });
+    });
 }
 
 /**

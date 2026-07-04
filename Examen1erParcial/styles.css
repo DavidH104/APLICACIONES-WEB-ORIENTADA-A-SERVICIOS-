@@ -11,10 +11,64 @@ body {
 }
 
 header {
-    background-color: #1a252f;
+    background: linear-gradient(135deg, #071d3d 0%, #123b63 45%, #1f6fbe 100%);
     color: white;
-    padding: 1.5rem;
-    text-align: center;
+    padding: 1.25rem 1.25rem 1.5rem;
+    box-shadow: 0 12px 35px rgba(7, 29, 61, 0.25);
+    width: 100%;
+    display: block;
+    margin: 0;
+}
+
+.hero-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.hero-brand {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    text-align: left;
+}
+
+.hero-logo {
+    width: min(170px, 28vw);
+    height: auto;
+    flex-shrink: 0;
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.28));
+}
+
+.hero-copy {
+    max-width: 620px;
+}
+
+.hero-kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #ffd34d;
+    margin-bottom: 0.35rem;
+}
+
+.hero-copy h1 {
+    font-size: clamp(2rem, 3.8vw, 3rem);
+    margin-bottom: 0.45rem;
+    line-height: 1.1;
+}
+
+.hero-copy p:last-child {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-size: 1rem;
 }
 
 .container {
