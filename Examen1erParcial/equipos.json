@@ -52,11 +52,11 @@
         },
         {
             "id": "mun2",
-            "nombre": "MetLife Stadium (Mundial 2026)",
-            "ciudad": "New Jersey, NY",
-            "historia": "Sede designada para la final de la Copa del Mundo 2026. Casa de los Giants y Jets.",
-            "latitud": 40.812840,
-            "longitud": -74.074208
+            "nombre": "Estadio BBVA (Mundial 2026)",
+            "ciudad": "Monterrey, México",
+            "historia": "Recinto moderno en Monterrey, sede de varios partidos de la fase de grupos 2026.",
+            "latitud": 25.682, 
+            "longitud": -100.309
         },
         {
             "id": "mun3",
@@ -76,11 +76,99 @@
         },
         {
             "id": "mun5",
+            "nombre": "BC Place (Mundial 2026)",
+            "ciudad": "Vancouver, Canadá",
+            "historia": "Gran estadio techado en la costa oeste de Canadá, sede del Mundial 2026.",
+            "latitud": 49.2777,
+            "longitud": -123.1087
+        },
+        {
+            "id": "mun6",
+            "nombre": "Commonwealth Stadium (Mundial 2026)",
+            "ciudad": "Edmonton, Canadá",
+            "historia": "Estadio principal de fútbol en Alberta y una de las sedes canadienses del Mundial.",
+            "latitud": 53.5627,
+            "longitud": -113.5209
+        },
+        {
+            "id": "mun7",
+            "nombre": "MetLife Stadium (Mundial 2026)",
+            "ciudad": "East Rutherford, NJ",
+            "historia": "Sede designada para la final de la Copa del Mundo 2026. Casa de los Giants y Jets.",
+            "latitud": 40.812840,
+            "longitud": -74.074208
+        },
+        {
+            "id": "mun8",
+            "nombre": "AT&T Stadium (Mundial 2026)",
+            "ciudad": "Arlington, TX",
+            "historia": "Estadio de gran capacidad en Dallas-Fort Worth, sede de partidos importantes del Mundial.",
+            "latitud": 32.747284,
+            "longitud": -97.094494
+        },
+        {
+            "id": "mun9",
+            "nombre": "Mercedes-Benz Stadium (Mundial 2026)",
+            "ciudad": "Atlanta, GA",
+            "historia": "Estadio moderno con techo retráctil, hospitalario para los fanáticos del Mundial.",
+            "latitud": 33.755,
+            "longitud": -84.4008
+        },
+        {
+            "id": "mun10",
+            "nombre": "Hard Rock Stadium (Mundial 2026)",
+            "ciudad": "Miami Gardens, FL",
+            "historia": "Sede importante en el sur de Estados Unidos, con experiencia en eventos internacionales.",
+            "latitud": 25.958,
+            "longitud": -80.238
+        },
+        {
+            "id": "mun11",
             "nombre": "SoFi Stadium (Mundial 2026)",
-            "ciudad": "Los Ángeles, CA",
+            "ciudad": "Inglewood, CA",
             "historia": "Uno de los estadios más tecnológicos del mundo, sede de múltiples e importantes partidos en 2026.",
             "latitud": 33.953400,
             "longitud": -118.338700
+        },
+        {
+            "id": "mun12",
+            "nombre": "NRG Stadium (Mundial 2026)",
+            "ciudad": "Houston, TX",
+            "historia": "Gran recinto en Texas con capacidad para grandes eventos deportivos internacionales.",
+            "latitud": 29.6847,
+            "longitud": -95.4107
+        },
+        {
+            "id": "mun13",
+            "nombre": "Gillette Stadium (Mundial 2026)",
+            "ciudad": "Foxborough, MA",
+            "historia": "Estadio ubicado cerca de Boston, uno de los recintos estadounidenses para el Mundial.",
+            "latitud": 42.0909,
+            "longitud": -71.2643
+        },
+        {
+            "id": "mun14",
+            "nombre": "Levi's Stadium (Mundial 2026)",
+            "ciudad": "Santa Clara, CA",
+            "historia": "Sede del Mundial en el área de la Bahía de San Francisco y hogar de los 49ers.",
+            "latitud": 37.403,
+            "longitud": -121.97
+        },
+        {
+            "id": "mun15",
+            "nombre": "Lumen Field (Mundial 2026)",
+            "ciudad": "Seattle, WA",
+            "historia": "Estadio de clima templado en el noroeste de Estados Unidos, sede de múltiples partidos.",
+            "latitud": 47.5952,
+            "longitud": -122.3316
+        },
+        {
+            "id": "mun16",
+            "nombre": "Lincoln Financial Field (Mundial 2026)",
+            "ciudad": "Filadelfia, PA",
+            "historia": "Estadio emblemático del noreste estadounidense, uno de los recintos del Mundial 2026.",
+            "latitud": 39.9008,
+            "longitud": -75.1675
         }
     ],
     "NBA": [

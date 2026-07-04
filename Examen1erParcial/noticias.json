@@ -1,0 +1,34 @@
+[
+  {
+    "id": "n1",
+    "titulo": "Anuncio oficial: Calendario actualizado",
+    "fecha": "2026-06-25",
+    "extracto": "La FIFA confirma ligeros ajustes en horarios y sedes de la fase de grupos. Consulta los cambios y verifica tus entradas.",
+    "url": "https://www.fifa.com/worldcup/news/calendar-update",
+    "categoria": "Oficial"
+  },
+  {
+    "id": "n2",
+    "titulo": "Apertura de Fan Zones en Ciudad de México",
+    "fecha": "2026-06-20",
+    "extracto": "Se inauguraron varias fan zones con actividades culturales, pantallas gigantes y puestos de comida en las sedes mexicanas.",
+    "url": "",
+    "categoria": "Eventos"
+  },
+  {
+    "id": "n3",
+    "titulo": "Recomendaciones de transporte hacia MetLife Stadium",
+    "fecha": "2026-06-28",
+    "extracto": "Autoridades locales publican rutas recomendadas y servicios adicionales de transporte público para la final.",
+    "url": "",
+    "categoria": "Transporte"
+  },
+  {
+    "id": "n4",
+    "titulo": "Apertura de venta de merchandising oficial",
+    "fecha": "2026-06-15",
+    "extracto": "La tienda oficial lanzó nuevos artículos conmemorativos del Mundial 2026, disponibles en línea y en sedes seleccionadas.",
+    "url": "",
+    "categoria": "Comercial"
+  }
+]

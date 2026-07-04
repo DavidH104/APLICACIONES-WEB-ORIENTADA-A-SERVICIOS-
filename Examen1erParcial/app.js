@@ -57,6 +57,7 @@ let userMarker;
 let routingControl;
 let equiposInstanciados = []; // Aquí guardaremos los objetos creados
 let promocionesData = {};
+let noticiasData = [];
 let equipoSeleccionado = null; // Instancia del equipo actual
 
 // Elementos del DOM
@@ -303,6 +304,55 @@ function renderTablasPosiciones() {
     `).join('');
 }
 
+function renderEstadios() {
+    const container = document.getElementById('stadium-cards');
+    if (!container) return;
+
+    const estadios = equiposInstanciados.filter(eq => eq.deporte === 'Futbol Soccer (Mundial 2026)');
+
+    container.innerHTML = estadios.map((estadio) => `
+        <article class="stadium-card">
+            <h3>${estadio.nombre}</h3>
+            <p><strong>Ciudad:</strong> ${estadio.ciudad}</p>
+            <p>${estadio.historia}</p>
+            <button class="btn-view-stadium" data-id="${estadio.id}">Ver en mapa</button>
+        </article>
+    `).join('');
+
+    container.querySelectorAll('.btn-view-stadium').forEach((button) => {
+        button.addEventListener('click', () => {
+            const estadioId = button.dataset.id;
+            const estadio = equiposInstanciados.find(eq => eq.id === estadioId);
+            if (estadio) {
+                mostrarMarcadorEstadio(estadio);
+                document.getElementById('info-equipo').classList.remove('hidden');
+                document.getElementById('equipo-nombre').textContent = estadio.nombre;
+                document.getElementById('equipo-ciudad').textContent = `${estadio.ciudad} (${estadio.deporte})`;
+                document.getElementById('equipo-historia').textContent = estadio.historia;
+            }
+        });
+    });
+}
+
+function renderNoticias() {
+    const container = document.getElementById('news-list');
+    if (!container) return;
+
+    if (!Array.isArray(noticiasData) || noticiasData.length === 0) {
+        container.innerHTML = `<p class="card">No hay noticias disponibles por el momento.</p>`;
+        return;
+    }
+
+    container.innerHTML = noticiasData.map((n) => `
+        <article class="news-card">
+            <div class="news-meta">${n.fecha} • ${n.categoria || 'General'}</div>
+            <h4>${n.titulo}</h4>
+            <p>${n.extracto}</p>
+            ${n.url ? `<a href="${n.url}" target="_blank" rel="noopener">Leer más</a>` : ''}
+        </article>
+    `).join('');
+}
+
 /**
  * INICIALIZACIÓN DEL MAPA (Leaflet)
  */
@@ -321,14 +371,16 @@ function initMap() {
  */
 async function cargarServicios() {
     try {
-        // Fetch paralelo para ambos "servicios"
-        const [resEquipos, resPromos] = await Promise.all([
+        // Fetch paralelo para equipos, promociones y noticias
+        const [resEquipos, resPromos, resNoticias] = await Promise.all([
             fetch('equipos.json'),
-            fetch('promociones.json')
+            fetch('promociones.json'),
+            fetch('noticias.json')
         ]);
 
         const dataEquipos = await resEquipos.json();
         promocionesData = await resPromos.json();
+        noticiasData = await resNoticias.json();
 
         selectEquipo.innerHTML = '<option value="" disabled selected>Selecciona un equipo...</option>';
 
@@ -353,6 +405,9 @@ async function cargarServicios() {
             equiposInstanciados.push(instancia);
             agregarOpcionSelect(instancia, "NBA");
         });
+
+        renderEstadios();
+        renderNoticias();
 
     } catch (error) {
         console.error("Error al cargar los JSON:", error);
