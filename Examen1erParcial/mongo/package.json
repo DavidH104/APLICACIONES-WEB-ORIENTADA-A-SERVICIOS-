@@ -9,7 +9,8 @@
     "seed": "node seed.js",
     "view": "node view.js",
     "test-insert": "node insert-test.js",
-    "queries": "node queries.js"
+    "queries": "node queries.js",
+    "api": "node api-server.js"
   },
   "dependencies": {
     "mongodb": "^7.3.0"
