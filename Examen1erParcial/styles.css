@@ -1,315 +1,164 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #f4f7f6;
-    color: #333;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  color: #0f172a;
 }
 
-header {
-    background-color: #1a252f;
-    color: white;
-    padding: 1.5rem;
-    text-align: center;
+.hero {
+  background: linear-gradient(90deg, #0f172a 0%, #1d4ed8 100%);
+  color: white;
+  padding: 2rem 1.5rem;
+  text-align: center;
 }
 
-.container {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+.hero h1 {
+  margin-bottom: 0.5rem;
 }
 
-.controls-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.main-menu {
+  background: #111827;
+  padding: 1rem 1.5rem;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.main-menu ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  list-style: none;
+  justify-content: center;
 }
 
-select, button {
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+.main-menu a,
+.main-menu .disabled {
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  background: #1f2937;
+  display: inline-block;
 }
 
-button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s;
+.main-menu .disabled {
+  opacity: 0.6;
 }
 
-button:hover:not(:disabled) { background-color: #2980b9; }
-button:disabled { background-color: #95a5a6; cursor: not-allowed; }
-
-.card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+#content-area {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
-.card.hidden { display: none; }
-.card.promo { background-color: #f1c40f; color: #333; border-left: 5px solid #e67e22; }
-.card.geo { background-color: #e8f8f5; border-left: 5px solid #1abc9c; font-size: 0.9em; }
-
-h2, h3 { margin-bottom: 10px; }
-
-#map {
-    height: 600px;
-    width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.modulo-section {
+  display: none;
 }
 
-.standings-section {
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    padding: 0 20px 20px;
+.modulo-section.active {
+  display: block;
 }
 
-.standings-header {
-    margin-bottom: 16px;
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.standings-header h2 {
-    color: #1a252f;
-    margin-bottom: 6px;
+.card,
+.table-card,
+.stadium-card,
+.selection-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
 }
 
-.standings-header p {
-    color: #64748b;
+.selection-card button,
+.stadium-card a,
+.btn-primary {
+  margin-top: 0.8rem;
+  padding: 0.65rem 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
 }
 
-.standings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-}
-
-.stadiums-section {
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    padding: 0 20px 20px;
-}
-
-.stadium-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-}
-
-.stadium-card {
-    background: white;
-    border-radius: 8px;
-    padding: 18px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.stadium-card h3 {
-    margin-bottom: 8px;
-    color: #1a252f;
-}
-
-.stadium-card p {
-    margin-bottom: 10px;
-    color: #4b5563;
-    line-height: 1.4;
-}
-
-.btn-view-stadium {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    background-color: #16a34a;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-view-stadium:hover {
-    background-color: #15803d;
-}
-
-.news-section {
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    padding: 0 20px 20px;
-}
-
-.news-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 14px;
-}
-
-.news-card {
-    background: white;
-    border-radius: 8px;
-    padding: 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-}
-
-.news-card h4 {
-    margin-bottom: 6px;
-    color: #0f172a;
-}
-
-.news-card p { color: #475569; margin-bottom: 8px; }
-
-.news-meta { font-size: 0.85rem; color: #64748b; margin-bottom: 8px; }
-
-.news-card a { color: #2563eb; text-decoration: none; font-weight: 600; }
-
-.news-card a:hover { text-decoration: underline; }
-
-.results-section {
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    padding: 0 20px 20px;
-}
-
-.results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 12px;
-}
-
-.result-card {
-    background: white;
-    border-radius: 8px;
-    padding: 12px 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.match-date {
-    font-size: 0.78rem;
-    color: #64748b;
-    margin-bottom: 4px;
-    font-weight: 700;
-}
-
-.match-group {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #2563eb;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-}
-
-.match-score {
-    font-size: 0.95rem;
-    margin-bottom: 6px;
-}
-
-.match-stadium {
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
-.group-card {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.group-card h3 {
-    margin-bottom: 4px;
-    color: #1a252f;
-}
-
-.group-status {
-    color: #64748b;
-    font-size: 0.92rem;
-    margin-bottom: 10px;
-}
-
-.table-wrapper {
-    overflow-x: auto;
+.selection-card button:hover,
+.stadium-card a:hover,
+.btn-primary:hover {
+  background: #1d4ed8;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.92rem;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
 }
 
-th, td {
-    padding: 7px 6px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: center;
+th,
+td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
 }
 
-th:first-child, td:first-child {
-    text-align: left;
+th:first-child,
+td:first-child {
+  text-align: left;
 }
 
 th {
-    background: #f8fafc;
-    color: #334155;
-    font-weight: 700;
+  background: #f8fafc;
 }
 
-tr:nth-child(even) td {
-    background: #f9fafb;
+.flag {
+  width: 34px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
-.map-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
 
-.map-header h2 {
-    font-size: 1.1rem;
-    color: #1a252f;
+.modal-content {
+  background: white;
+  width: min(680px, 100%);
+  border-radius: 14px;
+  padding: 1.2rem;
+  position: relative;
 }
 
-.btn-toggle {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: none;
-    background-color: #2c3e50;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s ease;
+.close-btn {
+  position: absolute;
+  right: 1rem;
+  top: 0.7rem;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
-.btn-toggle:hover {
-    background-color: #22313f;
+.status-message {
+  margin-top: 0.8rem;
+  color: #64748b;
 }
 
-.btn-toggle.hidden {
-    display: none;
-}
-
-.btn-social { margin-top: 10px; width: 100%; }
-.btn-social.x { background-color: #000; }
-.btn-social.x:hover { background-color: #333; }
-.btn-social.wa { background-color: #25D366; }
-.btn-social.wa:hover { background-color: #128C7E; }
-
-/* Responsividad */
 @media (max-width: 768px) {
-    .container { grid-template-columns: 1fr; }
-    #map { height: 400px; }
-    .standings-grid { grid-template-columns: 1fr; }
-    .results-grid { grid-template-columns: 1fr; }
+  .main-menu ul {
+    justify-content: flex-start;
+  }
 }
