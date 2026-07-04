@@ -1,68 +1,102 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mundial 2026 - Arquitectura de Módulos</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruta para Asistir al Partido</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <h1>Mundial 2026 - Arquitectura de Módulos</h1>
-    <p>Frontend unificado consumiendo datos desde una API conectada a MongoDB.</p>
-  </header>
-
-  <nav class="main-menu">
-    <ul>
-      <li><a href="#inicio" onclick="showModule('inicio')">1. Inicio</a></li>
-      <li><a href="#confederaciones" onclick="showModule('confederaciones')">2. Confederaciones</a></li>
-      <li><a href="#estadios" onclick="showModule('estadios')">3. Estadios y Ubicaciones</a></li>
-      <li><a href="#grupos" onclick="showModule('grupos')">4. Grupos</a></li>
-      <li class="disabled">5. Calendario</li>
-      <li class="disabled">6. Clasificación</li>
-      <li class="disabled">7. Simulador</li>
-    </ul>
-  </nav>
-
-  <main id="content-area">
-    <section id="mod-inicio" class="modulo-section active">
-      <h2>Inicio</h2>
-      <p>Este avance muestra cómo el frontend consume datos desde una API conectada a MongoDB.</p>
-      <div class="card-grid">
-        <div class="card">
-          <h3>API REST</h3>
-          <p>Endpoints disponibles: /api/selecciones, /api/estadios, /api/clasificaciones.</p>
+    <header class="hero-header">
+        <div class="hero-brand">
+            <img src="assets/fifa-world-cup-2026-logo.svg" alt="Logo oficial de la Copa del Mundo FIFA 2026" class="hero-logo">
+            <div class="hero-copy">
+                <p class="hero-kicker">Mundial 2026</p>
+                <h1>Ruta al Estadio</h1>
+                <p>Encuentra a tu equipo, descubre promociones y genera tu ruta con una experiencia premium.</p>
+            </div>
         </div>
-        <div class="card">
-          <h3>Módulo activo</h3>
-          <p>Actualmente el módulo de grupos está funcionando con datos reales desde la base de datos.</p>
+    </header>
+
+    <main class="container">
+        <section class="controls-panel">
+            <div class="form-group">
+                <label for="select-equipo">Selecciona un Equipo/Estadio:</label>
+                <select id="select-equipo">
+                    <option value="" disabled selected>Cargando equipos...</option>
+                </select>
+                <button id="btn-trazar-ruta" disabled>📍 Trazar Ruta desde mi Ubicación</button>
+            </div>
+
+            <div id="info-equipo" class="card hidden">
+                <h2 id="equipo-nombre">Nombre</h2>
+                <p><strong>📍 Ciudad:</strong> <span id="equipo-ciudad"></span></p>
+                <p><strong>📖 Historia:</strong> <span id="equipo-historia"></span></p>
+            </div>
+
+            <div id="info-promocion" class="card promo hidden">
+                <h3>🎟️ Promoción Exclusiva</h3>
+                <p id="promo-texto"></p>
+            </div>
+
+            <div id="info-geo" class="card geo hidden">
+                <h3>📡 Datos de tu Ubicación</h3>
+                <p id="geo-datos"></p>
+            </div>
+
+            <div id="share-buttons" class="hidden">
+                <button id="btn-twitter" class="btn-social x">Compartir en X (Twitter)</button>
+                <button id="btn-whatsapp" class="btn-social wa">Compartir en WhatsApp</button>
+            </div>
+        </section>
+
+        <section class="map-panel">
+            <div class="map-header">
+                <h2>Mapa de Ruta</h2>
+                <button id="btn-toggle-instructions" class="btn-toggle hidden" type="button">⬇️ Minimizar instrucciones</button>
+            </div>
+            <div id="map"></div>
+        </section>
+    </main>
+
+    <section class="standings-section">
+        <div class="standings-header">
+            <h2>📊 Tablas de Posiciones</h2>
+            <p>Estado actualizado hasta el 25 de junio de 2026.</p>
         </div>
-      </div>
+        <div id="tabla-posiciones" class="standings-grid"></div>
     </section>
 
-    <section id="mod-confederaciones" class="modulo-section">
-      <h2>Confederaciones</h2>
-      <div id="confederaciones-container" class="card-grid"></div>
+    <section class="stadiums-section">
+        <div class="standings-header">
+            <h2>🏟️ Estadios del Mundial 2026</h2>
+            <p>Conoce las sedes oficiales y selecciona una para verla en el mapa.</p>
+        </div>
+        <div id="stadium-cards" class="stadium-grid"></div>
     </section>
 
-    <section id="mod-estadios" class="modulo-section">
-      <h2>Estadios y Ubicaciones</h2>
-      <div id="estadios-container" class="card-grid"></div>
+    <section class="news-section">
+        <div class="standings-header">
+            <h2>📰 Noticias</h2>
+            <p>Últimas novedades y comunicados sobre el Mundial 2026.</p>
+        </div>
+        <div id="news-list" class="news-grid"></div>
     </section>
 
-    <section id="mod-grupos" class="modulo-section">
-      <h2>Grupos del Mundial FIFA 2026</h2>
-      <div id="grupos-container"></div>
+    <section class="results-section">
+        <div class="standings-header">
+            <h2>⚽ Historial de Partidos</h2>
+            <p>Partidos disputados en la fase de grupos del Mundial 2026 hasta el 25 de junio.</p>
+        </div>
+        <div id="resultados-recientes" class="results-grid"></div>
     </section>
-  </main>
 
-  <div id="modal-seleccion" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <div id="modal-body-info"></div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

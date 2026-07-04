@@ -1,0 +1,40 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F4F98"/>
+      <stop offset="50%" stop-color="#1D71B8"/>
+      <stop offset="100%" stop-color="#00A8C6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#FFB300"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#002245" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <circle cx="600" cy="600" r="500" fill="url(#bg)"/>
+  <circle cx="600" cy="600" r="430" fill="#FFFFFF" fill-opacity="0.06"/>
+
+  <g filter="url(#shadow)">
+    <circle cx="600" cy="600" r="420" fill="#FFFFFF"/>
+    <circle cx="600" cy="600" r="360" fill="url(#gold)"/>
+
+    <path d="M600 250C455 250 338 367 338 512C338 657 455 774 600 774C745 774 862 657 862 512C862 367 745 250 600 250Z" fill="#071D3D"/>
+    <path d="M600 315C490 315 402 403 402 513C402 623 490 711 600 711C710 711 798 623 798 513C798 403 710 315 600 315Z" fill="#FFFFFF"/>
+    <path d="M600 365C524 365 462 427 462 503C462 579 524 641 600 641C676 641 738 579 738 503C738 427 676 365 600 365Z" fill="#0E4B93"/>
+
+    <path d="M510 400L600 490L690 400" stroke="#FFD54F" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M445 540C480 495 530 468 600 468C670 468 720 495 755 540" stroke="#FFD54F" stroke-width="36" stroke-linecap="round"/>
+    <path d="M450 594C485 638 540 664 600 664C660 664 715 638 750 594" stroke="#FFD54F" stroke-width="36" stroke-linecap="round"/>
+  </g>
+
+  <g fill="#FFD54F">
+    <path d="M600 120L640 210L740 220L665 285L690 385L600 330L510 385L535 285L460 220L560 210Z"/>
+    <path d="M600 980L640 890L740 880L665 815L690 715L600 770L510 715L535 815L460 880L560 890Z"/>
+  </g>
+
+  <rect x="270" y="920" width="660" height="110" rx="55" fill="#071D3D"/>
+  <text x="600" y="1005" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="84" font-weight="800" letter-spacing="8" fill="#FFFFFF">2026</text>
+</svg>

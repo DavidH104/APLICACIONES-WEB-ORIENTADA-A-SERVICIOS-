@@ -1,4 +1,4 @@
-
+db.continentes.find({}, { nombre: 1, confederacion: 1, paises: 1, _id: 1 });
 /* global use, db */
 // MongoDB Playground
 // To disable this template go to Settings | MongoDB | Use Default Template For Playground.
