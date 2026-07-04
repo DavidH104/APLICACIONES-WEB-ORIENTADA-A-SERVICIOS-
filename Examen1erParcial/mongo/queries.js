@@ -9,200 +9,99 @@ async function run() {
     await client.connect();
     const db = client.db(DB_NAME);
 
-    console.log('1. Continentes con confederación y países');
-    console.log(await db.collection('continentes').find({}, { projection: { nombre: 1, confederacion: 1, paises: 1 } }).toArray());
+    console.log('1. Búsqueda por confederaciones');
+    console.log(JSON.stringify(await db.collection('continentes').aggregate([
+      { $group: { _id: '$confederacion', continente: { $first: '$continente' }, pais: { $first: { $arrayElemAt: ['$paises_incluidos', 0] } } } },
+      { $project: { _id: 0, confederacion: '$_id', continente: 1, pais: 1 } },
+      { $sort: { confederacion: 1 } }
+    ]).toArray(), null, 2));
 
-    console.log('\n2. Continentes por confederación (UEFA)');
-    console.log(await db.collection('continentes').find({ confederacion: 'UEFA' }).toArray());
-
-    console.log('\n3. Selecciones con continente y confederación');
-    console.log(await db.collection('selecciones').aggregate([
-      {
-        $lookup: {
-          from: 'continentes',
-          localField: 'continenteId',
-          foreignField: '_id',
-          as: 'continente'
-        }
-      },
+    console.log('\n2. Mejores 10 rankeados');
+    console.log(JSON.stringify(await db.collection('selecciones').aggregate([
+      { $lookup: { from: 'continentes', localField: 'continente_id', foreignField: '_id', as: 'continente' } },
       { $unwind: '$continente' },
-      {
-        $project: {
-          nombre: 1,
-          pais: 1,
-          historia: 1,
-          ventajas: 1,
-          desventajas: 1,
-          ranking: 1,
-          'continente.nombre': 1,
-          'continente.confederacion': 1
-        }
-      }
-    ]).toArray());
+      { $project: { _id: 1, seleccion: '$nombre', continente: '$continente.continente', confederacion: '$continente.confederacion', historia: 1, ventajas: 1, desventajas: 1, ranking: 1 } },
+      { $sort: { ranking: 1 } },
+      { $limit: 10 }
+    ]).toArray(), null, 2));
 
-    console.log('\n4. Top 10 mejor rankeados');
-    console.log(await db.collection('selecciones').find({}, { projection: { nombre: 1, pais: 1, ranking: 1 } }).sort({ ranking: 1 }).limit(10).toArray());
-
-    console.log('\n5. Selecciones con grupo, partidos y estadio');
-    console.log(await db.collection('selecciones').aggregate([
-      {
-        $lookup: {
-          from: 'grupos',
-          localField: 'grupoId',
-          foreignField: '_id',
-          as: 'grupo'
-        }
-      },
+    console.log('\n3. Consulta para mapas');
+    console.log(JSON.stringify(await db.collection('selecciones').aggregate([
+      { $lookup: { from: 'grupos', localField: 'grupo_id', foreignField: '_id', as: 'grupo' } },
       { $unwind: '$grupo' },
-      {
-        $lookup: {
-          from: 'partidos',
-          let: { seleccionId: '$_id' },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $or: [
-                    { $eq: ['$equipo_localId', '$$seleccionId'] },
-                    { $eq: ['$equipo_visitanteId', '$$seleccionId'] }
-                  ]
-                }
-              }
-            }
-          ],
-          as: 'partidos'
-        }
-      },
-      {
-        $unwind: { path: '$partidos', preserveNullAndEmptyArrays: true }
-      },
-      {
-        $lookup: {
-          from: 'estadios',
-          localField: 'partidos.estadioId',
-          foreignField: '_id',
-          as: 'estadio'
-        }
-      },
-      { $unwind: { path: '$estadio', preserveNullAndEmptyArrays: true } },
-      {
-        $group: {
-          _id: '$_id',
-          nombre: { $first: '$nombre' },
-          grupo: { $first: '$grupo.nombre' },
-          latitud: { $first: '$latitud' },
-          longitud: { $first: '$longitud' },
-          estadios: { $addToSet: { nombre: '$estadio.nombre', capacidad: '$estadio.capacidad' } },
-          partidos: { $addToSet: '$partidos' }
-        }
-      }
-    ]).toArray());
+      { $lookup: { from: 'partidos', let: { seleccionId: '$_id' }, pipeline: [{ $match: { $expr: { $or: [{ $eq: ['$equipo_local_id', '$$seleccionId'] }, { $eq: ['$equipo_visitante_id', '$$seleccionId'] }] } } }, { $match: { fase: 'Grupos' } }], as: 'partidos' } },
+      { $lookup: { from: 'estadios', localField: 'partidos.estadio_id', foreignField: '_id', as: 'estadios' } },
+      { $project: { _id: 0, seleccion: '$nombre', grupo: '$grupo.nombre', partidos: { $map: { input: '$partidos', as: 'partido', in: { fecha: '$$partido.fecha', fase: '$$partido.fase', goles_local: '$$partido.goles_local', goles_visitante: '$$partido.goles_visitante' } } }, estadio: { $arrayElemAt: ['$estadios.nombre', 0] }, capacidad: { $arrayElemAt: ['$estadios.capacidad', 0] }, latitud: '$geolocalizacion.latitud', longitud: '$geolocalizacion.longitud' } }
+    ]).toArray(), null, 2));
 
-    console.log('\n6. Coordenadas de selecciones para Google Maps');
-    console.log(await db.collection('selecciones').find({}, { projection: { nombre: 1, latitud: 1, longitud: 1 } }).toArray());
-
-    console.log('\n7. Clasificaciones con bandera y estadísticas');
-    console.log(await db.collection('clasificaciones').aggregate([
-      {
-        $lookup: {
-          from: 'selecciones',
-          localField: 'seleccionId',
-          foreignField: '_id',
-          as: 'seleccion'
-        }
-      },
+    console.log('\n4. Tabla de grupos');
+    console.log(JSON.stringify(await db.collection('clasificaciones').aggregate([
+      { $lookup: { from: 'selecciones', localField: 'seleccion_id', foreignField: '_id', as: 'seleccion' } },
       { $unwind: '$seleccion' },
-      {
-        $project: {
-          bandera: '$seleccion.banderaUrl',
-          seleccion: '$seleccion.nombre',
-          pj: 1,
-          gf: 1,
-          gc: 1,
-          dg: 1,
-          pg: 1,
-          pe: 1,
-          pp: 1,
-          pts: 1
-        }
-      }
-    ]).toArray());
+      { $lookup: { from: 'grupos', localField: 'grupo_id', foreignField: '_id', as: 'grupo' } },
+      { $unwind: '$grupo' },
+      { $project: { _id: 0, bandera: '$seleccion.bandera_url', seleccion: '$seleccion.nombre', grupo: '$grupo.nombre', pj: 1, pg: 1, pe: 1, pp: 1, gf: 1, gc: 1, dg: 1, pts: 1 } },
+      { $sort: { grupo: 1, pts: -1 } }
+    ]).toArray(), null, 2));
 
-    console.log('\n8. Relación boletos, selección y estadio');
-    console.log(await db.collection('boletos').aggregate([
-      {
-        $lookup: {
-          from: 'selecciones',
-          localField: 'seleccionId',
-          foreignField: '_id',
-          as: 'seleccion'
-        }
-      },
+    console.log('\n5. Consulta general de boletos');
+    console.log(JSON.stringify(await db.collection('boletos').aggregate([
+      { $lookup: { from: 'selecciones', localField: 'seleccion_id', foreignField: '_id', as: 'seleccion' } },
       { $unwind: '$seleccion' },
-      {
-        $lookup: {
-          from: 'continentes',
-          localField: 'seleccion.continenteId',
-          foreignField: '_id',
-          as: 'continente'
-        }
-      },
+      { $lookup: { from: 'continentes', localField: 'seleccion.continente_id', foreignField: '_id', as: 'continente' } },
       { $unwind: '$continente' },
-      {
-        $lookup: {
-          from: 'estadios',
-          localField: 'estadioId',
-          foreignField: '_id',
-          as: 'estadio'
-        }
-      },
+      { $lookup: { from: 'estadios', localField: 'estadio_id', foreignField: '_id', as: 'estadio' } },
       { $unwind: '$estadio' },
-      {
-        $project: {
-          continente: '$continente.nombre',
-          confederacion: '$continente.confederacion',
-          seleccion: '$seleccion.nombre',
-          estadio: '$estadio.nombre',
-          latitud: '$estadio.latitud',
-          longitud: '$estadio.longitud',
-          capacidad: '$estadio.capacidad',
-          fecha: 1,
-          horario: 1,
-          costo: '$costo'
-        }
-      }
-    ]).toArray());
+      { $project: { _id: 0, continente: '$continente.continente', confederacion: '$continente.confederacion', seleccion: '$seleccion.nombre', estadio: '$estadio.nombre', latitud: '$estadio.latitud', longitud: '$estadio.longitud', capacidad: '$estadio.capacidad', fecha: 1, horario: 1, costo: 1 } }
+    ]).toArray(), null, 2));
 
-    console.log('\n9. Top 5 estadios donde las selecciones locales metieron más goles');
-    console.log(await db.collection('partidos').aggregate([
-      {
-        $group: {
-          _id: '$estadioId',
-          golesLocalTotales: { $sum: '$goles_local' }
-        }
-      },
-      {
-        $lookup: {
-          from: 'estadios',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'estadio'
-        }
-      },
+    console.log('\n6. Top 5 estadios con más goles locales');
+    console.log(JSON.stringify(await db.collection('partidos').aggregate([
+      { $group: { _id: '$estadio_id', goles_locales: { $sum: '$goles_local' } } },
+      { $lookup: { from: 'estadios', localField: '_id', foreignField: '_id', as: 'estadio' } },
       { $unwind: '$estadio' },
-      {
-        $project: {
-          estadio: '$estadio.nombre',
-          ciudad: '$estadio.ciudad',
-          pais: '$estadio.pais',
-          golesLocalTotales: 1
-        }
-      },
-      { $sort: { golesLocalTotales: -1 } },
+      { $project: { _id: 0, estadio: '$estadio.nombre', ciudad: '$estadio.ciudad', goles_locales: 1 } },
+      { $sort: { goles_locales: -1 } },
       { $limit: 5 }
-    ]).toArray());
+    ]).toArray(), null, 2));
 
-    console.log('\nConsultas adicionales ejecutadas correctamente.');
+    console.log('\n7. Promedio de costo de boletos por selección');
+    console.log(JSON.stringify(await db.collection('boletos').aggregate([
+      { $lookup: { from: 'selecciones', localField: 'seleccion_id', foreignField: '_id', as: 'seleccion' } },
+      { $unwind: '$seleccion' },
+      { $group: { _id: '$seleccion.nombre', promedio_costo: { $avg: '$costo' }, boletos: { $sum: 1 } } },
+      { $sort: { promedio_costo: -1 } }
+    ]).toArray(), null, 2));
+
+    console.log('\n8. Selecciones eliminadas en dieciseisavos');
+    console.log(JSON.stringify(await db.collection('partidos').aggregate([
+      { $match: { fase: 'Dieciseisavos' } },
+      { $project: { _id: 0, local_id: '$equipo_local_id', visitante_id: '$equipo_visitante_id', goles_local: 1, goles_visitante: 1 } },
+      { $lookup: { from: 'selecciones', localField: 'local_id', foreignField: '_id', as: 'local' } },
+      { $unwind: '$local' },
+      { $lookup: { from: 'selecciones', localField: 'visitante_id', foreignField: '_id', as: 'visitante' } },
+      { $unwind: '$visitante' },
+      { $project: { local: '$local.nombre', visitante: '$visitante.nombre', goles_local: 1, goles_visitante: 1, eliminado: { $cond: [{ $gt: ['$goles_local', '$goles_visitante'] }, '$visitante.nombre', '$local.nombre'] } } }
+    ]).toArray(), null, 2));
+
+    console.log('\n9. Clasificación general por puntos');
+    console.log(JSON.stringify(await db.collection('clasificaciones').aggregate([
+      { $lookup: { from: 'selecciones', localField: 'seleccion_id', foreignField: '_id', as: 'seleccion' } },
+      { $unwind: '$seleccion' },
+      { $project: { _id: 0, seleccion: '$seleccion.nombre', pts: 1 } },
+      { $sort: { pts: -1 } }
+    ]).toArray(), null, 2));
+
+    console.log('\n10. Próximos partidos por fecha');
+    console.log(JSON.stringify(await db.collection('partidos').aggregate([
+      { $sort: { fecha: 1 } },
+      { $limit: 5 },
+      { $lookup: { from: 'selecciones', localField: 'equipo_local_id', foreignField: '_id', as: 'local' } },
+      { $unwind: '$local' },
+      { $lookup: { from: 'selecciones', localField: 'equipo_visitante_id', foreignField: '_id', as: 'visitante' } },
+      { $unwind: '$visitante' },
+      { $project: { _id: 0, fecha: 1, fase: 1, local: '$local.nombre', visitante: '$visitante.nombre', goles_local: 1, goles_visitante: 1 } }
+    ]).toArray(), null, 2));
   } catch (error) {
     console.error('Error al ejecutar consultas:', error);
   } finally {
