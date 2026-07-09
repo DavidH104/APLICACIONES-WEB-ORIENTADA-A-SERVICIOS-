@@ -110,6 +110,8 @@ button {
 button:hover:not(:disabled) { background-color: #2980b9; }
 button:disabled { background-color: #95a5a6; cursor: not-allowed; }
 
+.hidden { display: none !important; }
+
 .card {
     background: white;
     padding: 15px;
@@ -117,9 +119,144 @@ button:disabled { background-color: #95a5a6; cursor: not-allowed; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.card.hidden { display: none; }
 .card.promo { background-color: #f1c40f; color: #333; border-left: 5px solid #e67e22; }
 .card.geo { background-color: #e8f8f5; border-left: 5px solid #1abc9c; font-size: 0.9em; }
+
+.admin-login-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    border-radius: 999px;
+    padding: 0.75rem 1.1rem;
+    background-color: rgba(255,255,255,0.18);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.75);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+
+.admin-modal-content {
+    background: white;
+    border-radius: 14px;
+    max-width: 420px;
+    width: 100%;
+    padding: 28px 24px;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.2);
+}
+
+.admin-modal-content h2 {
+    margin-bottom: 18px;
+    font-size: 1.45rem;
+    color: #0f172a;
+}
+
+.admin-modal-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.admin-modal-content input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.admin-form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.admin-form-actions button {
+    flex: 1 1 48%;
+}
+
+.admin-form-actions .secondary {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.admin-panel {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.admin-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.admin-panel-header h2 {
+    margin-bottom: 6px;
+}
+
+.btn-logout-admin {
+    background-color: #ef4444;
+    border-radius: 999px;
+    padding: 0.85rem 1.1rem;
+}
+
+.btn-logout-admin:hover {
+    background-color: #dc2626;
+}
+
+.admin-matches {
+    display: grid;
+    gap: 16px;
+}
+
+.admin-match-form {
+    display: grid;
+    gap: 10px;
+}
+
+.admin-match-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.92rem;
+    color: #0f172a;
+}
+
+.admin-match-form input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+}
+
+.admin-match-form button {
+    width: fit-content;
+    align-self: flex-start;
+    background-color: #10b981;
+    border: none;
+}
+
+.admin-match-form button:hover {
+    background-color: #059669;
+}
 
 h2, h3 { margin-bottom: 10px; }
 
@@ -366,4 +503,23 @@ tr:nth-child(even) td {
     #map { height: 400px; }
     .standings-grid { grid-template-columns: 1fr; }
     .results-grid { grid-template-columns: 1fr; }
+}
+
+.admin-qualified {
+    display: grid;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.qualified-list {
+    display: grid;
+    gap: 8px;
+}
+
+.qualified-item {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
 }

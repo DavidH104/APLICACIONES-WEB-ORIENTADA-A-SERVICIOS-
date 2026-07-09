@@ -13,14 +13,32 @@
 <body>
     <header class="hero-header">
         <div class="hero-brand">
-            <img src="assets/fifa-world-cup-2026-logo.svg" alt="Logo oficial de la Copa del Mundo FIFA 2026" class="hero-logo">
+            <img src="assets/fifa-world-cup-2026ffpapa.svg" alt="Logo oficial de la Copa del Mundo FIFA 2026" class="hero-logo">
             <div class="hero-copy">
                 <p class="hero-kicker">Mundial 2026</p>
                 <h1>Ruta al Estadio</h1>
                 <p>Encuentra a tu equipo, descubre promociones y genera tu ruta con una experiencia premium.</p>
             </div>
         </div>
+        <button id="btn-admin-login" class="admin-login-btn" type="button">Panel admin</button>
     </header>
+
+    <div id="admin-modal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <h2>Acceso administrador</h2>
+            <form id="admin-login-form">
+                <label for="admin-user">Usuario</label>
+                <input id="admin-user" name="usuario" type="text" placeholder="admin@mundial.local" required>
+                <label for="admin-password">Contraseña</label>
+                <input id="admin-password" name="password" type="password" placeholder="********" required>
+                <div class="admin-form-actions">
+                    <button type="submit">Entrar</button>
+                    <button id="btn-close-admin" type="button" class="secondary">Cancelar</button>
+                </div>
+                <p class="admin-login-note">Usa credenciales de administrador para acceder al panel de resultados.</p>
+            </form>
+        </div>
+    </div>
 
     <main class="container">
         <section class="controls-panel">
@@ -29,6 +47,7 @@
                 <select id="select-equipo">
                     <option value="" disabled selected>Cargando equipos...</option>
                 </select>
+                <div id="catalog-status" class="catalog-status" aria-live="polite"></div>
                 <button id="btn-trazar-ruta" disabled>📍 Trazar Ruta desde mi Ubicación</button>
             </div>
 
@@ -62,6 +81,18 @@
             <div id="map"></div>
         </section>
     </main>
+
+    <section id="admin-panel" class="admin-panel hidden">
+        <div class="admin-panel-header">
+            <div>
+                <h2>Panel de administración</h2>
+                <p>Actualiza los goles de los partidos de fase de grupos y recalcula la tabla automáticamente.</p>
+            </div>
+            <button id="btn-logout-admin" class="btn-logout-admin" type="button">Cerrar sesión</button>
+        </div>
+        <div id="admin-matches" class="admin-matches"></div>
+        <div id="admin-qualified" class="admin-qualified"></div>
+    </section>
 
     <section class="standings-section">
         <div class="standings-header">
