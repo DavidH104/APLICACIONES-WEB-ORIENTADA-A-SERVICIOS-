@@ -523,3 +523,161 @@ tr:nth-child(even) td {
     color: #0f172a;
     border: 1px solid #e2e8f0;
 }
+
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 18px 0 12px;
+    flex-wrap: wrap;
+}
+
+.admin-tab {
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    color: #0f172a;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.admin-tab.active {
+    background: #1f6fbe;
+    color: white;
+    border-color: #1f6fbe;
+}
+
+.admin-tab-content {
+    display: block;
+}
+
+.admin-tab-content.hidden {
+    display: none;
+}
+
+.admin-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    margin-bottom: 18px;
+}
+
+.admin-form {
+    display: grid;
+    gap: 12px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: 700;
+    color: #334155;
+    font-size: 0.92rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #0f172a;
+}
+
+.btn-primary {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #059669;
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+.admin-list {
+    display: grid;
+    gap: 12px;
+}
+
+.admin-item {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-item-title {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.admin-item-meta {
+    color: #475569;
+    font-size: 0.92rem;
+}
+
+.admin-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-item-actions button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background-color: #2563eb;
+}
+
+.btn-edit:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-delete {
+    background-color: #ef4444;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+}
+
+.admin-matches {
+    display: grid;
+    gap: 16px;
+}

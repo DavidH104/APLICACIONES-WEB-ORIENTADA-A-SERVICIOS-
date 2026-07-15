@@ -452,6 +452,23 @@ const server = http.createServer(async (req, res) => {
         sendJson(res, 200, payload);
         return;
       }
+
+      if (url.pathname === '/api/admin/opciones-select') {
+        const selecciones = await db.collection('selecciones').find({}).sort({ nombre: 1 }).toArray();
+        const estadios = await db.collection('estadios').find({}).sort({ nombre: 1 }).toArray();
+        const fases = await db.collection('fase_final').find({}).sort({ nombre: 1 }).toArray();
+        const grupos = await db.collection('grupos').find({}).sort({ nombre: 1 }).toArray();
+        const continentes = await db.collection('continentes').find({}).sort({ nombre: 1 }).toArray();
+
+        sendJson(res, 200, {
+          selecciones: selecciones.map(s => ({ id: s._id.toString(), nombre: s.nombre, grupoId: s.grupoId, continenteId: s.continenteId })),
+          estadios: estadios.map(e => ({ id: e._id.toString(), nombre: e.nombre, ciudad: e.ciudad })),
+          fases: fases.map(f => ({ id: f._id.toString(), nombre: f.nombre })),
+          grupos: grupos.map(g => ({ id: g._id.toString(), nombre: g.nombre })),
+          continentes: continentes.map(c => ({ id: c._id.toString(), nombre: c.nombre, confederacion: c.confederacion }))
+        });
+        return;
+      }
     }
 
     // --- MANEJO DE RUTAS POST ---
@@ -478,6 +495,71 @@ const server = http.createServer(async (req, res) => {
         } else {
           sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
         }
+        return;
+      }
+
+      if (url.pathname === '/api/admin/partidos') {
+        const body = await parseJsonBody(req);
+        const { faseId, equipo_localId, equipo_visitanteId, goles_local, goles_visitante, fecha, estadioId, horario } = body;
+        if (!faseId || !equipo_localId || !equipo_visitanteId || !fecha || !estadioId) {
+          sendJson(res, 400, { error: 'Faltan campos obligatorios: faseId, equipo_localId, equipo_visitanteId, fecha, estadioId' });
+          return;
+        }
+        const result = await db.collection('partidos').insertOne({
+          faseId: new ObjectId(faseId),
+          equipo_localId: new ObjectId(equipo_localId),
+          equipo_visitanteId: new ObjectId(equipo_visitanteId),
+          goles_local: Number(goles_local ?? 0),
+          goles_visitante: Number(goles_visitante ?? 0),
+          fecha: new Date(fecha),
+          estadioId: new ObjectId(estadioId),
+          horario: typeof horario === 'string' ? horario : new Date(fecha).toISOString().slice(11, 16)
+        });
+        await recalculateGroupClasification(db);
+        sendJson(res, 201, { id: result.insertedId.toString(), message: 'Partido creado' });
+        return;
+      }
+
+      if (url.pathname === '/api/admin/selecciones') {
+        const body = await parseJsonBody(req);
+        const { nombre, pais, continenteId, grupoId, historia, ventajas, desventajas, ranking, banderaUrl, latitud, longitud } = body;
+        if (!nombre || !pais || !continenteId || !grupoId) {
+          sendJson(res, 400, { error: 'Faltan campos obligatorios: nombre, pais, continenteId, grupoId' });
+          return;
+        }
+        const result = await db.collection('selecciones').insertOne({
+          nombre,
+          pais,
+          continenteId: new ObjectId(continenteId),
+          grupoId: new ObjectId(grupoId),
+          historia: historia || '',
+          ventajas: ventajas || '',
+          desventajas: desventajas || '',
+          ranking: Number(ranking || 0),
+          banderaUrl: banderaUrl || '',
+          latitud: Number(latitud || 0),
+          longitud: Number(longitud || 0)
+        });
+        sendJson(res, 201, { id: result.insertedId.toString(), message: 'Selección creada' });
+        return;
+      }
+
+      if (url.pathname === '/api/admin/estadios') {
+        const body = await parseJsonBody(req);
+        const { nombre, ciudad, pais, latitud, longitud, capacidad } = body;
+        if (!nombre || !ciudad || !pais || latitud === undefined || longitud === undefined || capacidad === undefined) {
+          sendJson(res, 400, { error: 'Faltan campos obligatorios: nombre, ciudad, pais, latitud, longitud, capacidad' });
+          return;
+        }
+        const result = await db.collection('estadios').insertOne({
+          nombre,
+          ciudad,
+          pais,
+          latitud: Number(latitud),
+          longitud: Number(longitud),
+          capacidad: Number(capacidad)
+        });
+        sendJson(res, 201, { id: result.insertedId.toString(), message: 'Estadio creado' });
         return;
       }
     }
@@ -509,6 +591,148 @@ const server = http.createServer(async (req, res) => {
 
         await recalculateGroupClasification(db);
         sendJson(res, 200, { message: 'Marcador actualizado y clasificación recálculada' });
+        return;
+      }
+
+      const partidoMatch = url.pathname.match(/^\/api\/admin\/partidos\/([^/]+)$/);
+      if (partidoMatch) {
+        const partidoId = partidoMatch[1];
+        const body = await parseJsonBody(req);
+        const updateFields = {};
+        if (body.faseId) updateFields.faseId = new ObjectId(body.faseId);
+        if (body.equipo_localId) updateFields.equipo_localId = new ObjectId(body.equipo_localId);
+        if (body.equipo_visitanteId) updateFields.equipo_visitanteId = new ObjectId(body.equipo_visitanteId);
+        if (body.goles_local !== undefined) updateFields.goles_local = Number(body.goles_local);
+        if (body.goles_visitante !== undefined) updateFields.goles_visitante = Number(body.goles_visitante);
+        if (body.fecha) updateFields.fecha = new Date(body.fecha);
+        if (body.estadioId) updateFields.estadioId = new ObjectId(body.estadioId);
+        if (body.horario) updateFields.horario = body.horario;
+
+        if (!ObjectId.isValid(partidoId)) {
+          sendJson(res, 400, { error: 'ID de partido inválido' });
+          return;
+        }
+
+        const updateResult = await db.collection('partidos').updateOne(
+          { _id: new ObjectId(partidoId) },
+          { $set: updateFields }
+        );
+
+        if (updateResult.matchedCount === 0) {
+          sendJson(res, 404, { error: 'Partido no encontrado' });
+          return;
+        }
+
+        await recalculateGroupClasification(db);
+        sendJson(res, 200, { message: 'Partido actualizado' });
+        return;
+      }
+
+      const seleccionMatch = url.pathname.match(/^\/api\/admin\/selecciones\/([^/]+)$/);
+      if (seleccionMatch) {
+        const seleccionId = seleccionMatch[1];
+        const body = await parseJsonBody(req);
+        const updateFields = {};
+        if (body.nombre) updateFields.nombre = body.nombre;
+        if (body.pais) updateFields.pais = body.pais;
+        if (body.continenteId) updateFields.continenteId = new ObjectId(body.continenteId);
+        if (body.grupoId) updateFields.grupoId = new ObjectId(body.grupoId);
+        if (body.historia !== undefined) updateFields.historia = body.historia;
+        if (body.ventajas !== undefined) updateFields.ventajas = body.ventajas;
+        if (body.desventajas !== undefined) updateFields.desventajas = body.desventajas;
+        if (body.ranking !== undefined) updateFields.ranking = Number(body.ranking);
+        if (body.banderaUrl !== undefined) updateFields.banderaUrl = body.banderaUrl;
+        if (body.latitud !== undefined) updateFields.latitud = Number(body.latitud);
+        if (body.longitud !== undefined) updateFields.longitud = Number(body.longitud);
+
+        if (!ObjectId.isValid(seleccionId)) {
+          sendJson(res, 400, { error: 'ID de selección inválido' });
+          return;
+        }
+
+        const updateResult = await db.collection('selecciones').updateOne(
+          { _id: new ObjectId(seleccionId) },
+          { $set: updateFields }
+        );
+
+        if (updateResult.matchedCount === 0) {
+          sendJson(res, 404, { error: 'Selección no encontrada' });
+          return;
+        }
+
+        sendJson(res, 200, { message: 'Selección actualizada' });
+        return;
+      }
+
+      const estadioMatch = url.pathname.match(/^\/api\/admin\/estadios\/([^/]+)$/);
+      if (estadioMatch) {
+        const estadioId = estadioMatch[1];
+        const body = await parseJsonBody(req);
+        const updateFields = {};
+        if (body.nombre) updateFields.nombre = body.nombre;
+        if (body.ciudad) updateFields.ciudad = body.ciudad;
+        if (body.pais) updateFields.pais = body.pais;
+        if (body.latitud !== undefined) updateFields.latitud = Number(body.latitud);
+        if (body.longitud !== undefined) updateFields.longitud = Number(body.longitud);
+        if (body.capacidad !== undefined) updateFields.capacidad = Number(body.capacidad);
+
+        if (!ObjectId.isValid(estadioId)) {
+          sendJson(res, 400, { error: 'ID de estadio inválido' });
+          return;
+        }
+
+        const updateResult = await db.collection('estadios').updateOne(
+          { _id: new ObjectId(estadioId) },
+          { $set: updateFields }
+        );
+
+        if (updateResult.matchedCount === 0) {
+          sendJson(res, 404, { error: 'Estadio no encontrado' });
+          return;
+        }
+
+        sendJson(res, 200, { message: 'Estadio actualizado' });
+        return;
+      }
+    }
+
+    // --- MANEJO DE RUTAS DELETE ---
+    if (req.method === 'DELETE') {
+      const partidoMatch = url.pathname.match(/^\/api\/admin\/partidos\/([^/]+)$/);
+      if (partidoMatch) {
+        const partidoId = partidoMatch[1];
+        if (!ObjectId.isValid(partidoId)) {
+          sendJson(res, 400, { error: 'ID de partido inválido' });
+          return;
+        }
+        await db.collection('partidos').deleteOne({ _id: new ObjectId(partidoId) });
+        await recalculateGroupClasification(db);
+        sendJson(res, 200, { message: 'Partido eliminado' });
+        return;
+      }
+
+      const seleccionMatch = url.pathname.match(/^\/api\/admin\/selecciones\/([^/]+)$/);
+      if (seleccionMatch) {
+        const seleccionId = seleccionMatch[1];
+        if (!ObjectId.isValid(seleccionId)) {
+          sendJson(res, 400, { error: 'ID de selección inválido' });
+          return;
+        }
+        await db.collection('selecciones').deleteOne({ _id: new ObjectId(seleccionId) });
+        await db.collection('clasificaciones').deleteMany({ seleccionId: new ObjectId(seleccionId) });
+        sendJson(res, 200, { message: 'Selección eliminada' });
+        return;
+      }
+
+      const estadioMatch = url.pathname.match(/^\/api\/admin\/estadios\/([^/]+)$/);
+      if (estadioMatch) {
+        const estadioId = estadioMatch[1];
+        if (!ObjectId.isValid(estadioId)) {
+          sendJson(res, 400, { error: 'ID de estadio inválido' });
+          return;
+        }
+        await db.collection('estadios').deleteOne({ _id: new ObjectId(estadioId) });
+        sendJson(res, 200, { message: 'Estadio eliminado' });
         return;
       }
     }

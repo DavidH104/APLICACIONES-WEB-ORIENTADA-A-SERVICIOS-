@@ -42,8 +42,6 @@ const adminModal = document.getElementById('admin-modal');
 const btnCloseAdmin = document.getElementById('btn-close-admin');
 const adminLoginForm = document.getElementById('admin-login-form');
 const adminPanel = document.getElementById('admin-panel');
-const adminMatchesContainer = document.getElementById('admin-matches');
-const adminQualifiedContainer = document.getElementById('admin-qualified');
 const btnLogoutAdmin = document.getElementById('btn-logout-admin');
 let instructionsVisible = true;
 let adminLoggedIn = false;
@@ -197,150 +195,6 @@ async function fetchClasificaciones() {
 async function loadStandings() {
     const clasificaciones = await fetchClasificaciones();
     renderStandings(clasificaciones);
-}
-
-function showAdminModal() { adminModal.classList.remove('hidden'); }
-function hideAdminModal() { adminModal.classList.add('hidden'); }
-function showAdminPanel() { adminPanel.classList.remove('hidden'); adminLoggedIn = true; }
-function hideAdminPanel() { adminPanel.classList.add('hidden'); adminLoggedIn = false; }
-
-btnAdminLogin.addEventListener('click', showAdminModal);
-btnCloseAdmin.addEventListener('click', hideAdminModal);
-btnLogoutAdmin.addEventListener('click', () => {
-    hideAdminPanel();
-});
-
-adminLoginForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const user = adminLoginForm.usuario.value.trim();
-    const password = adminLoginForm.password.value.trim();
-    try {
-        const resp = await fetch('/api/admin/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuario: user, password })
-        });
-        if (!resp.ok) {
-            const err = await resp.json().catch(() => ({}));
-            alert(err.error || 'Credenciales inválidas');
-            return;
-        }
-        const data = await resp.json();
-        if (data.ok) {
-            hideAdminModal();
-            showAdminPanel();
-            await Promise.all([loadAdminMatches(), loadQualifiedTeams()]);
-        } else {
-            alert('Credenciales inválidas');
-        }
-    } catch (err) {
-        console.error('Error en login admin:', err);
-        alert('Error al autenticar. Revisa la consola.');
-    }
-});
-
-async function loadAdminMatches() {
-    try {
-        const response = await fetch('/api/admin/partidos-fase-grupos');
-        if (!response.ok) throw new Error('Error al cargar partidos de fase de grupos');
-        const partidos = await response.json();
-        renderAdminMatches(partidos);
-    } catch (error) {
-        console.error(error);
-        adminMatchesContainer.innerHTML = '<div class="stadium-card">No se pudieron cargar los partidos.</div>';
-    }
-}
-
-async function loadQualifiedTeams() {
-    try {
-        const response = await fetch('/api/admin/qualificados');
-        if (!response.ok) throw new Error('Error al cargar equipos clasificados');
-        const data = await response.json();
-        renderQualifiedTeams(data);
-    } catch (error) {
-        console.error(error);
-        adminQualifiedContainer.innerHTML = '<div class="stadium-card">No se pudieron cargar los equipos clasificados.</div>';
-    }
-}
-
-function renderQualifiedTeams(data) {
-    adminQualifiedContainer.innerHTML = '';
-    if (!data || (!Array.isArray(data.directos) && !Array.isArray(data.mejoresTerceros))) {
-        adminQualifiedContainer.innerHTML = '<div class="stadium-card">No hay equipos clasificados disponibles.</div>';
-        return;
-    }
-
-    const directosCard = document.createElement('article');
-    directosCard.className = 'stadium-card';
-    directosCard.innerHTML = '<h3>Clasificados Directos (Top 2 por grupo)</h3>';
-    const directosList = document.createElement('div');
-    directosList.className = 'qualified-list';
-    data.directos.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'qualified-item';
-        itemEl.textContent = `${item.grupo} - ${item.posicion}°: ${item.nombre} (${item.pts} pts, DG ${item.dg})`;
-        directosList.appendChild(itemEl);
-    });
-    directosCard.appendChild(directosList);
-
-    const tercerosCard = document.createElement('article');
-    tercerosCard.className = 'stadium-card';
-    tercerosCard.innerHTML = '<h3>8 Mejores Terceros</h3>';
-    const tercerosList = document.createElement('div');
-    tercerosList.className = 'qualified-list';
-    data.mejoresTerceros.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'qualified-item';
-        itemEl.textContent = `${item.grupo} - ${item.nombre} (${item.pts} pts, DG ${item.dg}, GF ${item.gf})`;
-        tercerosList.appendChild(itemEl);
-    });
-    tercerosCard.appendChild(tercerosList);
-
-    adminQualifiedContainer.append(directosCard, tercerosCard);
-}
-
-function renderAdminMatches(partidos) {
-    adminMatchesContainer.innerHTML = '';
-    if (!Array.isArray(partidos) || partidos.length === 0) {
-        adminMatchesContainer.innerHTML = '<div class="stadium-card">No hay partidos de fase de grupos disponibles.</div>';
-        return;
-    }
-
-    partidos.forEach(partido => {
-        const card = document.createElement('article'); card.className = 'stadium-card';
-        const title = document.createElement('h3'); title.textContent = `${partido.local.nombre} vs ${partido.visitante.nombre}`;
-        const info = document.createElement('p'); info.textContent = `Grupo ${partido.grupo} · ${new Date(partido.fecha).toLocaleString()} · ${partido.estadio.nombre}`;
-        const form = document.createElement('div'); form.className = 'admin-match-form';
-        form.innerHTML = `
-            <label>Goles ${partido.local.nombre}: <input type="number" min="0" value="${partido.goles_local ?? 0}" data-role="local" /></label>
-            <label>Goles ${partido.visitante.nombre}: <input type="number" min="0" value="${partido.goles_visitante ?? 0}" data-role="visitante" /></label>
-            <button class="btn-primary">Actualizar</button>
-        `;
-        const btn = form.querySelector('button');
-        btn.addEventListener('click', async () => {
-            const golesLocal = Number(form.querySelector('input[data-role="local"]').value);
-            const golesVisitante = Number(form.querySelector('input[data-role="visitante"]').value);
-            await updateMatchScore(partido.id, golesLocal, golesVisitante);
-        });
-        card.append(title, info, form);
-        adminMatchesContainer.appendChild(card);
-    });
-}
-
-async function updateMatchScore(matchId, golesLocal, golesVisitante) {
-    try {
-        const response = await fetch(`/api/partidos/${matchId}/score`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ goles_local: golesLocal, goles_visitante: golesVisitante })
-        });
-        if (!response.ok) throw new Error('No se pudo actualizar el partido');
-        alert('Partido actualizado con éxito. Clasificación recalculada.');
-        await Promise.all([loadAdminMatches(), loadStandings(), loadQualifiedTeams()]);
-    } catch (error) {
-        console.error(error);
-        alert('Error actualizando el partido. Revisa la consola.');
-    }
 }
 
 function mostrarMarcadorEstadio(equipo){ const lat = equipo.getLat(), lng = equipo.getLng(); if (stadiumMarker) map.removeLayer(stadiumMarker); stadiumMarker = L.marker([lat,lng]).addTo(map).bindPopup(`<b>${equipo.nombre}</b><br>${equipo.ciudad}`).openPopup(); map.setView([lat,lng],14); }
@@ -501,5 +355,377 @@ function trazarRutaLeaflet(uLat,uLng,dLat,dLng){
     btnToggleInstructions.classList.remove('hidden');
     btnToggleInstructions.textContent = '⬇️ Ocultar instrucciones';
 }
+
+let opcionesSelect = { selecciones: [], estadios: [], fases: [], grupos: [], continentes: [] };
+
+async function cargarOpcionesAdmin() {
+    try {
+        const response = await fetch('/api/admin/opciones-select');
+        if (!response.ok) throw new Error('No se pudieron cargar opciones');
+        opcionesSelect = await response.json();
+        poblarSelects();
+    } catch (error) {
+        console.error('Error cargando opciones admin:', error);
+    }
+}
+
+function poblarSelects() {
+    const fill = (el, items, valueField = 'id', textField = 'nombre') => {
+        if (!el) return;
+        el.innerHTML = '<option value=\"\">Selecciona...</option>';
+        (items || []).forEach(item => {
+            const option = document.createElement('option');
+            option.value = item[valueField];
+            option.textContent = item[textField];
+            el.appendChild(option);
+        });
+    };
+
+    fill(document.getElementById('partido-fase'), opcionesSelect.fases);
+    fill(document.getElementById('partido-local'), opcionesSelect.selecciones);
+    fill(document.getElementById('partido-visitante'), opcionesSelect.selecciones);
+    fill(document.getElementById('partido-estadio'), opcionesSelect.estadios, 'id', 'nombre');
+    fill(document.getElementById('seleccion-continente'), opcionesSelect.continentes);
+    fill(document.getElementById('seleccion-grupo'), opcionesSelect.grupos);
+}
+
+function showAdminTab(tabName) {
+    document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabName));
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        if (!content.id) return;
+        const current = content.id.replace('admin-tab-', '');
+        content.classList.toggle('hidden', current !== tabName);
+    });
+}
+
+document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.addEventListener('click', () => showAdminTab(tab.dataset.tab));
+});
+
+async function loadAdminPartidos() {
+    try {
+        const response = await fetch('/api/admin/partidos-fase-grupos');
+        if (!response.ok) throw new Error('Error al cargar partidos');
+        const partidos = await response.json();
+        renderAdminPartidos(partidos);
+    } catch (error) {
+        console.error(error);
+        document.getElementById('admin-partidos-lista').innerHTML = '<div class=\"admin-item\">No se pudieron cargar los partidos.</div>';
+    }
+}
+
+function renderAdminPartidos(partidos) {
+    const container = document.getElementById('admin-partidos-lista');
+    container.innerHTML = '';
+    if (!Array.isArray(partidos) || partidos.length === 0) {
+        container.innerHTML = '<div class=\"admin-item\">No hay partidos.</div>';
+        return;
+    }
+    partidos.forEach(partido => {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        item.innerHTML = `
+            <div>
+                <div class=\"admin-item-title\">${partido.local.nombre} vs ${partido.visitante.nombre}</div>
+                <div class=\"admin-item-meta\">Grupo ${partido.grupo} · ${new Date(partido.fecha).toLocaleString()} · ${partido.estadio?.nombre || 'Sin estadio'} · ${partido.goles_local ?? '-'} - ${partido.goles_visitante ?? '-'}</div>
+            </div>
+            <div class=\"admin-item-actions\">
+                <button class=\"btn-edit\" data-id=\"${partido.id}\">Editar</button>
+                <button class=\"btn-delete\" data-id=\"${partido.id}\">Eliminar</button>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+
+    container.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => editarPartido(btn.dataset.id));
+    });
+    container.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('¿Eliminar este partido?')) return;
+            const res = await fetch(`/api/admin/partidos/${btn.dataset.id}`, { method: 'DELETE' });
+            if (!res.ok) return alert('No se pudo eliminar');
+            alert('Partido eliminado');
+            await Promise.all([loadAdminPartidos(), loadStandings()]);
+        });
+    });
+}
+
+async function editarPartido(id) {
+    const response = await fetch('/api/admin/partidos-fase-grupos');
+    const partidos = await response.json();
+    const partido = partidos.find(p => p.id === id);
+    if (!partido) return alert('Partido no encontrado');
+
+    document.getElementById('partido-id').value = partido.id;
+    document.getElementById('partido-fase').value = partido.fase || '';
+    document.getElementById('partido-fecha').value = new Date(partido.fecha).toISOString().slice(0, 16);
+    document.getElementById('partido-horario').value = partido.horario || '';
+    document.getElementById('partido-local').value = partido.local?.id || '';
+    document.getElementById('partido-visitante').value = partido.visitante?.id || '';
+    document.getElementById('partido-estadio').value = partido.estadio?.id || '';
+    document.getElementById('partido-goles-local').value = partido.goles_local ?? 0;
+    document.getElementById('partido-goles-visitante').value = partido.goles_visitante ?? 0;
+    showAdminTab('partidos');
+}
+
+document.getElementById('form-partido').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('partido-id').value;
+    const body = {
+        faseId: document.getElementById('partido-fase').value,
+        equipo_localId: document.getElementById('partido-local').value,
+        equipo_visitanteId: document.getElementById('partido-visitante').value,
+        estadioId: document.getElementById('partido-estadio').value,
+        fecha: document.getElementById('partido-fecha').value,
+        horario: document.getElementById('partido-horario').value,
+        goles_local: Number(document.getElementById('partido-goles-local').value),
+        goles_visitante: Number(document.getElementById('partido-goles-visitante').value)
+    };
+
+    const method = id ? 'PATCH' : 'POST';
+    const url = id ? `/api/admin/partidos/${id}` : '/api/admin/partidos';
+    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) return alert('No se pudo guardar el partido');
+    alert(id ? 'Partido actualizado' : 'Partido creado');
+    document.getElementById('form-partido').reset();
+    document.getElementById('partido-id').value = '';
+            await Promise.all([loadAdminPartidos(), loadStandings()]);
+});
+
+document.getElementById('btn-cancelar-partido').addEventListener('click', () => {
+    document.getElementById('form-partido').reset();
+    document.getElementById('partido-id').value = '';
+});
+
+async function loadAdminSelecciones() {
+    try {
+        const response = await fetch('/api/selecciones');
+        const selecciones = await response.json();
+        renderAdminSelecciones(selecciones);
+    } catch (error) {
+        console.error(error);
+        document.getElementById('admin-selecciones-lista').innerHTML = '<div class=\"admin-item\">No se pudieron cargar las selecciones.</div>';
+    }
+}
+
+function renderAdminSelecciones(selecciones) {
+    const container = document.getElementById('admin-selecciones-lista');
+    container.innerHTML = '';
+    if (!Array.isArray(selecciones) || selecciones.length === 0) {
+        container.innerHTML = '<div class=\"admin-item\">No hay selecciones.</div>';
+        return;
+    }
+    selecciones.forEach(sel => {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        item.innerHTML = `
+            <div>
+                <div class=\"admin-item-title\">${sel.nombre}</div>
+                <div class=\"admin-item-meta\">${sel.pais} · ${sel.continente || ''} · Grupo ${sel.grupo || ''} · Ranking ${sel.ranking ?? '-'}</div>
+            </div>
+            <div class=\"admin-item-actions\">
+                <button class=\"btn-edit\" data-id=\"${sel.id}\">Editar</button>
+                <button class=\"btn-delete\" data-id=\"${sel.id}\">Eliminar</button>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+
+    container.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const res = await fetch('/api/selecciones');
+            const all = await res.json();
+            const sel = all.find(s => s.id === btn.dataset.id);
+            if (!sel) return alert('Selección no encontrada');
+            document.getElementById('seleccion-id').value = sel.id;
+            document.getElementById('seleccion-nombre').value = sel.nombre || '';
+            document.getElementById('seleccion-pais').value = sel.pais || '';
+            document.getElementById('seleccion-ranking').value = sel.ranking ?? '';
+            document.getElementById('seleccion-historia').value = sel.historia || '';
+            document.getElementById('seleccion-ventajas').value = sel.ventajas || '';
+            document.getElementById('seleccion-desventajas').value = sel.desventajas || '';
+            document.getElementById('seleccion-bandera').value = sel.banderaUrl || '';
+            document.getElementById('seleccion-latitud').value = sel.latitud ?? '';
+            document.getElementById('seleccion-longitud').value = sel.longitud ?? '';
+            if (opcionesSelect.continentes.length) document.getElementById('seleccion-continente').value = sel.continente || '';
+            if (opcionesSelect.grupos.length) document.getElementById('seleccion-grupo').value = sel.grupo || '';
+            showAdminTab('selecciones');
+        });
+    });
+
+    container.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('¿Eliminar esta selección?')) return;
+            const res = await fetch(`/api/admin/selecciones/${btn.dataset.id}`, { method: 'DELETE' });
+            if (!res.ok) return alert('No se pudo eliminar');
+            alert('Selección eliminada');
+            await Promise.all([loadAdminSelecciones(), loadStandings()]);
+        });
+    });
+}
+
+document.getElementById('form-seleccion').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('seleccion-id').value;
+    const body = {
+        nombre: document.getElementById('seleccion-nombre').value,
+        pais: document.getElementById('seleccion-pais').value,
+        ranking: document.getElementById('seleccion-ranking').value,
+        continenteId: document.getElementById('seleccion-continente').value,
+        grupoId: document.getElementById('seleccion-grupo').value,
+        historia: document.getElementById('seleccion-historia').value,
+        ventajas: document.getElementById('seleccion-ventajas').value,
+        desventajas: document.getElementById('seleccion-desventajas').value,
+        banderaUrl: document.getElementById('seleccion-bandera').value,
+        latitud: document.getElementById('seleccion-latitud').value,
+        longitud: document.getElementById('seleccion-longitud').value
+    };
+
+    const method = id ? 'PATCH' : 'POST';
+    const url = id ? `/api/admin/selecciones/${id}` : '/api/admin/selecciones';
+    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) return alert('No se pudo guardar la selección');
+    alert(id ? 'Selección actualizada' : 'Selección creada');
+    document.getElementById('form-seleccion').reset();
+    document.getElementById('seleccion-id').value = '';
+    await Promise.all([loadAdminSelecciones(), loadStandings()]);
+});
+
+document.getElementById('btn-cancelar-seleccion').addEventListener('click', () => {
+    document.getElementById('form-seleccion').reset();
+    document.getElementById('seleccion-id').value = '';
+});
+
+async function loadAdminEstadios() {
+    try {
+        const response = await fetch('/api/estadios');
+        const estadios = await response.json();
+        renderAdminEstadios(estadios);
+    } catch (error) {
+        console.error(error);
+        document.getElementById('admin-estadios-lista').innerHTML = '<div class=\"admin-item\">No se pudieron cargar los estadios.</div>';
+    }
+}
+
+function renderAdminEstadios(estadios) {
+    const container = document.getElementById('admin-estadios-lista');
+    container.innerHTML = '';
+    if (!Array.isArray(estadios) || estadios.length === 0) {
+        container.innerHTML = '<div class=\"admin-item\">No hay estadios.</div>';
+        return;
+    }
+    estadios.forEach(est => {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        item.innerHTML = `
+            <div>
+                <div class=\"admin-item-title\">${est.nombre}</div>
+                <div class=\"admin-item-meta\">${est.ciudad}, ${est.pais} · Capacidad: ${est.capacidad ?? '-'} · Lat: ${est.latitud ?? '-'} Lng: ${est.longitud ?? '-'}</div>
+            </div>
+            <div class=\"admin-item-actions\">
+                <button class=\"btn-edit\" data-id=\"${est.id}\">Editar</button>
+                <button class=\"btn-delete\" data-id=\"${est.id}\">Eliminar</button>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+
+    container.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const res = await fetch('/api/estadios');
+            const all = await res.json();
+            const est = all.find(e => e.id === btn.dataset.id);
+            if (!est) return alert('Estadio no encontrado');
+            document.getElementById('estadio-id').value = est.id;
+            document.getElementById('estadio-nombre').value = est.nombre || '';
+            document.getElementById('estadio-ciudad').value = est.ciudad || '';
+            document.getElementById('estadio-pais').value = est.pais || '';
+            document.getElementById('estadio-latitud').value = est.latitud ?? '';
+            document.getElementById('estadio-longitud').value = est.longitud ?? '';
+            document.getElementById('estadio-capacidad').value = est.capacidad ?? '';
+            showAdminTab('estadios');
+        });
+    });
+
+    container.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('¿Eliminar este estadio?')) return;
+            const res = await fetch(`/api/admin/estadios/${btn.dataset.id}`, { method: 'DELETE' });
+            if (!res.ok) return alert('No se pudo eliminar');
+            alert('Estadio eliminado');
+            await loadAdminEstadios();
+        });
+    });
+}
+
+document.getElementById('form-estadio').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('estadio-id').value;
+    const body = {
+        nombre: document.getElementById('estadio-nombre').value,
+        ciudad: document.getElementById('estadio-ciudad').value,
+        pais: document.getElementById('estadio-pais').value,
+        latitud: document.getElementById('estadio-latitud').value,
+        longitud: document.getElementById('estadio-longitud').value,
+        capacidad: document.getElementById('estadio-capacidad').value
+    };
+
+    const method = id ? 'PATCH' : 'POST';
+    const url = id ? `/api/admin/estadios/${id}` : '/api/admin/estadios';
+    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) return alert('No se pudo guardar el estadio');
+    alert(id ? 'Estadio actualizado' : 'Estadio creado');
+    document.getElementById('form-estadio').reset();
+    document.getElementById('estadio-id').value = '';
+    await loadAdminEstadios();
+});
+
+document.getElementById('btn-cancelar-estadio').addEventListener('click', () => {
+    document.getElementById('form-estadio').reset();
+    document.getElementById('estadio-id').value = '';
+});
+
+async function showAdminPanel() {
+    adminPanel.classList.remove('hidden');
+    adminLoggedIn = true;
+    await cargarOpcionesAdmin();
+    await Promise.all([loadAdminPartidos(), loadAdminSelecciones(), loadAdminEstadios()]);
+}
+
+function hideAdminPanel() {
+    adminPanel.classList.add('hidden');
+    adminLoggedIn = false;
+}
+
+btnLogoutAdmin.addEventListener('click', hideAdminPanel);
+
+adminLoginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const user = adminLoginForm.usuario.value.trim();
+    const password = adminLoginForm.password.value.trim();
+    try {
+        const resp = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuario: user, password })
+        });
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            alert(err.error || 'Credenciales inválidas');
+            return;
+        }
+        const data = await resp.json();
+        if (data.ok) {
+            hideAdminModal();
+            await showAdminPanel();
+        } else {
+            alert('Credenciales inválidas');
+        }
+    } catch (err) {
+        console.error('Error en login admin:', err);
+        alert('Error al autenticar. Revisa la consola.');
+    }
+});
 
 window.onload = () => { initMap(); cargarServicios(); };

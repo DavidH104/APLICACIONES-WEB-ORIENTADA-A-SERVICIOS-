@@ -86,12 +86,176 @@
         <div class="admin-panel-header">
             <div>
                 <h2>Panel de administración</h2>
-                <p>Actualiza los goles de los partidos de fase de grupos y recalcula la tabla automáticamente.</p>
+                <p>Gestiona partidos, selecciones y estadios. Actualiza resultados y controla la base de datos.</p>
             </div>
             <button id="btn-logout-admin" class="btn-logout-admin" type="button">Cerrar sesión</button>
         </div>
-        <div id="admin-matches" class="admin-matches"></div>
-        <div id="admin-qualified" class="admin-qualified"></div>
+
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="partidos">Partidos</button>
+            <button class="admin-tab" data-tab="selecciones">Selecciones</button>
+            <button class="admin-tab" data-tab="estadios">Estadios</button>
+        </div>
+
+        <section id="admin-tab-partidos" class="admin-tab-content">
+            <div class="admin-card">
+                <h3>Crear / Actualizar Partido</h3>
+                <form id="form-partido" class="admin-form">
+                    <input type="hidden" id="partido-id" />
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partido-fase">Fase</label>
+                            <select id="partido-fase" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="partido-fecha">Fecha</label>
+                            <input id="partido-fecha" type="datetime-local" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="partido-horario">Horario</label>
+                            <input id="partido-horario" type="time" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partido-local">Local</label>
+                            <select id="partido-local" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="partido-visitante">Visitante</label>
+                            <select id="partido-visitante" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="partido-estadio">Estadio</label>
+                            <select id="partido-estadio" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partido-goles-local">Goles local</label>
+                            <input id="partido-goles-local" type="number" min="0" value="0" />
+                        </div>
+                        <div class="form-group">
+                            <label for="partido-goles-visitante">Goles visitante</label>
+                            <input id="partido-goles-visitante" type="number" min="0" value="0" />
+                        </div>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button type="submit" class="btn-primary">Guardar partido</button>
+                        <button type="button" id="btn-cancelar-partido" class="btn-secondary">Limpiar</button>
+                    </div>
+                </form>
+            </div>
+            <div id="admin-partidos-lista" class="admin-list"></div>
+        </section>
+
+        <section id="admin-tab-selecciones" class="admin-tab-content hidden">
+            <div class="admin-card">
+                <h3>Crear / Actualizar Selección</h3>
+                <form id="form-seleccion" class="admin-form">
+                    <input type="hidden" id="seleccion-id" />
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="seleccion-nombre">Nombre</label>
+                            <input id="seleccion-nombre" type="text" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-pais">País</label>
+                            <input id="seleccion-pais" type="text" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-ranking">Ranking</label>
+                            <input id="seleccion-ranking" type="number" min="0" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="seleccion-continente">Continente</label>
+                            <select id="seleccion-continente" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-grupo">Grupo</label>
+                            <select id="seleccion-grupo" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="seleccion-historia">Historia</label>
+                            <input id="seleccion-historia" type="text" />
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-ventajas">Ventajas</label>
+                            <input id="seleccion-ventajas" type="text" />
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-desventajas">Desventajas</label>
+                            <input id="seleccion-desventajas" type="text" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="seleccion-bandera">Bandera URL</label>
+                            <input id="seleccion-bandera" type="url" />
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-latitud">Latitud</label>
+                            <input id="seleccion-latitud" type="number" step="any" />
+                        </div>
+                        <div class="form-group">
+                            <label for="seleccion-longitud">Longitud</label>
+                            <input id="seleccion-longitud" type="number" step="any" />
+                        </div>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button type="submit" class="btn-primary">Guardar selección</button>
+                        <button type="button" id="btn-cancelar-seleccion" class="btn-secondary">Limpiar</button>
+                    </div>
+                </form>
+            </div>
+            <div id="admin-selecciones-lista" class="admin-list"></div>
+        </section>
+
+        <section id="admin-tab-estadios" class="admin-tab-content hidden">
+            <div class="admin-card">
+                <h3>Crear / Actualizar Estadio</h3>
+                <form id="form-estadio" class="admin-form">
+                    <input type="hidden" id="estadio-id" />
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estadio-nombre">Nombre</label>
+                            <input id="estadio-nombre" type="text" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="estadio-ciudad">Ciudad</label>
+                            <input id="estadio-ciudad" type="text" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="estadio-pais">País</label>
+                            <input id="estadio-pais" type="text" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estadio-latitud">Latitud</label>
+                            <input id="estadio-latitud" type="number" step="any" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="estadio-longitud">Longitud</label>
+                            <input id="estadio-longitud" type="number" step="any" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="estadio-capacidad">Capacidad</label>
+                            <input id="estadio-capacidad" type="number" min="0" required />
+                        </div>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button type="submit" class="btn-primary">Guardar estadio</button>
+                        <button type="button" id="btn-cancelar-estadio" class="btn-secondary">Limpiar</button>
+                    </div>
+                </form>
+            </div>
+            <div id="admin-estadios-lista" class="admin-list"></div>
+        </section>
     </section>
 
     <section class="standings-section">
