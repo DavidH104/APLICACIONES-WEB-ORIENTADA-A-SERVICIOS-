@@ -20,7 +20,7 @@ function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, POST',
     'Access-Control-Allow-Headers': 'Content-Type'
   });
   res.end(JSON.stringify(payload));
@@ -142,7 +142,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, POST',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end();
@@ -157,7 +157,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   try {
-    // Serve static files for non-API GET requests from the project root (one level above /mongo)
+    // Serve static files for non-API GET requests from the project root
     if (req.method === 'GET' && !url.pathname.startsWith('/api/')) {
       try {
         const __filename = fileURLToPath(import.meta.url);
@@ -203,6 +203,7 @@ const server = http.createServer(async (req, res) => {
 
     const db = await getDb();
 
+    // --- MANEJO DE RUTAS GET ---
     if (req.method === 'GET') {
       if (url.pathname === '/api/selecciones') {
         const selecciones = await db.collection('selecciones').aggregate([
@@ -250,34 +251,6 @@ const server = http.createServer(async (req, res) => {
         }));
         sendJson(res, 200, payload);
         return;
-      }
-
-      if (req.method === 'POST') {
-        if (url.pathname === '/api/admin/login') {
-          const body = await parseJsonBody(req).catch(() => ({}));
-          const usuario = (body.usuario || body.user || '').toString();
-          const password = (body.password || '').toString();
-          if (!usuario || !password) {
-            sendJson(res, 400, { error: 'Faltan credenciales' });
-            return;
-          }
-          const userDoc = await db.collection('usuarios').findOne({ usuario });
-          if (!userDoc) {
-            sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
-            return;
-          }
-          // verify password using scrypt
-          const crypto = await import('crypto');
-          const salt = userDoc.salt;
-          const derived = crypto.scryptSync(password, salt, 64, { N: 16384 });
-          const stored = Buffer.from(userDoc.passwordHash, 'hex');
-          if (crypto.timingSafeEqual(derived, stored)) {
-            sendJson(res, 200, { ok: true, usuario: userDoc.usuario, role: userDoc.role || 'admin' });
-          } else {
-            sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
-          }
-          return;
-        }
       }
 
       if (url.pathname === '/api/estadios') {
@@ -479,11 +452,37 @@ const server = http.createServer(async (req, res) => {
         sendJson(res, 200, payload);
         return;
       }
-
-      sendJson(res, 404, { error: 'Ruta no encontrada' });
-      return;
     }
 
+    // --- MANEJO DE RUTAS POST ---
+    if (req.method === 'POST') {
+      if (url.pathname === '/api/admin/login') {
+        const body = await parseJsonBody(req).catch(() => ({}));
+        const usuario = (body.usuario || body.user || '').toString();
+        const password = (body.password || '').toString();
+        if (!usuario || !password) {
+          sendJson(res, 400, { error: 'Faltan credenciales' });
+          return;
+        }
+        const userDoc = await db.collection('usuarios').findOne({ usuario });
+        if (!userDoc) {
+          sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
+          return;
+        }
+        const crypto = await import('crypto');
+        const salt = userDoc.salt;
+        const derived = crypto.scryptSync(password, salt, 64, { N: 16384 });
+        const stored = Buffer.from(userDoc.passwordHash, 'hex');
+        if (crypto.timingSafeEqual(derived, stored)) {
+          sendJson(res, 200, { ok: true, usuario: userDoc.usuario, role: userDoc.role || 'admin' });
+        } else {
+          sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
+        }
+        return;
+      }
+    }
+
+    // --- MANEJO DE RUTAS PATCH ---
     if (req.method === 'PATCH') {
       const scoreMatch = url.pathname.match(/^\/api\/partidos\/([^/]+)\/score$/);
       if (scoreMatch) {
@@ -514,6 +513,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    // Si llega aquí es una ruta de API inexistente
     sendJson(res, 404, { error: 'Ruta no encontrada' });
   } catch (error) {
     console.error('Error en API:', error);
