@@ -453,6 +453,41 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
+      if (url.pathname === '/api/clasificaciones-admin') {
+        const clasificaciones = await db.collection('clasificaciones').aggregate([
+          {
+            $lookup: { from: 'selecciones', localField: 'seleccionId', foreignField: '_id', as: 'seleccion' }
+          },
+          { $unwind: '$seleccion' },
+          {
+            $lookup: { from: 'grupos', localField: 'grupoId', foreignField: '_id', as: 'grupo' }
+          },
+          { $unwind: { path: '$grupo', preserveNullAndEmptyArrays: true } },
+          {
+            $project: {
+              _id: 1,
+              nombre: '$seleccion.nombre',
+              grupo: '$grupo.nombre',
+              pj: 1, pg: 1, pe: 1, pp: 1, gf: 1, gc: 1, dg: 1, pts: 1
+            }
+          },
+          { $sort: { grupo: 1, pts: -1, dg: -1, gf: -1, nombre: 1 } }
+        ]).toArray();
+        const payload = clasificaciones.map((item) => ({ ...item, id: item._id.toString(), _id: undefined }));
+        sendJson(res, 200, payload);
+        return;
+      }
+
+      if (url.pathname === '/api/fases') {
+        const fases = await db.collection('fase_final').find({}).sort({ fecha: 1 }).toArray();
+        const payload = fases.map((item) => {
+          const { _id, ...rest } = item;
+          return { ...rest, id: _id.toString() };
+        });
+        sendJson(res, 200, payload);
+        return;
+      }
+
       if (url.pathname === '/api/admin/opciones-select') {
         const selecciones = await db.collection('selecciones').find({}).sort({ nombre: 1 }).toArray();
         const estadios = await db.collection('estadios').find({}).sort({ nombre: 1 }).toArray();
@@ -664,34 +699,53 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-      const estadioMatch = url.pathname.match(/^\/api\/admin\/estadios\/([^/]+)$/);
-      if (estadioMatch) {
-        const estadioId = estadioMatch[1];
+      const clasificacionMatch = url.pathname.match(/^\/api\/admin\/clasificaciones\/([^/]+)$/);
+      if (clasificacionMatch) {
+        const id = clasificacionMatch[1];
+        const body = await parseJsonBody(req);
+        const updateFields = {};
+        ['pj', 'pg', 'pe', 'pp', 'gf', 'gc', 'dg', 'pts'].forEach((field) => {
+          if (body[field] !== undefined) updateFields[field] = Number(body[field]);
+        });
+        if (!ObjectId.isValid(id)) {
+          sendJson(res, 400, { error: 'ID de clasificación inválido' });
+          return;
+        }
+        const updateResult = await db.collection('clasificaciones').updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updateFields }
+        );
+        if (updateResult.matchedCount === 0) {
+          sendJson(res, 404, { error: 'Clasificación no encontrada' });
+          return;
+        }
+        sendJson(res, 200, { message: 'Tabla de posición actualizada' });
+        return;
+      }
+
+      const faseMatch = url.pathname.match(/^\/api\/admin\/fases\/([^/]+)$/);
+      if (faseMatch) {
+        const id = faseMatch[1];
         const body = await parseJsonBody(req);
         const updateFields = {};
         if (body.nombre) updateFields.nombre = body.nombre;
-        if (body.ciudad) updateFields.ciudad = body.ciudad;
-        if (body.pais) updateFields.pais = body.pais;
-        if (body.latitud !== undefined) updateFields.latitud = Number(body.latitud);
-        if (body.longitud !== undefined) updateFields.longitud = Number(body.longitud);
-        if (body.capacidad !== undefined) updateFields.capacidad = Number(body.capacidad);
-
-        if (!ObjectId.isValid(estadioId)) {
-          sendJson(res, 400, { error: 'ID de estadio inválido' });
+        if (body.clasificados !== undefined) updateFields.clasificados = body.clasificados;
+        if (body.partidos !== undefined) updateFields.partidos = Number(body.partidos);
+        if (body.sede) updateFields.sede = body.sede;
+        if (body.fecha) updateFields.fecha = new Date(body.fecha);
+        if (!ObjectId.isValid(id)) {
+          sendJson(res, 400, { error: 'ID de fase inválido' });
           return;
         }
-
-        const updateResult = await db.collection('estadios').updateOne(
-          { _id: new ObjectId(estadioId) },
+        const updateResult = await db.collection('fase_final').updateOne(
+          { _id: new ObjectId(id) },
           { $set: updateFields }
         );
-
         if (updateResult.matchedCount === 0) {
-          sendJson(res, 404, { error: 'Estadio no encontrado' });
+          sendJson(res, 404, { error: 'Fase no encontrada' });
           return;
         }
-
-        sendJson(res, 200, { message: 'Estadio actualizado' });
+        sendJson(res, 200, { message: 'Fase actualizada' });
         return;
       }
     }

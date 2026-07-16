@@ -12,7 +12,7 @@ body {
 
 header {
     background: linear-gradient(135deg, #071d3d 0%, #123b63 45%, #1f6fbe 100%);
-    color: white;
+    color: rgb(28, 96, 234);
     padding: 1.25rem 1.25rem 1.5rem;
     box-shadow: 0 12px 35px rgba(7, 29, 61, 0.25);
     width: 100%;
@@ -675,6 +675,74 @@ tr:nth-child(even) td {
 
 .btn-delete:hover {
     background-color: #dc2626;
+}
+
+.admin-edit-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.admin-edit-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-edit-fields label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.72rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+.admin-edit-fields input {
+    width: 64px;
+    padding: 6px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.admin-edit-fields input[type="text"],
+.admin-edit-fields input[type="datetime-local"] {
+    width: 160px;
+}
+
+.admin-badge {
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+}
+
+.admin-note {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.tabla-general table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-general th, .tabla-general td {
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+}
+
+.tabla-general th {
+    background: #1e293b;
+    color: white;
+}
+
+.tabla-general td:first-child, .tabla-general td:nth-child(2) {
+    text-align: left;
 }
 
 .admin-matches {

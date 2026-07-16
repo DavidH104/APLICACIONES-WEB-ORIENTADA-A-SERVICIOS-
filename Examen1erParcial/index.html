@@ -95,6 +95,8 @@
             <button class="admin-tab active" data-tab="partidos">Partidos</button>
             <button class="admin-tab" data-tab="selecciones">Selecciones</button>
             <button class="admin-tab" data-tab="estadios">Estadios</button>
+            <button class="admin-tab" data-tab="clasificaciones">Tablas</button>
+            <button class="admin-tab" data-tab="fases">Fases</button>
         </div>
 
         <section id="admin-tab-partidos" class="admin-tab-content">
@@ -256,12 +258,28 @@
             </div>
             <div id="admin-estadios-lista" class="admin-list"></div>
         </section>
+
+        <section id="admin-tab-clasificaciones" class="admin-tab-content hidden">
+            <div class="admin-card">
+                <h3>Editar Tabla de Posiciones</h3>
+                <p class="admin-note">Edita los puntos y estadísticas de cada equipo. La tabla se recalcula automáticamente al guardar un partido.</p>
+            </div>
+            <div id="admin-clasificaciones-lista" class="admin-list"></div>
+        </section>
+
+        <section id="admin-tab-fases" class="admin-tab-content hidden">
+            <div class="admin-card">
+                <h3>Editar Fases del Torneo</h3>
+                <p class="admin-note">Edita el nombre, sede, fecha y número de partidos de cada fase.</p>
+            </div>
+            <div id="admin-fases-lista" class="admin-list"></div>
+        </section>
     </section>
 
     <section class="standings-section">
         <div class="standings-header">
             <h2>📊 Tablas de Posiciones</h2>
-            <p>Estado actualizado hasta el 25 de junio de 2026.</p>
+            <p>Clasificación de los 12 grupos (A-L) actualizada al 16 de julio de 2026.</p>
         </div>
         <div id="tabla-posiciones" class="standings-grid"></div>
     </section>
@@ -285,7 +303,7 @@
     <section class="results-section">
         <div class="standings-header">
             <h2>⚽ Historial de Partidos</h2>
-            <p>Partidos disputados en la fase de grupos del Mundial 2026 hasta el 25 de junio.</p>
+            <p>Todos los partidos disputados del Mundial 2026, desde la fase de grupos hasta el 16 de julio.</p>
         </div>
         <div id="resultados-recientes" class="results-grid"></div>
     </section>

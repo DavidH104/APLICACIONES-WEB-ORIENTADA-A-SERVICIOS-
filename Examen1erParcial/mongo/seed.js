@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import crypto from 'crypto';
 
 const MONGO_URI = 'mongodb://localhost:27017';
 const DB_NAME = 'mundial2026';
@@ -192,6 +193,15 @@ async function main() {
       { usuario_id: userIds[0], estadio_id: stadiumIds['Estadio Azteca'], dia: 'Sábado', fecha: new Date('2026-06-11'), horario: '20:00', seleccion_id: selectionIds['México'], costo: 1200 },
       { usuario_id: userIds[1], estadio_id: stadiumIds['BC Place'], dia: 'Domingo', fecha: new Date('2026-06-12'), horario: '20:00', seleccion_id: selectionIds['Canadá'], costo: 950 }
     ]);
+
+    const adminSalt = crypto.randomBytes(16).toString('hex');
+    const adminPasswordHash = crypto.scryptSync('admin123', adminSalt, 64, { N: 16384 }).toString('hex');
+    await db.collection('usuarios').updateOne(
+      { usuario: 'admin@mundial.local' },
+      { $set: { usuario: 'admin@mundial.local', passwordHash: adminPasswordHash, salt: adminSalt, role: 'admin', createdAt: new Date() } },
+      { upsert: true }
+    );
+    console.log('Usuario administrador asegurado: admin@mundial.local / admin123');
 
     console.log('Datos reales sembrados correctamente.');
   } catch (error) {
