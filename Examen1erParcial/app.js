@@ -919,7 +919,23 @@ function hideAdminPanel() {
     adminLoggedIn = false;
 }
 
-btnLogoutAdmin.addEventListener('click', hideAdminPanel);
+function hideAdminModal() {
+    adminModal.classList.add('hidden');
+    adminLoginForm.reset();
+}
+
+function showAdminModal() {
+    adminModal.classList.remove('hidden');
+}
+
+btnAdminLogin.addEventListener('click', showAdminModal);
+
+btnCloseAdmin.addEventListener('click', hideAdminModal);
+
+btnLogoutAdmin.addEventListener('click', () => {
+    hideAdminPanel();
+    hideAdminModal();
+});
 
 adminLoginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
