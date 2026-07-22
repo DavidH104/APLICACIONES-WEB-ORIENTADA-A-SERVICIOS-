@@ -724,9 +724,12 @@ tr:nth-child(even) td {
     font-size: 0.9rem;
 }
 
-.tabla-general table {
-    width: 100%;
-    border-collapse: collapse;
+.tabla-general {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    grid-column: 1 / -1;
 }
 
 .tabla-general th, .tabla-general td {
