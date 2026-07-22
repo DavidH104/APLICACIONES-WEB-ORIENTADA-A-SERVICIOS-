@@ -1,4 +1,5 @@
 import { MongoClient, ObjectId } from 'mongodb';
+import crypto from 'crypto';
 
 const MONGO_URI = 'mongodb://127.0.0.1:27017';
 const DB_NAME = 'mundial2026';
@@ -303,6 +304,17 @@ async function main() {
   console.log('Base de datos poblada y actualizada al 16 de julio de 2026.');
   console.log('Partidos insertados:', todos.length);
   console.log('Clasificaciones recalculadas:', docs.length, 'equipos');
+
+  const adminEmail = 'admin@mundial.local';
+  const adminPassword = 'admin123';
+  const adminSalt = crypto.randomBytes(16).toString('hex');
+  const adminHash = crypto.scryptSync(adminPassword, adminSalt, 64, { N: 16384 }).toString('hex');
+  const adminPayload = { usuario: adminEmail, passwordHash: adminHash, salt: adminSalt, role: 'admin', createdAt: new Date() };
+
+  await db.collection('usuarios').updateOne({ usuario: adminEmail }, { $set: adminPayload }, { upsert: true });
+  await db.collection('admin').updateOne({ usuario: adminEmail }, { $set: adminPayload }, { upsert: true });
+  console.log('Usuario admin asegurado en colecciones usuarios y admin.');
+  console.log('Credenciales:', adminEmail, '/', adminPassword);
 }
 
 main().catch((err) => {

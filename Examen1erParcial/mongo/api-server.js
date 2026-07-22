@@ -516,7 +516,11 @@ const server = http.createServer(async (req, res) => {
           sendJson(res, 400, { error: 'Faltan credenciales' });
           return;
         }
-        const userDoc = await db.collection('usuarios').findOne({ usuario });
+        const userDoc = await db.collection('admin').findOne({ usuario }).catch(() => null);
+        const source = userDoc ? 'admin' : null;
+        if (!source) {
+          userDoc = await db.collection('usuarios').findOne({ usuario }).catch(() => null);
+        }
         if (!userDoc) {
           sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
           return;
