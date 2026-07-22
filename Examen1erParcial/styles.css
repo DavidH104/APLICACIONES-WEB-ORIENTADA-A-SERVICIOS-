@@ -134,6 +134,18 @@ button:disabled { background-color: #95a5a6; cursor: not-allowed; }
     box-shadow: 0 10px 20px rgba(0,0,0,0.12);
 }
 
+.simulacion-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 9.5rem;
+    border-radius: 999px;
+    padding: 0.75rem 1.1rem;
+    background-color: rgba(255,255,255,0.18);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
 .admin-modal {
     position: fixed;
     inset: 0;
