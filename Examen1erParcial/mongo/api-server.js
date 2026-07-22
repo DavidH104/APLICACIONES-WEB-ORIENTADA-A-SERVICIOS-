@@ -308,6 +308,82 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
+      if (url.pathname === '/api/admin/partidos') {
+        const partidos = await db.collection('partidos').aggregate([
+          {
+            $lookup: {
+              from: 'fase_final',
+              localField: 'faseId',
+              foreignField: '_id',
+              as: 'fase'
+            }
+          },
+          { $unwind: { path: '$fase', preserveNullAndEmptyArrays: true } },
+          {
+            $lookup: {
+              from: 'selecciones',
+              localField: 'equipo_localId',
+              foreignField: '_id',
+              as: 'local'
+            }
+          },
+          { $unwind: { path: '$local', preserveNullAndEmptyArrays: true } },
+          {
+            $lookup: {
+              from: 'selecciones',
+              localField: 'equipo_visitanteId',
+              foreignField: '_id',
+              as: 'visitante'
+            }
+          },
+          { $unwind: { path: '$visitante', preserveNullAndEmptyArrays: true } },
+          {
+            $lookup: {
+              from: 'grupos',
+              localField: 'local.grupoId',
+              foreignField: '_id',
+              as: 'grupo'
+            }
+          },
+          { $unwind: { path: '$grupo', preserveNullAndEmptyArrays: true } },
+          {
+            $lookup: {
+              from: 'estadios',
+              localField: 'estadioId',
+              foreignField: '_id',
+              as: 'estadio'
+            }
+          },
+          { $unwind: { path: '$estadio', preserveNullAndEmptyArrays: true } },
+          {
+            $project: {
+              _id: 1,
+              fase: '$fase.nombre',
+              fecha: 1,
+              horario: 1,
+              goles_local: 1,
+              goles_visitante: 1,
+              local: { id: '$local._id', nombre: '$local.nombre' },
+              visitante: { id: '$visitante._id', nombre: '$visitante.nombre' },
+              estadio: { id: '$estadio._id', nombre: '$estadio.nombre' },
+              grupo: '$grupo.nombre'
+            }
+          },
+          { $sort: { fecha: 1 } }
+        ]).toArray();
+
+        const payload = partidos.map((item) => ({
+          ...item,
+          id: item._id.toString(),
+          _id: undefined,
+          local: item.local ? { id: item.local.id.toString(), nombre: item.local.nombre } : null,
+          visitante: item.visitante ? { id: item.visitante.id.toString(), nombre: item.visitante.nombre } : null,
+          estadio: item.estadio ? { id: item.estadio.id.toString(), nombre: item.estadio.nombre } : null
+        }));
+        sendJson(res, 200, payload);
+        return;
+      }
+
       if (url.pathname === '/api/admin/partidos-fase-grupos') {
         const partidos = await db.collection('partidos').aggregate([
           {
