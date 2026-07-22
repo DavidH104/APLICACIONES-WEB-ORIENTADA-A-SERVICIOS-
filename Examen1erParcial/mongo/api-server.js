@@ -580,6 +580,236 @@ const server = http.createServer(async (req, res) => {
         });
         return;
       }
+
+      if (url.pathname === '/api/simulacion') {
+        const params = url.searchParams;
+        const tipo = params.get('consulta') || '1';
+        const seleccionId = params.get('seleccionId');
+
+        if (tipo === '1') {
+          const data = await db.collection('clasificaciones').aggregate([
+            { $lookup: { from: 'selecciones', localField: 'seleccionId', foreignField: '_id', as: 'seleccion' } },
+            { $unwind: '$seleccion' },
+            { $lookup: { from: 'grupos', localField: 'grupoId', foreignField: '_id', as: 'grupo' } },
+            { $unwind: { path: '$grupo', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'continentes', localField: 'seleccion.continenteId', foreignField: '_id', as: 'continente' } },
+            { $unwind: { path: '$continente', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, grupo: '$grupo.nombre', seleccion: '$seleccion.nombre', bandera: '$seleccion.banderaUrl', continente: '$continente.nombre', ranking: '$seleccion.ranking', pj: 1, pg: 1, pe: 1, pp: 1, gf: 1, gc: 1, dg: 1, pts: 1 } },
+            { $sort: { grupo: 1, pts: -1, dg: -1, gf: -1 } }
+          ]).toArray();
+          sendJson(res, 200, data);
+          return;
+        }
+
+        if (tipo === '2') {
+          if (!seleccionId) {
+            const sel = await db.collection('selecciones').find({}, { projection: { nombre: 1, banderaUrl: 1 } }).sort({ nombre: 1 }).toArray();
+            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ id: s._id.toString(), nombre: s.nombre, bandera: s.banderaUrl })) });
+            return;
+          }
+          const selObj = await db.collection('selecciones').findOne({ _id: new ObjectId(seleccionId) });
+          if (!selObj) { sendJson(res, 404, { error: 'Selección no encontrada' }); return; }
+          const partidos = await db.collection('partidos').aggregate([
+            { $match: { $expr: { $or: [{ $eq: ['$equipo_localId', new ObjectId(seleccionId)] }, { $eq: ['$equipo_visitanteId', new ObjectId(seleccionId)] }] } } },
+            { $lookup: { from: 'selecciones', localField: 'equipo_localId', foreignField: '_id', as: 'local' } },
+            { $unwind: { path: '$local', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'selecciones', localField: 'equipo_visitanteId', foreignField: '_id', as: 'visitante' } },
+            { $unwind: { path: '$visitante', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, fecha: 1, rival: { $cond: [{ $eq: ['$equipo_localId', new ObjectId(seleccionId)] }, '$visitante.nombre', '$local.nombre'] }, goles_local: 1, goles_visitante: 1, es_local: { $eq: ['$equipo_localId', new ObjectId(seleccionId)] } } },
+            { $sort: { fecha: -1 } }
+          ]).toArray();
+          let golesAnotados = 0, golesRecibidos = 0, victorias = 0, empates = 0, derrotas = 0;
+          partidos.forEach(p => {
+            const misGoles = p.es_local ? p.goles_local : p.goles_visitante;
+            const susGoles = p.es_local ? p.goles_visitante : p.goles_local;
+            golesAnotados += misGoles || 0;
+            golesRecibidos += susGoles || 0;
+            if (misGoles > susGoles) victorias++;
+            else if (misGoles < susGoles) derrotas++;
+            else empates++;
+          });
+          const ultimoPartido = partidos[0] || null;
+          sendJson(res, 200, { seleccion: selObj.nombre, bandera: selObj.banderaUrl, partidos, victorias, empates, derrotas, golesAnotados, golesRecibidos, ultimoPartido });
+          return;
+        }
+
+        if (tipo === '3') {
+          const sel = await db.collection('selecciones').aggregate([
+            { $lookup: { from: 'continentes', localField: 'continenteId', foreignField: '_id', as: 'continente' } },
+            { $unwind: { path: '$continente', preserveNullAndEmptyArrays: true } },
+            {
+              $lookup: {
+                from: 'partidos',
+                let: { sid: '$_id' },
+                pipeline: [
+                  { $match: { $expr: { $or: [{ $eq: ['$equipo_localId', '$$sid'] }, { $eq: ['$equipo_visitanteId', '$$sid'] }] } } },
+                  { $group: { _id: null, goles: { $sum: { $add: ['$goles_local', '$goles_visitante'] } }, partidos: { $sum: 1 } } }
+                ],
+                as: 'stats'
+              }
+            },
+            { $unwind: { path: '$stats', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, seleccion: '$nombre', bandera: '$banderaUrl', ranking: 1, continente: '$continente.nombre', promedio_goles: { $cond: [{ $gt: [{ $ifNull: ['$stats.partidos', 0] }, 0] }, { $divide: ['$stats.goles', '$stats.partidos'] }, 0] }, partidos: { $ifNull: ['$stats.partidos', 0] } } },
+            { $sort: { promedio_goles: -1 } }
+          ]).toArray();
+          sendJson(res, 200, sel);
+          return;
+        }
+
+        if (tipo === '4') {
+          const estadios = await db.collection('partidos').aggregate([
+            { $group: { _id: '$estadioId', total_partidos: { $sum: 1 } } },
+            { $lookup: { from: 'estadios', localField: '_id', foreignField: '_id', as: 'estadio' } },
+            { $unwind: '$estadio' },
+            {
+              $lookup: {
+                from: 'partidos',
+                let: { eid: '$_id' },
+                pipeline: [
+                  { $match: { $expr: { $eq: ['$estadioId', '$$eid'] } } },
+                  { $lookup: { from: 'selecciones', localField: 'equipo_localId', foreignField: '_id', as: 'local' } },
+                  { $unwind: { path: '$local', preserveNullAndEmptyArrays: true } },
+                  { $lookup: { from: 'selecciones', localField: 'equipo_visitanteId', foreignField: '_id', as: 'visitante' } },
+                  { $unwind: { path: '$visitante', preserveNullAndEmptyArrays: true } },
+                  { $project: { _id: 0, local: '$local.nombre', visitante: '$visitante.nombre', goles_local: 1, goles_visitante: 1 } }
+                ],
+                as: 'detalle'
+              }
+            },
+            { $project: { _id: 0, estadio: '$estadio.nombre', ciudad: '$estadio.ciudad', capacidad: '$estadio.capacidad', total_partidos: 1, detalle: 1 } },
+            { $sort: { total_partidos: -1 } }
+          ]).toArray();
+          sendJson(res, 200, estadios);
+          return;
+        }
+
+        if (tipo === '5') {
+          if (!seleccionId) {
+            const sel = await db.collection('selecciones').find({}, { projection: { nombre: 1, banderaUrl: 1 } }).sort({ nombre: 1 }).toArray();
+            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ id: s._id.toString(), nombre: s.nombre, bandera: s.banderaUrl })) });
+            return;
+          }
+          const selObj = await db.collection('selecciones').findOne({ _id: new ObjectId(seleccionId) });
+          if (!selObj) { sendJson(res, 404, { error: 'Selección no encontrada' }); return; }
+          const partidos = await db.collection('partidos').aggregate([
+            { $match: { $expr: { $or: [{ $eq: ['$equipo_localId', new ObjectId(seleccionId)] }, { $eq: ['$equipo_visitanteId', new ObjectId(seleccionId)] }] } } },
+            { $lookup: { from: 'estadios', localField: 'estadioId', foreignField: '_id', as: 'estadio' } },
+            { $unwind: { path: '$estadio', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'selecciones', localField: 'equipo_localId', foreignField: '_id', as: 'local' } },
+            { $unwind: { path: '$local', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'selecciones', localField: 'equipo_visitanteId', foreignField: '_id', as: 'visitante' } },
+            { $unwind: { path: '$visitante', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, fecha: 1, rival: { $cond: [{ $eq: ['$equipo_localId', new ObjectId(seleccionId)] }, '$visitante.nombre', '$local.nombre'] }, estadio: '$estadio.nombre', ciudad: '$estadio.ciudad', goles_local: 1, goles_visitante: 1, es_local: { $eq: ['$equipo_localId', new ObjectId(seleccionId)] } } },
+            { $sort: { fecha: -1 } }
+          ]).toArray();
+          const resultado = partidos.map(p => ({ ...p, resultado: `${p.goles_local ?? '-'} - ${p.goles_visitante ?? '-'}` }));
+          sendJson(res, 200, { seleccion: selObj.nombre, bandera: selObj.banderaUrl, partidos: resultado });
+          return;
+        }
+
+        if (tipo === '6') {
+          const data = await db.collection('selecciones').aggregate([
+            { $lookup: { from: 'clasificaciones', localField: '_id', foreignField: 'seleccionId', as: 'clasif' } },
+            { $unwind: { path: '$clasif', preserveNullAndEmptyArrays: true } },
+            {
+              $lookup: {
+                from: 'partidos',
+                let: { sid: '$_id' },
+                pipeline: [
+                  { $match: { $expr: { $or: [{ $eq: ['$equipo_localId', '$$sid'] }, { $eq: ['$equipo_visitanteId', '$$sid'] }] } } },
+                  { $group: { _id: null, pj: { $sum: 1 }, pg: { $sum: { $cond: [{ $or: [{ $and: [{ $eq: ['$equipo_localId', '$$sid'] }, { $gt: ['$goles_local', '$goles_visitante'] }] }, { $and: [{ $eq: ['$equipo_visitanteId', '$$sid'] }, { $gt: ['$goles_visitante', '$goles_local'] }] }] }, 1, 0] } }, pe: { $sum: { $cond: [{ $eq: ['$goles_local', '$goles_visitante'] }, 1, 0] } }, pp: { $sum: { $cond: [{ $or: [{ $and: [{ $eq: ['$equipo_localId', '$$sid'] }, { $lt: ['$goles_local', '$goles_visitante'] }] }, { $and: [{ $eq: ['$equipo_visitanteId', '$$sid'] }, { $lt: ['$goles_visitante', '$goles_local'] }] }] }, 1, 0] } } } }
+                ],
+                as: 'stats'
+              }
+            },
+            { $unwind: { path: '$stats', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, seleccion: '$nombre', bandera: '$banderaUrl', ranking: 1, pj: { $ifNull: ['$stats.pj', { $ifNull: ['$clasif.pj', 0] }] }, pg: { $ifNull: ['$stats.pg', { $ifNull: ['$clasif.pg', 0] }] }, pe: { $ifNull: ['$stats.pe', { $ifNull: ['$clasif.pe', 0] }] }, pp: { $ifNull: ['$stats.pp', { $ifNull: ['$clasif.pp', 0] }] }, campeon: { $literal: 0 }, finales: [] } },
+            { $sort: { pj: -1 } }
+          ]).toArray();
+          sendJson(res, 200, data);
+          return;
+        }
+
+        if (tipo === '7') {
+          const partidos = await db.collection('partidos').aggregate([
+            { $lookup: { from: 'selecciones', localField: 'equipo_localId', foreignField: '_id', as: 'local' } },
+            { $unwind: { path: '$local', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'selecciones', localField: 'equipo_visitanteId', foreignField: '_id', as: 'visitante' } },
+            { $unwind: { path: '$visitante', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'clasificaciones', localField: 'equipo_localId', foreignField: 'seleccionId', as: 'clasif_local' } },
+            { $unwind: { path: '$clasif_local', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'clasificaciones', localField: 'equipo_visitanteId', foreignField: 'seleccionId', as: 'clasif_visitante' } },
+            { $unwind: { path: '$clasif_visitante', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, id: '$_id', fecha: 1, goles_local: 1, goles_visitante: 1, equipo_local: '$local.nombre', equipo_visitante: '$visitante.nombre', ranking_local: '$local.ranking', ranking_visitante: '$visitante.ranking', gf_local: { $ifNull: ['$clasif_local.gf', 0] }, gc_local: { $ifNull: ['$clasif_local.gc', 0] }, pj_local: { $ifNull: ['$clasif_local.pj', 0] }, gf_visitante: { $ifNull: ['$clasif_visitante.gf', 0] }, gc_visitante: { $ifNull: ['$clasif_visitante.gc', 0] }, pj_visitante: { $ifNull: ['$clasif_visitante.pj', 0] } } },
+            { $sort: { fecha: 1 } }
+          ]).toArray();
+          const resultado = partidos.map(p => {
+            const promGolesLocal = p.pj_local > 0 ? (p.gf_local / p.pj_local) : 0;
+            const promGolesVisitante = p.pj_visitante > 0 ? (p.gf_visitante / p.pj_visitante) : 0;
+            const fuerzaLocal = p.ranking_local + promGolesLocal + (p.gc_local > 0 ? -p.gc_local : 0);
+            const fuerzaVisitante = p.ranking_visitante + promGolesVisitante + (p.gc_visitante > 0 ? -p.gc_visitante : 0);
+            const suma = fuerzaLocal + fuerzaVisitante;
+            const probLocal = suma > 0 ? parseFloat(((fuerzaLocal / suma) * 100).toFixed(2)) : 50;
+            const probVisitante = suma > 0 ? parseFloat(((fuerzaVisitante / suma) * 100).toFixed(2)) : 50;
+            return { ...p, promedio_goles_local: parseFloat(promGolesLocal.toFixed(2)), promedio_goles_visitante: parseFloat(promGolesVisitante.toFixed(2)), goles_recibidos_local: p.gc_local, goles_recibidos_visitante: p.gc_visitante, fuerza_local: parseFloat(fuerzaLocal.toFixed(2)), fuerza_visitante: parseFloat(fuerzaVisitante.toFixed(2)), probabilidad_local: probLocal, probabilidad_visitante: probVisitante };
+          });
+          sendJson(res, 200, resultado);
+          return;
+        }
+
+        if (tipo === '8') {
+          const data = await db.collection('boletos').aggregate([
+            { $lookup: { from: 'estadios', localField: 'estadioId', foreignField: '_id', as: 'estadio' } },
+            { $unwind: '$estadio' },
+            { $group: { _id: '$estadioId', nombre_estadio: { $first: '$estadio.nombre' }, ciudad: { $first: '$estadio.ciudad' }, capacidad: { $first: '$estadio.capacidad' }, promedio_costo: { $avg: '$costo' }, costo_min: { $min: '$costo' }, costo_max: { $max: '$costo' }, total_boletos: { $sum: 1 }, partidos: { $addToSet: '$partidoId' } } },
+            { $project: { _id: 0, estadio: '$nombre_estadio', ciudad: 1, capacidad: 1, promedio_costo: { $trunc: ['$promedio_costo', 2] }, costo_min: 1, costo_max: 1, total_boletos: 1, numero_partidos: { $size: '$partidos' } } },
+            { $sort: { promedio_costo: -1 } }
+          ]).toArray();
+          sendJson(res, 200, data);
+          return;
+        }
+
+        if (tipo === '9') {
+          const data = await db.collection('selecciones').aggregate([
+            { $lookup: { from: 'continentes', localField: 'continenteId', foreignField: '_id', as: 'continente' } },
+            { $unwind: { path: '$continente', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, ranking: 1, continente: '$continente.nombre', confederacion: '$continente.confederacion', seleccion: '$nombre', bandera: '$banderaUrl' } },
+            { $sort: { ranking: 1 } }
+          ]).toArray();
+          sendJson(res, 200, data);
+          return;
+        }
+
+        if (tipo === '10') {
+          const partidos = await db.collection('partidos').aggregate([
+            { $lookup: { from: 'selecciones', localField: 'equipo_localId', foreignField: '_id', as: 'local' } },
+            { $unwind: { path: '$local', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'selecciones', localField: 'equipo_visitanteId', foreignField: '_id', as: 'visitante' } },
+            { $unwind: { path: '$visitante', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'estadios', localField: 'estadioId', foreignField: '_id', as: 'estadio' } },
+            { $unwind: { path: '$estadio', preserveNullAndEmptyArrays: true } },
+            {
+              $lookup: {
+                from: 'partidos',
+                let: { lid: '$equipo_localId', vid: '$equipo_visitanteId' },
+                pipeline: [
+                  { $match: { $expr: { $or: [{ $eq: ['$equipo_localId', '$$lid'] }, { $eq: ['$equipo_visitanteId', '$$vid'] }] } } },
+                  { $group: { _id: null, victorias_local: { $sum: { $cond: [{ $eq: ['$equipo_localId', '$$lid'] }, { $cond: [{ $gt: ['$goles_local', '$goles_visitante'] }, 1, 0] }, { $cond: [{ $gt: ['$goles_visitante', '$goles_local'] }, 1, 0] }] } }, victorias_visitante: { $sum: { $cond: [{ $eq: ['$equipo_localId', '$$vid'] }, { $cond: [{ $gt: ['$goles_local', '$goles_visitante'] }, 1, 0] }, { $cond: [{ $gt: ['$goles_visitante', '$goles_local'] }, 1, 0] }] } }, empates: { $sum: { $cond: [{ $eq: ['$goles_local', '$goles_visitante'] }, 1, 0] } } } }
+                ],
+                as: 'historial'
+              }
+            },
+            { $unwind: { path: '$historial', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, partido: { id: '$_id', fecha: 1, fase: '$faseId' }, equipo_local: '$local.nombre', equipo_visitante: '$visitante.nombre', ranking_local: '$local.ranking', ranking_visitante: '$visitante.ranking', estadio: '$estadio.nombre', ciudad: '$estadio.ciudad', capacidad: '$estadio.capacidad', victorias_local: { $ifNull: ['$historial.victorias_local', 0] }, victorias_visitante: { $ifNull: ['$historial.victorias_visitante', 0] }, empates: { $ifNull: ['$historial.empates', 0] } } },
+            { $sort: { fecha: 1 } }
+          ]).toArray();
+          sendJson(res, 200, partidos);
+          return;
+        }
+
+        sendJson(res, 400, { error: 'Consulta de simulación no válida' });
+        return;
+      }
     }
 
     // --- MANEJO DE RUTAS POST ---

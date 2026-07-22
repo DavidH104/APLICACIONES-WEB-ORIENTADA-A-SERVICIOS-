@@ -764,3 +764,217 @@ tr:nth-child(even) td {
     display: grid;
     gap: 16px;
 }
+
+.simulacion-view {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.simulacion-header {
+    background: linear-gradient(135deg, #071d3d 0%, #123b63 45%, #1f6fbe 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(7, 29, 61, 0.3);
+}
+
+.simulacion-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.btn-cerrar-simulacion {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-cerrar-simulacion:hover {
+    background: #dc2626;
+}
+
+.simulacion-container {
+    flex: 1;
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.simulacion-menu h3 {
+    margin-bottom: 1rem;
+    color: #1a252f;
+}
+
+.simulacion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.simulacion-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid #1f6fbe;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.simulacion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.simulacion-card .numero {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #1f6fbe;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.simulacion-card .titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.simulacion-card .descripcion {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.simulacion-resultados {
+    background: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.simulacion-resultados-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.simulacion-resultados-header h3 {
+    margin: 0;
+    color: #1a252f;
+}
+
+.btn-volver-menu {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-volver-menu:hover {
+    background: #1d4ed8;
+}
+
+.simulacion-loading {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.simulacion-tabla-container {
+    overflow-x: auto;
+}
+
+.simulacion-tabla-container table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.simulacion-tabla-container th,
+.simulacion-tabla-container td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.simulacion-tabla-container th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+}
+
+.simulacion-tabla-container tr:nth-child(even) td {
+    background: #f9fafb;
+}
+
+.simulacion-selector {
+    background: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.simulacion-selector h3 {
+    margin: 0;
+    color: #1a252f;
+}
+
+.simulacion-selector select {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 1rem;
+    min-width: 300px;
+}
+
+.btn-ejecutar {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-ejecutar:hover {
+    background: #059669;
+}
+
+@media (max-width: 768px) {
+    .simulacion-container { padding: 1rem; }
+    .simulacion-grid { grid-template-columns: 1fr; }
+    .simulacion-resultados-header { flex-direction: column; align-items: flex-start; }
+}

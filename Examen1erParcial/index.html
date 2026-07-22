@@ -309,6 +309,32 @@
         <div id="resultados-recientes" class="results-grid"></div>
     </section>
 
+    <div id="simulacion-view" class="simulacion-view hidden">
+        <div class="simulacion-header">
+            <h2>Simulación de Consultas</h2>
+            <button id="btn-cerrar-simulacion" class="btn-cerrar-simulacion" type="button">Cerrar</button>
+        </div>
+        <div class="simulacion-container">
+            <div class="simulacion-menu">
+                <h3>Selecciona una consulta</h3>
+                <div class="simulacion-grid" id="simulacion-grid"></div>
+            </div>
+            <div class="simulacion-resultados hidden" id="simulacion-resultados">
+                <div class="simulacion-resultados-header">
+                    <h3 id="simulacion-titulo"></h3>
+                    <button id="btn-volver-menu" class="btn-volver-menu" type="button">Volver al menú</button>
+                </div>
+                <div class="simulacion-loading hidden" id="simulacion-loading">Cargando datos...</div>
+                <div id="simulacion-tabla-container" class="simulacion-tabla-container"></div>
+            </div>
+            <div class="simulacion-selector hidden" id="simulacion-selector">
+                <h3>Selecciona una selección</h3>
+                <select id="simulacion-select-equipo"></select>
+                <button id="btn-ejecutar-con-select" class="btn-ejecutar" type="button">Ejecutar consulta</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>

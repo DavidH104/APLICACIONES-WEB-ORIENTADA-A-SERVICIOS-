@@ -965,4 +965,187 @@ adminLoginForm.addEventListener('submit', async (event) => {
     }
 });
 
+const simulacionView = document.getElementById('simulacion-view');
+const btnSimulacion = document.getElementById('btn-simulacion');
+const btnCerrarSimulacion = document.getElementById('btn-cerrar-simulacion');
+const simulacionGrid = document.getElementById('simulacion-grid');
+const simulacionResultados = document.getElementById('simulacion-resultados');
+const simulacionSelector = document.getElementById('simulacion-selector');
+const simulacionTablaContainer = document.getElementById('simulacion-tabla-container');
+const simulacionLoading = document.getElementById('simulacion-loading');
+const simulacionTitulo = document.getElementById('simulacion-titulo');
+const btnVolverMenu = document.getElementById('btn-volver-menu');
+const btnEjecutarConSelect = document.getElementById('btn-ejecutar-con-select');
+const simulacionSelectEquipo = document.getElementById('simulacion-select-equipo');
+
+const CONSULTAS = [
+    { numero: 1, titulo: 'Tabla general del grupo con estadísticas completas', descripcion: 'Grupo, selección, bandera, continente, ranking, PJ, PG, PE, PP, GF, GC, DG, Puntos.', requiereSeleccion: false },
+    { numero: 2, titulo: 'Historial completo de una selección', descripcion: 'Nombre, bandera, rival, victorias, empates, derrotas, goles anotados, recibidos, último partido.', requiereSeleccion: true },
+    { numero: 3, titulo: 'Selecciones con mejor rendimiento ofensivo', descripcion: 'Nombre, bandera, promedio de goles, promedio de tiros, posesión.', requiereSeleccion: false },
+    { numero: 4, titulo: 'Estadios con más partidos programados', descripcion: 'Estadios, partidos, zonas boletos, número de partidos, equipos, victorias, derrotas, empates.', requiereSeleccion: false },
+    { numero: 5, titulo: 'Historial de partidos de una selección con estadio', descripcion: 'Nombre, bandera, fecha, rival, estadio, ciudad, resultado.', requiereSeleccion: true },
+    { numero: 6, titulo: 'Selecciones con mayor experiencia mundialista', descripcion: 'Nombre, bandera, ranking, PJ, PG, PP, PE, campeón, finales.', requiereSeleccion: false },
+    { numero: 7, titulo: 'Probabilidad inicial de un partido por estadísticas', descripcion: 'Fuerza basada en ranking, promedio goles, posesión, goles recibidos.', requiereSeleccion: false },
+    { numero: 8, titulo: 'Precio promedio de boletos por estadio', descripcion: 'Precio promedio, precio más caro, precio más barato, zona de boletos, partidos.', requiereSeleccion: false },
+    { numero: 9, titulo: 'Ranking por continente', descripcion: 'Ranking FIFA, continente, selección, bandera, valor plantilla, edad promedio.', requiereSeleccion: false },
+    { numero: 10, titulo: 'Consulta maestra para el simulador', descripcion: 'Partido, local, visitante, grupo, ranking, goles promedio, posesión, historial, victorias, empates, estadio.', requiereSeleccion: false }
+];
+
+let consultaSeleccionada = null;
+
+function abrirSimulacion() {
+    simulacionView.classList.remove('hidden');
+    simulacionResultados.classList.add('hidden');
+    simulacionSelector.classList.add('hidden');
+    simulacionTablaContainer.innerHTML = '';
+    consultaSeleccionada = null;
+    renderizarMenu();
+}
+
+function cerrarSimulacion() {
+    simulacionView.classList.add('hidden');
+}
+
+function renderizarMenu() {
+    simulacionGrid.innerHTML = '';
+    CONSULTAS.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'simulacion-card';
+        card.innerHTML = `<div class="numero">Consulta ${c.numero}</div><div class="titulo">${c.titulo}</div><div class="descripcion">${c.descripcion}</div>`;
+        card.addEventListener('click', () => seleccionarConsulta(c));
+        simulacionGrid.appendChild(card);
+    });
+    simulacionView.querySelector('.simulacion-menu').classList.remove('hidden');
+}
+
+function seleccionarConsulta(consulta) {
+    consultaSeleccionada = consulta;
+    if (consulta.requiereSeleccion) {
+        simulacionSelector.classList.remove('hidden');
+        simulacionResultados.classList.add('hidden');
+        cargarSeleccionesParaSelector();
+    } else {
+        simulacionSelector.classList.add('hidden');
+        ejecutarConsulta(consulta.numero);
+    }
+}
+
+async function cargarSeleccionesParaSelector() {
+    try {
+        const resp = await fetch(`/api/simulacion?consulta=${consultaSeleccionada.numero}`);
+        console.log('cargarSeleccionesParaSelector', consultaSeleccionada.numero, resp.status, resp.statusText);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        const data = await resp.json();
+        console.log('data selecciones', data);
+        if (data.requiereSeleccion && Array.isArray(data.selecciones)) {
+            simulacionSelectEquipo.innerHTML = '<option value="">Selecciona una selección...</option>';
+            data.selecciones.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.nombre;
+                simulacionSelectEquipo.appendChild(opt);
+            });
+        } else {
+            simulacionTablaContainer.innerHTML = '<p>No se pudieron cargar las selecciones.</p>';
+        }
+    } catch (err) {
+        console.error('Error cargando selecciones:', err);
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error cargando selecciones: ${err.message}. Asegúrate de abrir la app desde http://localhost:3000 y tener el servidor backend corriendo.</p>`;
+    }
+}
+
+function mostrarResultados(titulo, datos) {
+    simulacionTitulo.textContent = titulo;
+    simulacionResultados.classList.remove('hidden');
+    simulacionLoading.classList.add('hidden');
+    simulacionTablaContainer.innerHTML = '';
+
+    if (!Array.isArray(datos) || datos.length === 0) {
+        simulacionTablaContainer.innerHTML = '<p>No hay datos disponibles.</p>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+    const columns = Object.keys(datos[0]);
+
+    const headerRow = document.createElement('tr');
+    columns.forEach(col => { const th = document.createElement('th'); th.textContent = col; headerRow.appendChild(th); });
+    thead.appendChild(headerRow);
+
+    datos.forEach(fila => {
+        const row = document.createElement('tr');
+        columns.forEach(col => {
+            const td = document.createElement('td');
+            const valor = fila[col];
+            if (valor === null || valor === undefined) td.textContent = '-';
+            else if (typeof valor === 'object') td.textContent = JSON.stringify(valor);
+            else td.textContent = valor;
+            row.appendChild(td);
+        });
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    simulacionTablaContainer.appendChild(table);
+}
+
+async function ejecutarConsulta(numero) {
+    simulacionResultados.classList.remove('hidden');
+    simulacionLoading.classList.remove('hidden');
+    simulacionTablaContainer.innerHTML = '';
+
+    try {
+        const resp = await fetch(`/api/simulacion?consulta=${numero}`);
+        console.log('ejecutarConsulta', numero, resp.status, resp.statusText);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        const data = await resp.json();
+        simulacionLoading.classList.add('hidden');
+        const titulo = CONSULTAS.find(c => c.numero === numero)?.titulo || `Consulta ${numero}`;
+        mostrarResultados(titulo, Array.isArray(data) ? data : [data]);
+    } catch (err) {
+        console.error(err);
+        simulacionLoading.classList.add('hidden');
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error al cargar la consulta: ${err.message}. Asegúrate de abrir la app desde http://localhost:3000 y tener el servidor backend corriendo.</p>`;
+    }
+}
+
+btnSimulacion.addEventListener('click', abrirSimulacion);
+btnCerrarSimulacion.addEventListener('click', cerrarSimulacion);
+btnVolverMenu.addEventListener('click', () => {
+    simulacionResultados.classList.add('hidden');
+    simulacionSelector.classList.add('hidden');
+    consultaSeleccionada = null;
+    renderizarMenu();
+});
+
+btnEjecutarConSelect.addEventListener('click', () => {
+    const sid = simulacionSelectEquipo.value;
+    if (!sid) { alert('Selecciona una selección'); return; }
+    ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
+});
+
+async function ejecutarConsultaConSeleccion(numero, sid) {
+    simulacionSelector.classList.add('hidden');
+    simulacionResultados.classList.remove('hidden');
+    simulacionLoading.classList.remove('hidden');
+    simulacionTablaContainer.innerHTML = '';
+
+    try {
+        const resp = await fetch(`/api/simulacion?consulta=${numero}&seleccionId=${sid}`);
+        console.log('ejecutarConsultaConSeleccion', numero, sid, resp.status, resp.statusText);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        const data = await resp.json();
+        simulacionLoading.classList.add('hidden');
+        const titulo = CONSULTAS.find(c => c.numero === numero)?.titulo || `Consulta ${numero}`;
+        mostrarResultados(titulo, Array.isArray(data) ? data : [data]);
+    } catch (err) {
+        console.error(err);
+        simulacionLoading.classList.add('hidden');
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error al cargar la consulta: ${err.message}. Asegúrate de abrir la app desde http://localhost:3000 y tener el servidor backend corriendo.</p>`;
+    }
+}
+
 window.onload = () => { initMap(); cargarServicios(); };
