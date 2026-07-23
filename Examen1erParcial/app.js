@@ -1079,8 +1079,20 @@ function mostrarResultados(titulo, datos) {
         columns.forEach(col => {
             const td = document.createElement('td');
             const valor = fila[col];
+            const esImagen = typeof valor === 'string' && /^(https?:\/\/|\.\/|\.\.\/).+\.(png|jpg|jpeg|gif|webp|svg)(\?.*)?$/i.test(valor.trim());
             if (valor === null || valor === undefined) td.textContent = '-';
-            else if (typeof valor === 'object') td.textContent = JSON.stringify(valor);
+            else if (esImagen) {
+                const img = document.createElement('img');
+                img.src = valor.trim();
+                img.alt = col;
+                img.className = 'tabla-bandera';
+                img.loading = 'lazy';
+                img.onerror = function() {
+                    this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZjFmOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTQwNDA0IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0Ij5PPC90ZXh0Pjwvc3ZnPg==';
+                    this.alt = 'Sin bandera';
+                };
+                td.appendChild(img);
+            } else if (typeof valor === 'object') td.textContent = JSON.stringify(valor);
             else td.textContent = valor;
             row.appendChild(td);
         });

@@ -47,6 +47,18 @@ function serializeObjectId(doc) {
   return serialized;
 }
 
+const COUNTRY_FLAG_MAP = {
+  'México':'mx','Inglaterra':'gb','Senegal':'sn','Australia':'au','Estados Unidos':'us','Alemania':'de','Marruecos':'ma','Japón':'jp','Canadá':'ca','Francia':'fr','Egipto':'eg','Irán':'ir','Costa Rica':'cr','España':'es','Ghana':'gh','Catar':'qa','Panamá':'pa','Portugal':'pt','Nigeria':'ng','Uzbekistán':'uz','Honduras':'hn','Países Bajos':'nl','Camerún':'cm','Corea del Sur':'kr','Jamaica':'jm','Bélgica':'be','Argelia':'dz','Emiratos Árabes Unidos':'ae','El Salvador':'sv','Croacia':'hr','Túnez':'tn','Colombia':'co','Uruguay':'uy','Italia':'it','Costa de Marfil':'ci','Arabia Saudita':'sa','Ecuador':'ec','Suiza':'ch','Escocia':'gb','Nueva Zelanda':'nz','Perú':'pe','Dinamarca':'dk','Polonia':'pl','Gales':'gb','Austria':'at','Brasil':'br','Serbia':'rs','Sudáfrica':'za','República Checa':'cz','Bosnia y Herzegovina':'ba','Qatar':'qa','Haití':'ht','RD Congo':'cd','Paraguay':'py','Noruega':'no','Suecia':'se','Argentina':'ar','Suecia':'se','Escocia':'gb','Gales':'gb','Inglaterra':'gb'
+};
+
+function normalizeBandera(paisNombre, urlActual) {
+  if (!urlActual || typeof urlActual !== 'string') return urlActual || '';
+  if (!urlActual.includes('example.com')) return urlActual;
+  const code = COUNTRY_FLAG_MAP[paisNombre];
+  if (!code) return urlActual;
+  return `https://flagcdn.com/w80/${code}.png`;
+}
+
 async function recalculateGroupClasification(db) {
   const groupMatches = await db.collection('partidos').aggregate([
     {
@@ -597,14 +609,14 @@ const server = http.createServer(async (req, res) => {
             { $project: { _id: 0, grupo: '$grupo.nombre', seleccion: '$seleccion.nombre', bandera: '$seleccion.banderaUrl', continente: '$continente.nombre', ranking: '$seleccion.ranking', pj: 1, pg: 1, pe: 1, pp: 1, gf: 1, gc: 1, dg: 1, pts: 1 } },
             { $sort: { grupo: 1, pts: -1, dg: -1, gf: -1 } }
           ]).toArray();
-          sendJson(res, 200, data);
+          sendJson(res, 200, data.map(item => ({ ...item, bandera: normalizeBandera(item.seleccion, item.bandera) })));
           return;
         }
 
         if (tipo === '2') {
           if (!seleccionId) {
             const sel = await db.collection('selecciones').find({}, { projection: { nombre: 1, banderaUrl: 1 } }).sort({ nombre: 1 }).toArray();
-            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ id: s._id.toString(), nombre: s.nombre, bandera: s.banderaUrl })) });
+            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ ...s, bandera: normalizeBandera(s.nombre, s.banderaUrl) })) });
             return;
           }
           const selObj = await db.collection('selecciones').findOne({ _id: new ObjectId(seleccionId) });
@@ -618,6 +630,12 @@ const server = http.createServer(async (req, res) => {
             { $project: { _id: 0, fecha: 1, rival: { $cond: [{ $eq: ['$equipo_localId', new ObjectId(seleccionId)] }, '$visitante.nombre', '$local.nombre'] }, goles_local: 1, goles_visitante: 1, es_local: { $eq: ['$equipo_localId', new ObjectId(seleccionId)] } } },
             { $sort: { fecha: -1 } }
           ]).toArray();
+          const partidosLegibles = partidos.map(p => {
+            const condicion = p.es_local ? 'Local' : 'Visitante';
+            const fechaStr = p.fecha ? new Date(p.fecha).toLocaleDateString('es-ES') : 'Sin fecha';
+            return `${selObj.nombre} ${p.goles_local}-${p.goles_visitante} ${p.rival} (${condicion}) - ${fechaStr}`;
+          });
+          const ultimoLegible = partidosLegibles[0] || 'Sin partidos';
           let golesAnotados = 0, golesRecibidos = 0, victorias = 0, empates = 0, derrotas = 0;
           partidos.forEach(p => {
             const misGoles = p.es_local ? p.goles_local : p.goles_visitante;
@@ -628,8 +646,7 @@ const server = http.createServer(async (req, res) => {
             else if (misGoles < susGoles) derrotas++;
             else empates++;
           });
-          const ultimoPartido = partidos[0] || null;
-          sendJson(res, 200, { seleccion: selObj.nombre, bandera: selObj.banderaUrl, partidos, victorias, empates, derrotas, golesAnotados, golesRecibidos, ultimoPartido });
+          sendJson(res, 200, { seleccion: selObj.nombre, bandera: normalizeBandera(selObj.nombre, selObj.banderaUrl), partidos: partidosLegibles, victorias, empates, derrotas, golesAnotados, golesRecibidos, ultimoPartido: ultimoLegible });
           return;
         }
 
@@ -652,7 +669,7 @@ const server = http.createServer(async (req, res) => {
             { $project: { _id: 0, seleccion: '$nombre', bandera: '$banderaUrl', ranking: 1, continente: '$continente.nombre', promedio_goles: { $cond: [{ $gt: [{ $ifNull: ['$stats.partidos', 0] }, 0] }, { $divide: ['$stats.goles', '$stats.partidos'] }, 0] }, partidos: { $ifNull: ['$stats.partidos', 0] } } },
             { $sort: { promedio_goles: -1 } }
           ]).toArray();
-          sendJson(res, 200, sel);
+          sendJson(res, 200, sel.map(item => ({ ...item, bandera: normalizeBandera(item.seleccion, item.bandera) })));
           return;
         }
 
@@ -703,7 +720,7 @@ const server = http.createServer(async (req, res) => {
             { $sort: { fecha: -1 } }
           ]).toArray();
           const resultado = partidos.map(p => ({ ...p, resultado: `${p.goles_local ?? '-'} - ${p.goles_visitante ?? '-'}` }));
-          sendJson(res, 200, { seleccion: selObj.nombre, bandera: selObj.banderaUrl, partidos: resultado });
+          sendJson(res, 200, { seleccion: selObj.nombre, bandera: normalizeBandera(selObj.nombre, selObj.banderaUrl), partidos: resultado });
           return;
         }
 
@@ -726,7 +743,7 @@ const server = http.createServer(async (req, res) => {
             { $project: { _id: 0, seleccion: '$nombre', bandera: '$banderaUrl', ranking: 1, pj: { $ifNull: ['$stats.pj', { $ifNull: ['$clasif.pj', 0] }] }, pg: { $ifNull: ['$stats.pg', { $ifNull: ['$clasif.pg', 0] }] }, pe: { $ifNull: ['$stats.pe', { $ifNull: ['$clasif.pe', 0] }] }, pp: { $ifNull: ['$stats.pp', { $ifNull: ['$clasif.pp', 0] }] }, campeon: { $literal: 0 }, finales: [] } },
             { $sort: { pj: -1 } }
           ]).toArray();
-          sendJson(res, 200, data);
+          sendJson(res, 200, data.map(item => ({ ...item, bandera: normalizeBandera(item.seleccion, item.bandera) })));
           return;
         }
 
@@ -776,7 +793,7 @@ const server = http.createServer(async (req, res) => {
             { $project: { _id: 0, ranking: 1, continente: '$continente.nombre', confederacion: '$continente.confederacion', seleccion: '$nombre', bandera: '$banderaUrl' } },
             { $sort: { ranking: 1 } }
           ]).toArray();
-          sendJson(res, 200, data);
+          sendJson(res, 200, data.map(item => ({ ...item, bandera: normalizeBandera(item.seleccion, item.bandera) })));
           return;
         }
 

@@ -973,6 +973,15 @@ tr:nth-child(even) td {
     background: #059669;
 }
 
+.tabla-bandera {
+    height: 32px;
+    width: auto;
+    max-width: 48px;
+    border-radius: 4px;
+    object-fit: contain;
+    display: block;
+}
+
 @media (max-width: 768px) {
     .simulacion-container { padding: 1rem; }
     .simulacion-grid { grid-template-columns: 1fr; }
