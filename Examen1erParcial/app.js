@@ -30,6 +30,7 @@ const equipoCiudad = document.getElementById('equipo-ciudad');
 const equipoHistoria = document.getElementById('equipo-historia');
 const infoPromocion = document.getElementById('info-promocion');
 const promoTexto = document.getElementById('promo-texto');
+const geoDatos = document.getElementById('geo-datos');
 const shareButtons = document.getElementById('share-buttons');
 const btnTwitter = document.getElementById('btn-twitter');
 const btnWhatsapp = document.getElementById('btn-whatsapp');
@@ -238,6 +239,17 @@ function mostrarPromocion(equipoId) {
     infoPromocion.classList.remove('hidden');
 }
 
+function mostrarInfoGeolocalizacion(lat, lng, accuracy) {
+    if (!geoDatos) return;
+    geoDatos.innerHTML = `
+        <strong>Latitud:</strong> ${lat.toFixed(6)}<br>
+        <strong>Longitud:</strong> ${lng.toFixed(6)}<br>
+        <strong>Precisión:</strong> ${accuracy ? accuracy.toFixed(1) + ' m' : 'N/A'}<br>
+        <strong>Obtenido:</strong> ${new Date().toLocaleString('es-ES')}
+    `;
+    document.getElementById('info-geo').classList.remove('hidden');
+}
+
 function setShareButtons(equipo) {
     shareButtons.classList.remove('hidden');
     const mensaje = `Voy en camino a ver a ${equipo.nombre} en ${equipo.ciudad}!`;
@@ -259,7 +271,13 @@ async function fetchClasificaciones() {
         if (!response.ok) throw new Error('No se pudo cargar las clasificaciones');
         return await response.json();
     } catch (error) {
-        console.error('Error cargando clasificaciones:', error);
+        console.warn('Error cargando clasificaciones desde API, usando archivo local:', error);
+        try {
+            const fallback = await fetch('clasificaciones.json');
+            if (fallback.ok) return await fallback.json();
+        } catch (fallbackError) {
+            console.error('Error cargando clasificaciones local:', fallbackError);
+        }
         return null;
     }
 }
@@ -394,18 +412,35 @@ async function loadResults() {
             fetch('/api/partidos').catch(() => ({ ok: false })),
             fetch('/api/selecciones').catch(() => ({ ok: false }))
         ]);
-        if (!partidosResp.ok || !seleccionesResp.ok) return renderResults();
-        const partidos = await partidosResp.json();
-        const selecciones = await seleccionesResp.json();
+        if (partidosResp.ok && seleccionesResp.ok) {
+            const partidos = await partidosResp.json();
+            const selecciones = await seleccionesResp.json();
+            const nombrePorId = {};
+            (selecciones || []).forEach(s => { nombrePorId[s.id] = s.nombre; });
+            const lista = (partidos || []).map(p => ({
+                local: nombrePorId[p.equipo_localId] || p.local || 'Por definir',
+                visitante: nombrePorId[p.equipo_visitanteId] || p.visitante || 'Por definir',
+                marcador: `${p.goles_local ?? '-'} - ${p.goles_visitante ?? '-'}`,
+                fecha: p.fecha ? new Date(p.fecha).toLocaleString() : ''
+            }));
+            return renderResults(lista);
+        }
+
+        const [pl, sl] = await Promise.all([
+            fetch('partidos.json').catch(() => ({ ok: false })),
+            fetch('selecciones.json').catch(() => ({ ok: false }))
+        ]);
+        const partidos = pl.ok ? await pl.json() : [];
+        const selecciones = sl.ok ? await sl.json() : [];
         const nombrePorId = {};
         (selecciones || []).forEach(s => { nombrePorId[s.id] = s.nombre; });
         const lista = (partidos || []).map(p => ({
-            local: nombrePorId[p.equipo_localId] || 'Por definir',
-            visitante: nombrePorId[p.equipo_visitanteId] || 'Por definir',
+            local: nombrePorId[p.equipo_localId] || p.local || 'Por definir',
+            visitante: nombrePorId[p.equipo_visitanteId] || p.visitante || 'Por definir',
             marcador: `${p.goles_local ?? '-'} - ${p.goles_visitante ?? '-'}`,
             fecha: p.fecha ? new Date(p.fecha).toLocaleString() : ''
         }));
-        renderResults(lista);
+        return lista.length ? renderResults(lista) : renderResults();
     } catch (error) {
         console.error('Error cargando resultados:', error);
         renderResults();
@@ -445,6 +480,7 @@ btnTrazarRuta.addEventListener('click', ()=>{
         const uLat = pos.coords.latitude, uLng = pos.coords.longitude;
         if (userMarker) map.removeLayer(userMarker);
         userMarker = L.marker([uLat,uLng]).addTo(map).bindPopup('¡Estás aquí!').openPopup();
+        mostrarInfoGeolocalizacion(uLat, uLng, pos.coords.accuracy);
         trazarRutaLeaflet(uLat,uLng,equipoSeleccionado.getLat(),equipoSeleccionado.getLng());
         btnTrazarRuta.textContent = '📍 Ruta Generada';
         btnTrazarRuta.disabled = false;
@@ -1101,8 +1137,8 @@ async function cargarSeleccionesParaSelector() {
 btnEjecutarConSelect.addEventListener('click', async () => {
     const sid = simulacionSelectEquipo.value;
     console.log('Ejecutar consulta 2 con seleccionId:', sid);
-    if (!sid || !/^[0-9a-fA-F]{24}$/.test(sid)) {
-        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Selecciona una selección válida. ID recibido: ${sid || 'vacío'}</p>`;
+    if (!sid) {
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Selecciona una selección válida.</p>`;
         return;
     }
     await ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
@@ -1189,12 +1225,6 @@ btnVolverMenu.addEventListener('click', () => {
     simulacionSelector.classList.add('hidden');
     consultaSeleccionada = null;
     renderizarMenu();
-});
-
-btnEjecutarConSelect.addEventListener('click', () => {
-    const sid = simulacionSelectEquipo.value;
-    if (!sid) { alert('Selecciona una selección'); return; }
-    ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
 });
 
 async function ejecutarConsultaConSeleccion(numero, sid) {

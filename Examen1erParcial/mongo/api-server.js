@@ -59,6 +59,162 @@ function normalizeBandera(paisNombre, urlActual) {
   return `https://flagcdn.com/w80/${code}.png`;
 }
 
+// --- SIMULACION: Índice de Fuerza (IF), probabilidades, Poisson, Monte Carlo ---
+function safeNum(v, def = 0) { return (v === undefined || v === null || Number.isNaN(Number(v))) ? def : Number(v); }
+
+function poissonPmf(lambda, k) {
+  return Math.exp(-lambda) * Math.pow(lambda, k) / (factorial(k));
+}
+
+function factorial(n) {
+  if (n < 2) return 1;
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+
+function poissonSample(lambda) {
+  // Knuth algorithm
+  const L = Math.exp(-lambda);
+  let k = 0;
+  let p = 1;
+  do {
+    k++;
+    p *= Math.random();
+  } while (p > L);
+  return k - 1;
+}
+
+function computeIFForSelection(selDoc, stats = {}, weights = null) {
+  // Default weights (from PDF example)
+  const defaultWeights = {
+    ranking: 0.20,
+    historial_mundial: 0.15,
+    historial_rival: 0.10,
+    goles_anotados: 0.10,
+    goles_recibidos: 0.10,
+    diferencia_goles: 0.10,
+    partidos_ganados: 0.10,
+    valor_plantilla: 0.05,
+    experiencia: 0.05
+  };
+  const w = weights || defaultWeights;
+
+  // Normalize ranking: lower ranking number -> better. Use maxRank fallback
+  const maxRank = 250;
+  const rankingScore = ('ranking' in selDoc) ? ((maxRank - safeNum(selDoc.ranking, maxRank)) / maxRank) * 100 : 50;
+
+  const pj = safeNum(stats.pj, 0);
+  const gf = safeNum(stats.gf, 0);
+  const gc = safeNum(stats.gc, 0);
+  const pg = safeNum(stats.pg, 0);
+  const diferencia = gf - gc;
+
+  const golesAnotadosScore = pj > 0 ? Math.min(100, (gf / pj) * 40) : 20; // heuristic
+  const golesRecibidosScore = pj > 0 ? Math.max(0, 100 - (gc / pj) * 40) : 50;
+  const diferenciaScore = Math.max(0, Math.min(100, (diferencia + 10) * 5));
+  const partidosGanadosScore = pj > 0 ? (pg / pj) * 100 : 20;
+
+  const historialMundialScore = safeNum(selDoc.experiencia_mundiales, 0) > 0 ? Math.min(100, selDoc.experiencia_mundiales * 10) : 0;
+  const valorPlantillaScore = safeNum(selDoc.valor_plantilla, 0) > 0 ? Math.min(100, selDoc.valor_plantilla / 1_000_000) : 0;
+
+  const score = (rankingScore * w.ranking)
+    + (historialMundialScore * w.historial_mundial)
+    + (golesAnotadosScore * w.goles_anotados)
+    + (golesRecibidosScore * w.goles_recibidos)
+    + (diferenciaScore * w.diferencia_goles)
+    + (partidosGanadosScore * w.partidos_ganados)
+    + (valorPlantillaScore * w.valor_plantilla)
+    + (historialMundialScore * w.experiencia);
+
+  // Clamp 0-100
+  const IF = Math.max(0, Math.min(100, score));
+  return { IF: parseFloat(IF.toFixed(2)), components: { rankingScore, golesAnotadosScore, golesRecibidosScore, diferenciaScore, partidosGanadosScore, valorPlantillaScore, historialMundialScore } };
+}
+
+function probabilitiesFromIF(ifA, ifB, homeAdv = 0) {
+  // Apply home advantage
+  const A = Math.max(0.001, ifA + homeAdv);
+  const B = Math.max(0.001, ifB);
+  // Use Bradley-Terry style with a draw baseline
+  const skal = 10; // scale to soften differences
+  const ra = Math.exp(A / skal);
+  const rb = Math.exp(B / skal);
+  const pNoDrawA = ra / (ra + rb);
+  const pNoDrawB = rb / (ra + rb);
+  const baselineDraw = 0.18; // default draw probability
+  // Reduce draw slightly as disparity grows
+  const disparity = Math.abs(A - B) / 100;
+  const draw = Math.max(0.06, baselineDraw * (1 - disparity));
+  const remaining = 1 - draw;
+  const pA = parseFloat((remaining * pNoDrawA).toFixed(4));
+  const pB = parseFloat((remaining * pNoDrawB).toFixed(4));
+  return { local: pA, draw, visitante: pB };
+}
+
+async function computeTeamStats(db, seleccionId) {
+  // aggregate local stats: pj, pg, pe, pp, gf, gc
+  try {
+    const oid = ObjectId.isValid(seleccionId) ? new ObjectId(seleccionId) : null;
+    if (!oid) return { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 };
+    const pipeline = [
+      { $match: { $or: [{ equipo_localId: oid }, { equipo_visitanteId: oid }] } },
+      { $project: { equipo_localId: 1, goles_local: { $ifNull: ['$goles_local', 0] }, goles_visitante: { $ifNull: ['$goles_visitante', 0] } } },
+      { $group: { _id: null, pj: { $sum: 1 }, gf: { $sum: { $cond: [{ $eq: ['$equipo_localId', oid] }, '$goles_local', '$goles_visitante'] } }, gc: { $sum: { $cond: [{ $eq: ['$equipo_localId', oid] }, '$goles_visitante', '$goles_local'] } }, pg: { $sum: { $cond: [{ $and: [{ $eq: ['$equipo_localId', oid] }, { $gt: ['$goles_local', '$goles_visitante'] }] }, 1, { $cond: [{ $and: [{ $eq: ['$equipo_visitanteId', oid] }, { $gt: ['$goles_visitante', '$goles_local'] }] }, 1, 0] } ] } }, pe: { $sum: { $cond: [{ $eq: ['$goles_local', '$goles_visitante'] }, 1, 0] } } } }
+    ];
+    const res = await db.collection('partidos').aggregate(pipeline).toArray();
+    if (!res || res.length === 0) return { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 };
+    const r = res[0];
+    const pp = (r.pj || 0) - (r.pg || 0) - (r.pe || 0);
+    return { pj: safeNum(r.pj, 0), pg: safeNum(r.pg, 0), pe: safeNum(r.pe, 0), pp: safeNum(pp, 0), gf: safeNum(r.gf, 0), gc: safeNum(r.gc, 0) };
+  } catch (err) {
+    return { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 };
+  }
+}
+
+async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, homeAdv = 5) {
+  const localDoc = await db.collection('selecciones').findOne({ _id: new ObjectId(localId) });
+  const visitanteDoc = await db.collection('selecciones').findOne({ _id: new ObjectId(visitanteId) });
+  const localStats = await computeTeamStats(db, localId);
+  const visitanteStats = await computeTeamStats(db, visitanteId);
+  const ifLocalObj = computeIFForSelection(localDoc || {}, localStats);
+  const ifVisitObj = computeIFForSelection(visitanteDoc || {}, visitanteStats);
+  const probs = probabilitiesFromIF(ifLocalObj.IF, ifVisitObj.IF, homeAdv);
+
+  // Estimate expected goals (lambda) per team from historic avg and IF ratio
+  const avgLocal = localStats.pj > 0 ? (localStats.gf / localStats.pj) : 1.2;
+  const avgVisit = visitanteStats.pj > 0 ? (visitanteStats.gf / visitanteStats.pj) : 0.9;
+  const ratio = (ifLocalObj.IF + ifVisitObj.IF) > 0 ? (ifLocalObj.IF / (ifLocalObj.IF + ifVisitObj.IF)) : 0.5;
+  const lambdaLocal = Math.max(0.1, (avgLocal * (0.8 + ratio)));
+  const lambdaVisit = Math.max(0.05, (avgVisit * (0.8 + (1 - ratio))));
+
+  let localWins = 0, visitanteWins = 0, draws = 0; let totalGoalsLocal = 0, totalGoalsVisit = 0;
+  const scoreMap = new Map();
+  for (let i = 0; i < iterations; i++) {
+    const gLocal = poissonSample(lambdaLocal);
+    const gVisit = poissonSample(lambdaVisit);
+    totalGoalsLocal += gLocal; totalGoalsVisit += gVisit;
+    const key = `${gLocal}-${gVisit}`;
+    scoreMap.set(key, (scoreMap.get(key) || 0) + 1);
+    if (gLocal > gVisit) localWins++; else if (gLocal < gVisit) visitanteWins++; else draws++;
+  }
+
+  // Convert scoreMap to top outcomes
+  const topScores = Array.from(scoreMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([score, cnt]) => ({ score, count: cnt, pct: parseFloat(((cnt / iterations) * 100).toFixed(2)) }));
+
+  return {
+    local: { id: localId, nombre: localDoc?.nombre || 'Local', IF: ifLocalObj.IF, promedio_goles_hist: avgLocal },
+    visitante: { id: visitanteId, nombre: visitanteDoc?.nombre || 'Visitante', IF: ifVisitObj.IF, promedio_goles_hist: avgVisit },
+    probs,
+    lambda: { local: parseFloat(lambdaLocal.toFixed(3)), visitante: parseFloat(lambdaVisit.toFixed(3)) },
+    iterations,
+    resultados: { localWins, visitanteWins, draws, pctLocal: parseFloat(((localWins / iterations) * 100).toFixed(2)), pctVisita: parseFloat(((visitanteWins / iterations) * 100).toFixed(2)), pctDraw: parseFloat(((draws / iterations) * 100).toFixed(2)) },
+    avgGoals: { local: parseFloat((totalGoalsLocal / iterations).toFixed(3)), visitante: parseFloat((totalGoalsVisit / iterations).toFixed(3)) },
+    topScores
+  };
+}
+
+
 async function recalculateGroupClasification(db) {
   const groupMatches = await db.collection('partidos').aggregate([
     {
@@ -829,6 +985,32 @@ const server = http.createServer(async (req, res) => {
             { $sort: { fecha: 1 } }
           ]).toArray();
           sendJson(res, 200, partidos);
+          return;
+        }
+
+        // --- Nuevo: calcular IF para todas las selecciones (consulta=11) ---
+        if (tipo === '11') {
+          const selecciones = await db.collection('selecciones').find({}).toArray();
+          const results = [];
+          for (const s of selecciones) {
+            const stats = await computeTeamStats(db, s._id.toString());
+            const ifObj = computeIFForSelection(s, stats);
+            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, components: ifObj.components });
+          }
+          results.sort((a, b) => b.IF - a.IF);
+          sendJson(res, 200, results);
+          return;
+        }
+
+        // --- Nuevo: simulación Monte Carlo para un partido (consulta=12) ---
+        if (tipo === '12') {
+          const localId = params.get('localId') || params.get('equipo_localId') || params.get('home');
+          const visitanteId = params.get('visitanteId') || params.get('equipo_visitanteId') || params.get('away');
+          const iter = Math.max(100, parseInt(params.get('iter') || params.get('iterations') || '5000', 10));
+          if (!localId || !visitanteId) { sendJson(res, 400, { error: 'Faltan localId o visitanteId' }); return; }
+          if (!ObjectId.isValid(localId) || !ObjectId.isValid(visitanteId)) { sendJson(res, 400, { error: 'IDs inválidos' }); return; }
+          const resultado = await monteCarloMatch(db, localId, visitanteId, iter, 5);
+          sendJson(res, 200, resultado);
           return;
         }
 
