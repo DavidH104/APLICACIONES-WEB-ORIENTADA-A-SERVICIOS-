@@ -9,8 +9,9 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['continente', 'confederacion', 'paises_incluidos'],
+        required: ['nombre', 'confederacion', 'paises_incluidos'],
         properties: {
+          nombre: { bsonType: 'string' },
           continente: { bsonType: 'string' },
           confederacion: { bsonType: 'string' },
           paises_incluidos: { bsonType: 'array', items: { bsonType: 'string' } }
@@ -35,24 +36,19 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['nombre', 'continente_id', 'historia', 'ventajas', 'desventajas', 'ranking', 'bandera_url', 'geolocalizacion'],
+        required: ['nombre', 'continenteId', 'grupoId', 'historia', 'ventajas', 'desventajas', 'ranking', 'banderaUrl', 'latitud', 'longitud'],
         properties: {
           nombre: { bsonType: 'string' },
-          continente_id: { bsonType: 'objectId' },
-          grupo_id: { bsonType: 'objectId' },
+          continenteId: { bsonType: 'objectId' },
+          grupoId: { bsonType: 'objectId' },
           historia: { bsonType: 'string' },
           ventajas: { bsonType: 'string' },
           desventajas: { bsonType: 'string' },
           ranking: { bsonType: ['int', 'long', 'double'] },
+          banderaUrl: { bsonType: 'string' },
           bandera_url: { bsonType: 'string' },
-          geolocalizacion: {
-            bsonType: 'object',
-            required: ['latitud', 'longitud'],
-            properties: {
-              latitud: { bsonType: ['double', 'int', 'long'] },
-              longitud: { bsonType: ['double', 'int', 'long'] }
-            }
-          }
+          latitud: { bsonType: ['double', 'int', 'long'] },
+          longitud: { bsonType: ['double', 'int', 'long'] }
         }
       }
     }
@@ -79,12 +75,12 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['nombre_fase', 'clasificados', 'partidos_ids', 'sede_id', 'fecha'],
+        required: ['nombre', 'clasificados', 'partidos', 'sede', 'fecha'],
         properties: {
-          nombre_fase: { bsonType: 'string' },
+          nombre: { bsonType: 'string' },
           clasificados: { bsonType: 'array', items: { bsonType: 'string' } },
-          partidos_ids: { bsonType: 'array', items: { bsonType: 'objectId' } },
-          sede_id: { bsonType: 'objectId' },
+          partidos: { bsonType: ['int', 'long', 'double'] },
+          sede: { bsonType: 'string' },
           fecha: { bsonType: 'date' }
         }
       }
@@ -95,15 +91,17 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['fase', 'equipo_local_id', 'equipo_visitante_id', 'goles_local', 'goles_visitante', 'fecha', 'estadio_id'],
+        required: ['fase', 'faseId', 'equipo_localId', 'equipo_visitanteId', 'goles_local', 'goles_visitante', 'fecha', 'estadioId'],
         properties: {
           fase: { bsonType: 'string' },
-          equipo_local_id: { bsonType: 'objectId' },
-          equipo_visitante_id: { bsonType: 'objectId' },
+          faseId: { bsonType: 'objectId' },
+          equipo_localId: { bsonType: 'objectId' },
+          equipo_visitanteId: { bsonType: 'objectId' },
           goles_local: { bsonType: ['int', 'long', 'double'] },
           goles_visitante: { bsonType: ['int', 'long', 'double'] },
           fecha: { bsonType: 'date' },
-          estadio_id: { bsonType: 'objectId' }
+          estadioId: { bsonType: 'objectId' },
+          horario: { bsonType: 'string' }
         }
       }
     }
@@ -113,10 +111,10 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['grupo_id', 'seleccion_id', 'pj', 'pg', 'pe', 'pp', 'gf', 'gc', 'dg', 'pts'],
+        required: ['grupoId', 'seleccionId', 'pj', 'pg', 'pe', 'pp', 'gf', 'gc', 'dg', 'pts'],
         properties: {
-          grupo_id: { bsonType: 'objectId' },
-          seleccion_id: { bsonType: 'objectId' },
+          grupoId: { bsonType: 'objectId' },
+          seleccionId: { bsonType: 'objectId' },
           pj: { bsonType: ['int', 'long', 'double'] },
           pg: { bsonType: ['int', 'long', 'double'] },
           pe: { bsonType: ['int', 'long', 'double'] },
@@ -134,9 +132,11 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['nombre'],
+        required: ['nombre', 'usuario'],
         properties: {
-          nombre: { bsonType: 'string' }
+          nombre: { bsonType: 'string' },
+          usuario: { bsonType: 'string' },
+          role: { bsonType: 'string' }
         }
       }
     }
@@ -146,14 +146,14 @@ const collections = [
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['usuario_id', 'estadio_id', 'dia', 'fecha', 'horario', 'seleccion_id', 'costo'],
+        required: ['usuarioId', 'estadioId', 'dia', 'fecha', 'horario', 'seleccionId', 'costo'],
         properties: {
-          usuario_id: { bsonType: 'objectId' },
-          estadio_id: { bsonType: 'objectId' },
+          usuarioId: { bsonType: 'objectId' },
+          estadioId: { bsonType: 'objectId' },
           dia: { bsonType: 'string' },
           fecha: { bsonType: 'date' },
           horario: { bsonType: 'string' },
-          seleccion_id: { bsonType: 'objectId' },
+          seleccionId: { bsonType: 'objectId' },
           costo: { bsonType: ['int', 'long', 'double'] }
         }
       }
@@ -175,17 +175,18 @@ async function createCollections(db) {
 
 async function createIndexes(db) {
   await Promise.all([
-    db.collection('selecciones').createIndex({ continente_id: 1 }),
-    db.collection('selecciones').createIndex({ grupo_id: 1 }),
-    db.collection('partidos').createIndex({ estadio_id: 1 }),
+    db.collection('selecciones').createIndex({ continenteId: 1 }),
+    db.collection('selecciones').createIndex({ grupoId: 1 }),
+    db.collection('partidos').createIndex({ estadioId: 1 }),
     db.collection('partidos').createIndex({ fase: 1 }),
-    db.collection('partidos').createIndex({ equipo_local_id: 1 }),
-    db.collection('partidos').createIndex({ equipo_visitante_id: 1 }),
-    db.collection('boletos').createIndex({ usuario_id: 1 }),
-    db.collection('boletos').createIndex({ estadio_id: 1 }),
-    db.collection('boletos').createIndex({ seleccion_id: 1 }),
-    db.collection('clasificaciones').createIndex({ grupo_id: 1 }),
-    db.collection('clasificaciones').createIndex({ seleccion_id: 1 })
+    db.collection('partidos').createIndex({ faseId: 1 }),
+    db.collection('partidos').createIndex({ equipo_localId: 1 }),
+    db.collection('partidos').createIndex({ equipo_visitanteId: 1 }),
+    db.collection('boletos').createIndex({ usuarioId: 1 }),
+    db.collection('boletos').createIndex({ estadioId: 1 }),
+    db.collection('boletos').createIndex({ seleccionId: 1 }),
+    db.collection('clasificaciones').createIndex({ grupoId: 1 }),
+    db.collection('clasificaciones').createIndex({ seleccionId: 1 })
   ]);
 }
 
