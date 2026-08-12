@@ -689,6 +689,20 @@ tr:nth-child(even) td {
     background-color: #dc2626;
 }
 
+.btn-random {
+    background-color: #7c3aed;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-random:hover {
+    background-color: #6d28d9;
+}
+
 .admin-edit-row {
     flex-direction: column;
     align-items: stretch;

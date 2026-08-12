@@ -563,7 +563,7 @@ function renderAdminPartidos(partidos) {
             const res = await fetch(`/api/admin/partidos/${btn.dataset.id}`, { method: 'DELETE' });
             if (!res.ok) return alert('No se pudo eliminar');
             alert('Partido eliminado');
-            await Promise.all([loadAdminPartidos(), loadStandings()]);
+            await Promise.all([loadAdminPartidos(), loadStandings(), loadResults()]);
         });
     });
 }
@@ -607,12 +607,56 @@ document.getElementById('form-partido').addEventListener('submit', async (e) => 
     alert(id ? 'Partido actualizado' : 'Partido creado');
     document.getElementById('form-partido').reset();
     document.getElementById('partido-id').value = '';
-            await Promise.all([loadAdminPartidos(), loadStandings()]);
+    await Promise.all([loadAdminPartidos(), loadStandings(), loadResults()]);
 });
 
 document.getElementById('btn-cancelar-partido').addEventListener('click', () => {
     document.getElementById('form-partido').reset();
     document.getElementById('partido-id').value = '';
+});
+
+document.getElementById('btn-partido-random').addEventListener('click', async () => {
+    try {
+        const resp = await fetch('/api/selecciones');
+        const selecciones = await resp.json();
+        const respEstadios = await fetch('/api/estadios');
+        const estadios = await respEstadios.json();
+        const respFases = await fetch('/api/fases');
+        const fases = await respFases.json();
+        if (!selecciones.length || !estadios.length || !fases.length) {
+            alert('Faltan datos base para generar el partido');
+            return;
+        }
+        const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+        const [local, visitante] = shuffle(selecciones).slice(0, 2);
+        const fase = fases[Math.floor(Math.random() * fases.length)];
+        const estadio = estadios[Math.floor(Math.random() * estadios.length)];
+        const hoy = new Date();
+        const fecha = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + Math.floor(Math.random() * 30), 10 + Math.floor(Math.random() * 12), 0, 0);
+        const body = {
+            faseId: fase.id,
+            equipo_localId: local.id,
+            equipo_visitanteId: visitante.id,
+            estadioId: estadio.id,
+            fecha: fecha.toISOString().slice(0, 16),
+            horario: fecha.toISOString().slice(11, 16),
+            goles_local: Math.floor(Math.random() * 4),
+            goles_visitante: Math.floor(Math.random() * 4)
+        };
+        const res = await fetch('/api/admin/partidos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || 'No se pudo guardar el partido aleatorio');
+            return;
+        }
+        alert('Partido aleatorio creado');
+        document.getElementById('form-partido').reset();
+        document.getElementById('partido-id').value = '';
+        await Promise.all([loadAdminPartidos(), loadStandings(), loadResults()]);
+    } catch (err) {
+        console.error(err);
+        alert('Error generando partido aleatorio');
+    }
 });
 
 async function loadAdminSelecciones() {
@@ -677,7 +721,7 @@ function renderAdminSelecciones(selecciones) {
             const res = await fetch(`/api/admin/selecciones/${btn.dataset.id}`, { method: 'DELETE' });
             if (!res.ok) return alert('No se pudo eliminar');
             alert('Selección eliminada');
-            await Promise.all([loadAdminSelecciones(), loadStandings()]);
+            await Promise.all([loadAdminSelecciones(), loadStandings(), loadResults()]);
         });
     });
 }
@@ -706,7 +750,7 @@ document.getElementById('form-seleccion').addEventListener('submit', async (e) =
     alert(id ? 'Selección actualizada' : 'Selección creada');
     document.getElementById('form-seleccion').reset();
     document.getElementById('seleccion-id').value = '';
-    await Promise.all([loadAdminSelecciones(), loadStandings()]);
+    await Promise.all([loadAdminSelecciones(), loadStandings(), loadResults()]);
 });
 
 document.getElementById('btn-cancelar-seleccion').addEventListener('click', () => {
@@ -849,7 +893,7 @@ function renderAdminClasificaciones(clasificaciones) {
             });
             if (!res.ok) return alert('No se pudo actualizar');
             alert('Tabla actualizada');
-            await Promise.all([loadAdminClasificaciones(), loadStandings()]);
+            await Promise.all([loadAdminClasificaciones(), loadStandings(), loadResults()]);
         });
         container.appendChild(wrap);
     });
@@ -911,7 +955,7 @@ async function showAdminPanel() {
     adminPanel.classList.remove('hidden');
     adminLoggedIn = true;
     await cargarOpcionesAdmin();
-    await Promise.all([loadAdminPartidos(), loadAdminSelecciones(), loadAdminEstadios(), loadAdminClasificaciones(), loadAdminFases()]);
+    await Promise.all([loadAdminPartidos(), loadAdminSelecciones(), loadAdminEstadios(), loadAdminClasificaciones(), loadAdminFases(), loadResults()]);
 }
 
 function hideAdminPanel() {
@@ -1023,6 +1067,7 @@ function seleccionarConsulta(consulta) {
     if (consulta.requiereSeleccion) {
         simulacionSelector.classList.remove('hidden');
         simulacionResultados.classList.add('hidden');
+        simulacionTablaContainer.innerHTML = '';
         cargarSeleccionesParaSelector();
     } else {
         simulacionSelector.classList.add('hidden');
@@ -1034,7 +1079,6 @@ async function cargarSeleccionesParaSelector() {
     try {
         const resp = await fetch(`/api/simulacion?consulta=${consultaSeleccionada.numero}`);
         console.log('cargarSeleccionesParaSelector', consultaSeleccionada.numero, resp.status, resp.statusText);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
         const data = await resp.json();
         console.log('data selecciones', data);
         if (data.requiereSeleccion && Array.isArray(data.selecciones)) {
@@ -1050,9 +1094,19 @@ async function cargarSeleccionesParaSelector() {
         }
     } catch (err) {
         console.error('Error cargando selecciones:', err);
-        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error cargando selecciones: ${err.message}. Asegúrate de abrir la app desde http://localhost:3000 y tener el servidor backend corriendo.</p>`;
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error cargando selecciones: ${err.message}</p>`;
     }
 }
+
+btnEjecutarConSelect.addEventListener('click', async () => {
+    const sid = simulacionSelectEquipo.value;
+    console.log('Ejecutar consulta 2 con seleccionId:', sid);
+    if (!sid || !/^[0-9a-fA-F]{24}$/.test(sid)) {
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Selecciona una selección válida. ID recibido: ${sid || 'vacío'}</p>`;
+        return;
+    }
+    await ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
+});
 
 function mostrarResultados(titulo, datos) {
     simulacionTitulo.textContent = titulo;
@@ -1112,7 +1166,11 @@ async function ejecutarConsulta(numero) {
     try {
         const resp = await fetch(`/api/simulacion?consulta=${numero}`);
         console.log('ejecutarConsulta', numero, resp.status, resp.statusText);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        if (!resp.ok) {
+          let detalle = resp.statusText;
+          try { const err = await resp.json(); detalle = JSON.stringify(err); } catch (_) { try { detalle = await resp.text(); } catch (_) {} }
+          throw new Error(`HTTP ${resp.status}: ${detalle}`);
+        }
         const data = await resp.json();
         simulacionLoading.classList.add('hidden');
         const titulo = CONSULTAS.find(c => c.numero === numero)?.titulo || `Consulta ${numero}`;
@@ -1120,7 +1178,7 @@ async function ejecutarConsulta(numero) {
     } catch (err) {
         console.error(err);
         simulacionLoading.classList.add('hidden');
-        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error al cargar la consulta: ${err.message}. Asegúrate de abrir la app desde http://localhost:3000 y tener el servidor backend corriendo.</p>`;
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error al cargar la consulta: ${err.message}</p>`;
     }
 }
 
@@ -1156,7 +1214,7 @@ async function ejecutarConsultaConSeleccion(numero, sid) {
     } catch (err) {
         console.error(err);
         simulacionLoading.classList.add('hidden');
-        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error al cargar la consulta: ${err.message}. Asegúrate de abrir la app desde http://localhost:3000 y tener el servidor backend corriendo.</p>`;
+        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Error al cargar la consulta: ${err.message}</p>`;
     }
 }
 

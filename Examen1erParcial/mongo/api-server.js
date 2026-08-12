@@ -456,7 +456,7 @@ const server = http.createServer(async (req, res) => {
               estadio: { id: '$estadio._id', nombre: '$estadio.nombre' }
             }
           },
-          { $sort: { fecha: 1 } }
+          { $sort: { fecha: -1 } }
         ]).toArray();
 
         const payload = partidos.map((item) => ({
@@ -535,7 +535,7 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (url.pathname === '/api/partidos') {
-        const partidos = await db.collection('partidos').find({}).sort({ fecha: 1 }).limit(20).toArray();
+        const partidos = await db.collection('partidos').find({}).sort({ fecha: -1 }).toArray();
         const payload = partidos.map(serializeObjectId);
         sendJson(res, 200, payload);
         return;
@@ -616,7 +616,11 @@ const server = http.createServer(async (req, res) => {
         if (tipo === '2') {
           if (!seleccionId) {
             const sel = await db.collection('selecciones').find({}, { projection: { nombre: 1, banderaUrl: 1 } }).sort({ nombre: 1 }).toArray();
-            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ ...s, bandera: normalizeBandera(s.nombre, s.banderaUrl) })) });
+            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ id: s._id.toString(), nombre: s.nombre, bandera: normalizeBandera(s.nombre, s.banderaUrl) })) });
+            return;
+          }
+          if (!ObjectId.isValid(seleccionId)) {
+            sendJson(res, 400, { error: 'ID de selección inválido', received: seleccionId });
             return;
           }
           const selObj = await db.collection('selecciones').findOne({ _id: new ObjectId(seleccionId) });
@@ -703,7 +707,11 @@ const server = http.createServer(async (req, res) => {
         if (tipo === '5') {
           if (!seleccionId) {
             const sel = await db.collection('selecciones').find({}, { projection: { nombre: 1, banderaUrl: 1 } }).sort({ nombre: 1 }).toArray();
-            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ id: s._id.toString(), nombre: s.nombre, bandera: s.banderaUrl })) });
+            sendJson(res, 200, { requiereSeleccion: true, selecciones: sel.map(s => ({ id: s._id.toString(), nombre: s.nombre, bandera: normalizeBandera(s.nombre, s.banderaUrl) })) });
+            return;
+          }
+          if (!ObjectId.isValid(seleccionId)) {
+            sendJson(res, 400, { error: 'ID de selección inválido', received: seleccionId });
             return;
           }
           const selObj = await db.collection('selecciones').findOne({ _id: new ObjectId(seleccionId) });
@@ -839,7 +847,7 @@ const server = http.createServer(async (req, res) => {
           sendJson(res, 400, { error: 'Faltan credenciales' });
           return;
         }
-        const userDoc = await db.collection('admin').findOne({ usuario }).catch(() => null);
+        let userDoc = await db.collection('admin').findOne({ usuario }).catch(() => null);
         const source = userDoc ? 'admin' : null;
         if (!source) {
           userDoc = await db.collection('usuarios').findOne({ usuario }).catch(() => null);
@@ -857,6 +865,33 @@ const server = http.createServer(async (req, res) => {
         } else {
           sendJson(res, 401, { ok: false, error: 'Credenciales inválidas' });
         }
+        return;
+      }
+
+      if (url.pathname === '/api/admin/partidos-random') {
+        const fases = await db.collection('fase_final').find({}).toArray();
+        const selecciones = await db.collection('selecciones').find({}).toArray();
+        const estadios = await db.collection('estadios').find({}).toArray();
+        if (!fases.length || !selecciones.length || !estadios.length) {
+          sendJson(res, 400, { error: 'Faltan datos base: fases, selecciones o estadios' });
+          return;
+        }
+        const fase = fases[Math.floor(Math.random() * fases.length)];
+        const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+        const [local, visitante] = shuffle(selecciones).slice(0, 2);
+        const estadio = estadios[Math.floor(Math.random() * estadios.length)];
+        const hoy = new Date();
+        const fecha = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + Math.floor(Math.random() * 30), 10 + Math.floor(Math.random() * 12), 0, 0);
+        sendJson(res, 200, {
+          faseId: fase._id.toString(),
+          equipo_localId: local._id.toString(),
+          equipo_visitanteId: visitante._id.toString(),
+          estadioId: estadio._id.toString(),
+          fecha: fecha.toISOString().slice(0, 16),
+          horario: fecha.toISOString().slice(11, 16),
+          goles_local: Math.floor(Math.random() * 4),
+          goles_visitante: Math.floor(Math.random() * 4)
+        });
         return;
       }
 
@@ -1126,7 +1161,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`API escuchando en http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3002;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`API escuchando en http://0.0.0.0:${PORT}`);
 });
