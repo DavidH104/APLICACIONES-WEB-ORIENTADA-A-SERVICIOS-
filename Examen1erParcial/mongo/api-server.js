@@ -214,6 +214,91 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
   };
 }
 
+// --- Estadísticas y historial helpers ---
+async function countCleanSheets(db, seleccionId) {
+  try {
+    const oid = new ObjectId(seleccionId);
+    const pipeline = [
+      { $match: { $or: [{ equipo_localId: oid }, { equipo_visitanteId: oid }] } },
+      { $project: { isLocal: { $eq: ['$equipo_localId', oid] }, goles_local: { $ifNull: ['$goles_local', 0] }, goles_visitante: { $ifNull: ['$goles_visitante', 0] } } },
+      { $project: { clean: { $cond: [{ $and: [{ $eq: ['$isLocal', true] }, { $eq: ['$goles_visitante', 0] }] }, 1, { $cond: [{ $and: [{ $eq: ['$isLocal', false] }, { $eq: ['$goles_local', 0] }] }, 1, 0] } ] } } },
+      { $group: { _id: null, count: { $sum: '$clean' } } }
+    ];
+    const res = await db.collection('partidos').aggregate(pipeline).toArray();
+    return (res && res[0]) ? safeNum(res[0].count, 0) : 0;
+  } catch (e) { return 0; }
+}
+
+async function populateEstadisticas(db) {
+  const selecciones = await db.collection('selecciones').find({}).toArray();
+  const out = [];
+  for (const s of selecciones) {
+    const sid = s._id.toString();
+    const stats = await computeTeamStats(db, sid);
+    const porterias_cero = await countCleanSheets(db, sid);
+    const partidos_jugados = safeNum(stats.pj, 0);
+    const partidos_ganados = safeNum(stats.pg, 0);
+    const partidos_empatados = safeNum(stats.pe, 0);
+    const partidos_perdidos = safeNum(stats.pp, 0);
+    const goles_favor = safeNum(stats.gf, 0);
+    const goles_contra = safeNum(stats.gc, 0);
+
+    const doc = {
+      seleccionId: new ObjectId(s._id),
+      partidos_jugados,
+      partidos_ganados,
+      partidos_empatados,
+      partidos_perdidos,
+      goles_favor,
+      goles_contra,
+      porterias_cero,
+      tiros_porteria: safeNum(s.tiros_porteria, 0),
+      posesion_promedio: safeNum(s.posesion_promedio, 0),
+      tiros_de_esquina: safeNum(s.tiros_esquina, 0),
+      faltas: safeNum(s.faltas, 0),
+      tarjetas_amarillas: safeNum(s.tarjetas_amarillas, 0),
+      tarjetas_rojas: safeNum(s.tarjetas_rojas, 0),
+      penales_anotados: safeNum(s.penales_anotados, 0),
+      penales_fallados: safeNum(s.penales_fallados, 0),
+      ranking_fifa: safeNum(s.ranking, 0),
+      valor_plantilla: safeNum(s.valor_plantilla, 0),
+      edad_promedio: safeNum(s.edad_promedio, 0),
+      experiencia_mundiales: safeNum(s.experiencia_mundiales, 0),
+      titulos_mundiales: safeNum(s.titulos_mundiales, 0),
+      subcampeonatos: safeNum(s.subcampeonatos, 0),
+      updatedAt: new Date()
+    };
+
+    // Upsert by seleccionId
+    await db.collection('estadisticas_seleccion').updateOne({ seleccionId: new ObjectId(s._id) }, { $set: doc }, { upsert: true });
+    out.push({ seleccionId: sid, nombre: s.nombre });
+  }
+  return out;
+}
+
+async function computeHeadToHead(db) {
+  // produce a collection of enfrentamientos agregados
+  const partidos = await db.collection('partidos').find({}).toArray();
+  const map = new Map();
+  partidos.forEach(p => {
+    const a = p.equipo_localId?.toString();
+    const b = p.equipo_visitanteId?.toString();
+    if (!a || !b) return;
+    const key = a < b ? `${a}__${b}` : `${b}__${a}`;
+    const rec = map.get(key) || { local: a, visitante: b, visitas: 0, victoriasA: 0, victoriasB: 0, empates: 0, golesA: 0, golesB: 0 };
+    const gA = safeNum(p.goles_local, 0), gB = safeNum(p.goles_visitante, 0);
+    rec.golesA += gA; rec.golesB += gB; rec.visitas++;
+    if (gA > gB) rec.victoriasA++; else if (gB > gA) rec.victoriasB++; else rec.empates++;
+    map.set(key, rec);
+  });
+  const out = Array.from(map.values());
+  // replace or insert
+  await db.collection('historial_enfrentamientos').deleteMany({});
+  if (out.length) await db.collection('historial_enfrentamientos').insertMany(out);
+  return out;
+}
+
+
 
 async function recalculateGroupClasification(db) {
   const groupMatches = await db.collection('partidos').aggregate([
@@ -1021,6 +1106,32 @@ const server = http.createServer(async (req, res) => {
 
     // --- MANEJO DE RUTAS POST ---
     if (req.method === 'POST') {
+      if (url.pathname === '/api/admin/poblar-estadisticas') {
+        try {
+          const out = await populateEstadisticas(db);
+          sendJson(res, 200, { ok: true, updated: out.length, items: out });
+        } catch (err) { console.error(err); sendJson(res, 500, { ok: false, error: err.message }); }
+        return;
+      }
+
+      if (url.pathname === '/api/admin/compute-h2h') {
+        try {
+          const out = await computeHeadToHead(db);
+          sendJson(res, 200, { ok: true, updated: out.length });
+        } catch (err) { console.error(err); sendJson(res, 500, { ok: false, error: err.message }); }
+        return;
+      }
+
+      // CRUD for IF weights
+      if (url.pathname === '/api/admin/if-pesos') {
+        const body = await parseJsonBody(req).catch(() => ({}));
+        try {
+          const doc = { ...body, updatedAt: new Date() };
+          await db.collection('config').updateOne({ key: 'if_weights' }, { $set: { value: doc } }, { upsert: true });
+          sendJson(res, 200, { ok: true, message: 'Pesos IF guardados' });
+        } catch (err) { console.error(err); sendJson(res, 500, { ok: false, error: err.message }); }
+        return;
+      }
       if (url.pathname === '/api/admin/login') {
         const body = await parseJsonBody(req).catch(() => ({}));
         const usuario = (body.usuario || body.user || '').toString();
