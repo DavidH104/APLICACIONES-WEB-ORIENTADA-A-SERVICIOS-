@@ -132,6 +132,15 @@ function computeIFForSelection(selDoc, stats = {}, weights = null) {
   return { IF: parseFloat(IF.toFixed(2)), components: { rankingScore, golesAnotadosScore, golesRecibidosScore, diferenciaScore, partidosGanadosScore, valorPlantillaScore, historialMundialScore } };
 }
 
+async function getIFWeights(db) {
+  try {
+    const cfg = await db.collection('config').findOne({ key: 'if_weights' });
+    return cfg ? cfg.value : null;
+  } catch (err) {
+    return null;
+  }
+}
+
 function probabilitiesFromIF(ifA, ifB, homeAdv = 0) {
   // Apply home advantage
   const A = Math.max(0.001, ifA + homeAdv);
@@ -172,13 +181,14 @@ async function computeTeamStats(db, seleccionId) {
   }
 }
 
-async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, homeAdv = 5) {
+async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, homeAdv = 5, weights = null) {
   const localDoc = await db.collection('selecciones').findOne({ _id: new ObjectId(localId) });
   const visitanteDoc = await db.collection('selecciones').findOne({ _id: new ObjectId(visitanteId) });
   const localStats = await computeTeamStats(db, localId);
   const visitanteStats = await computeTeamStats(db, visitanteId);
-  const ifLocalObj = computeIFForSelection(localDoc || {}, localStats);
-  const ifVisitObj = computeIFForSelection(visitanteDoc || {}, visitanteStats);
+  const effectiveWeights = weights || await getIFWeights(db);
+  const ifLocalObj = computeIFForSelection(localDoc || {}, localStats, effectiveWeights || undefined);
+  const ifVisitObj = computeIFForSelection(visitanteDoc || {}, visitanteStats, effectiveWeights || undefined);
   const probs = probabilitiesFromIF(ifLocalObj.IF, ifVisitObj.IF, homeAdv);
 
   // Estimate expected goals (lambda) per team from historic avg and IF ratio
@@ -212,6 +222,48 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
     avgGoals: { local: parseFloat((totalGoalsLocal / iterations).toFixed(3)), visitante: parseFloat((totalGoalsVisit / iterations).toFixed(3)) },
     topScores
   };
+}
+
+async function simulateGroupMonteCarlo(db, groupId, iterations = 2000) {
+  // get teams in group
+  const teams = await db.collection('selecciones').find({ grupoId: new ObjectId(groupId) }).toArray();
+  if (!teams || teams.length === 0) return { error: 'Grupo no encontrado o sin selecciones' };
+  const teamIds = teams.map(t => t._id.toString());
+  const weights = await getIFWeights(db);
+
+  // Build matches (each pair once)
+  const matches = [];
+  for (let i = 0; i < teams.length; i++) {
+    for (let j = i + 1; j < teams.length; j++) {
+      matches.push({ local: teams[i], visitante: teams[j] });
+    }
+  }
+
+  const finishCounts = {};
+  teamIds.forEach(id => finishCounts[id] = [0,0,0,0]);
+  const totalPoints = {}; teamIds.forEach(id => totalPoints[id] = 0);
+
+  for (let it = 0; it < iterations; it++) {
+    const points = {}; teamIds.forEach(id => points[id] = 0);
+    for (const m of matches) {
+      const localId = m.local._id.toString();
+      const visitId = m.visitante._id.toString();
+      const mc = await monteCarloMatch(db, localId, visitId, 1, 5, weights);
+      // monteCarloMatch with 1 iteration returns a sampled outcome in topScores? Instead sample directly using lambdas
+      const lambdaL = mc.lambda.local; const lambdaV = mc.lambda.visitante;
+      const gL = poissonSample(lambdaL);
+      const gV = poissonSample(lambdaV);
+      if (gL > gV) { points[localId] += 3; }
+      else if (gL < gV) { points[visitId] += 3; }
+      else { points[localId] += 1; points[visitId] += 1; }
+    }
+    // compute ranking
+    const ranking = Object.keys(points).map(id => ({ id, pts: points[id] })).sort((a,b) => b.pts - a.pts);
+    ranking.forEach((r, idx) => { finishCounts[r.id][idx]++; totalPoints[r.id] += r.pts; });
+  }
+
+  const result = teams.map(t => ({ id: t._id.toString(), nombre: t.nombre, avgPoints: parseFloat((totalPoints[t._id.toString()] / iterations).toFixed(3)), finishPct: finishCounts[t._id.toString()].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) }));
+  return { groupId, iterations, teams: result };
 }
 
 // --- Estadísticas y historial helpers ---
@@ -458,6 +510,28 @@ const server = http.createServer(async (req, res) => {
 
     // --- MANEJO DE RUTAS GET ---
     if (req.method === 'GET') {
+      // Admin: obtener estadisticas_seleccion
+      if (url.pathname === '/api/admin/estadisticas') {
+        const docs = await db.collection('estadisticas_seleccion').find({}).toArray();
+        const payload = docs.map(serializeObjectId);
+        sendJson(res, 200, payload);
+        return;
+      }
+
+      // Admin: obtener historial_enfrentamientos
+      if (url.pathname === '/api/admin/historial') {
+        const docs = await db.collection('historial_enfrentamientos').find({}).toArray();
+        const payload = docs.map(serializeObjectId);
+        sendJson(res, 200, payload);
+        return;
+      }
+
+      // Admin: obtener pesos IF (config)
+      if (url.pathname === '/api/admin/if-pesos') {
+        const cfg = await db.collection('config').findOne({ key: 'if_weights' });
+        sendJson(res, 200, { weights: cfg ? cfg.value : null });
+        return;
+      }
       if (url.pathname === '/api/selecciones') {
         const selecciones = await db.collection('selecciones').aggregate([
           {
@@ -1073,6 +1147,39 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
+        if (tipo === '11') {
+          const selecciones = await db.collection('selecciones').find({}).toArray();
+          const results = [];
+          for (const s of selecciones) {
+            const stats = await computeTeamStats(db, s._id.toString());
+            const ifObj = computeIFForSelection(s, stats);
+            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, components: ifObj.components });
+          }
+          results.sort((a, b) => b.IF - a.IF);
+          sendJson(res, 200, results);
+          return;
+        }
+
+        if (tipo === '12') {
+          const localId = params.get('localId') || params.get('equipo_localId') || params.get('home');
+          const visitanteId = params.get('visitanteId') || params.get('equipo_visitanteId') || params.get('away');
+          const iter = Math.max(1, parseInt(params.get('iter') || params.get('iterations') || '5000', 10));
+          if (!localId || !visitanteId) { sendJson(res, 400, { error: 'Faltan localId o visitanteId' }); return; }
+          if (!ObjectId.isValid(localId) || !ObjectId.isValid(visitanteId)) { sendJson(res, 400, { error: 'IDs inválidos' }); return; }
+          const resultado = await monteCarloMatch(db, localId, visitanteId, iter, 5);
+          sendJson(res, 200, resultado);
+          return;
+        }
+
+        if (tipo === '13') {
+          const groupId = params.get('groupId') || params.get('grupoId');
+          const iter = Math.max(100, parseInt(params.get('iter') || '2000', 10));
+          if (!groupId || !ObjectId.isValid(groupId)) { sendJson(res, 400, { error: 'groupId inválido' }); return; }
+          const resultado = await simulateGroupMonteCarlo(db, groupId, iter);
+          sendJson(res, 200, resultado);
+          return;
+        }
+
         // --- Nuevo: calcular IF para todas las selecciones (consulta=11) ---
         if (tipo === '11') {
           const selecciones = await db.collection('selecciones').find({}).toArray();
@@ -1207,6 +1314,94 @@ const server = http.createServer(async (req, res) => {
         });
         await recalculateGroupClasification(db);
         sendJson(res, 201, { id: result.insertedId.toString(), message: 'Partido creado' });
+        return;
+      }
+
+      // Admin: poblar estadisticas_seleccion a partir de partidos y selecciones
+      if (url.pathname === '/api/admin/poblar-estadisticas') {
+        try {
+          const selecciones = await db.collection('selecciones').find({}).toArray();
+          for (const s of selecciones) {
+            const stats = await computeTeamStats(db, s._id.toString());
+            // build doc with available fields from PDF where possible
+            const doc = {
+              seleccionId: s._id,
+              partidos_jugados: stats.pj || 0,
+              partidos_ganados: stats.pg || 0,
+              partidos_empatados: stats.pe || 0,
+              partidos_perdidos: stats.pp || 0,
+              goles_favor: stats.gf || 0,
+              goles_contra: stats.gc || 0,
+              // placeholders for advanced stats
+              porterias_cero: 0,
+              tiros_porteria: 0,
+              posesion_promedio: 0,
+              tiros_de_esquina: 0,
+              faltas: 0,
+              tarjetas_amarillas: 0,
+              tarjetas_rojas: 0,
+              penales_anotados: 0,
+              penales_fallados: 0,
+              ranking_fifa: safeNum(s.ranking, 0),
+              valor_plantilla: safeNum(s.valor_plantilla, 0),
+              edad_promedio: safeNum(s.edad_promedio, 0),
+              experiencia_mundiales: safeNum(s.experiencia_mundiales, 0),
+              titulos_mundiales: safeNum(s.titulos_mundiales, 0),
+              subcampeonatos: safeNum(s.subcampeonatos, 0),
+              updatedAt: new Date()
+            };
+            await db.collection('estadisticas_seleccion').updateOne({ seleccionId: s._id }, { $set: doc }, { upsert: true });
+          }
+          sendJson(res, 200, { message: 'Estadísticas pobladas' });
+        } catch (err) {
+          console.error('Error poblando estadisticas:', err);
+          sendJson(res, 500, { error: 'Error poblando estadisticas' });
+        }
+        return;
+      }
+
+      // Admin: poblar historial_enfrentamientos a partir de partidos
+      if (url.pathname === '/api/admin/poblar-historial') {
+        try {
+          // aggregate pairwise history
+          const pipeline = [
+            { $project: { local: '$equipo_localId', visitante: '$equipo_visitanteId', goles_local: { $ifNull: ['$goles_local', 0] }, goles_visitante: { $ifNull: ['$goles_visitante', 0] }, fecha: 1 } },
+            { $group: { _id: { local: '$local', visitante: '$visitante' }, partidos: { $push: { goles_local: '$goles_local', goles_visitante: '$goles_visitante', fecha: '$fecha' } }, total: { $sum: 1 } } }
+          ];
+          const lista = await db.collection('partidos').aggregate(pipeline).toArray();
+          for (const item of lista) {
+            const localId = item._id.local;
+            const visitanteId = item._id.visitante;
+            let victLocal = 0, victVisit = 0, empates = 0, golesLocal = 0, golesVisit = 0, ultimo = null;
+            for (const p of item.partidos) {
+              golesLocal += p.goles_local || 0; golesVisit += p.goles_visitante || 0;
+              if (p.goles_local > p.goles_visitante) victLocal++; else if (p.goles_local < p.goles_visitante) victVisit++; else empates++;
+              if (!ultimo || new Date(p.fecha) > new Date(ultimo)) ultimo = p.fecha;
+            }
+            const doc = {
+              localId, visitanteId, victorias_local: victLocal, victorias_visitante: victVisit, empates, goles_local: golesLocal, goles_visitante: golesVisit, partidos: item.total, ultimo_partido: ultimo
+            };
+            await db.collection('historial_enfrentamientos').updateOne({ localId, visitanteId }, { $set: doc }, { upsert: true });
+          }
+          sendJson(res, 200, { message: 'Historial poblado' });
+        } catch (err) {
+          console.error('Error poblando historial:', err);
+          sendJson(res, 500, { error: 'Error poblando historial' });
+        }
+        return;
+      }
+
+      // Admin: set IF weights
+      if (url.pathname === '/api/admin/if-pesos') {
+        try {
+          const body = await parseJsonBody(req).catch(() => ({}));
+          if (!body || typeof body !== 'object') { sendJson(res, 400, { error: 'Payload inválido' }); return; }
+          await db.collection('config').updateOne({ key: 'if_weights' }, { $set: { key: 'if_weights', value: body } }, { upsert: true });
+          sendJson(res, 200, { message: 'Pesos IF guardados' });
+        } catch (err) {
+          console.error('Error guardando IF weights:', err);
+          sendJson(res, 500, { error: 'Error guardando pesos' });
+        }
         return;
       }
 
