@@ -142,7 +142,14 @@ async function main() {
       ranking: s.ranking,
       banderaUrl: s.bandera_url,
       latitud: s.geolocalizacion.latitud,
-      longitud: s.geolocalizacion.longitud
+      longitud: s.geolocalizacion.longitud,
+      elo: s.elo,
+      valor_plantilla: s.valor_plantilla,
+      edad_promedio: s.edad_promedio,
+      experiencia_mundiales: s.experiencia_mundiales,
+      titulos_mundiales: s.titulos_mundiales,
+      subcampeonatos: s.subcampeonatos,
+      es_sede: s.es_sede
     });
     selectionIds[s.nombre] = insertedId;
   }

@@ -85,24 +85,143 @@ function poissonSample(lambda) {
   return k - 1;
 }
 
+function computeELOProbability(eloA, eloB) {
+  const ra = Math.pow(10, eloA / 400);
+  const rb = Math.pow(10, eloB / 400);
+  return ra / (ra + rb);
+}
+
+function updateELO(eloA, eloB, scoreA, scoreB, K = 30) {
+  const ea = computeELOProbability(eloA, eloB);
+  const eb = 1 - ea;
+  const newEloA = eloA + K * (scoreA - ea);
+  const newEloB = eloB + K * (scoreB - eb);
+  return { eloA: parseFloat(newEloA.toFixed(2)), eloB: parseFloat(newEloB.toFixed(2)) };
+}
+
+async function getMaxSquadValue(db) {
+  try {
+    const doc = await db.collection('selecciones').find({}).sort({ valor_plantilla: -1 }).limit(1).next();
+    return safeNum(doc?.valor_plantilla, 1);
+  } catch {
+    return 1;
+  }
+}
+
+async function getHeadToHeadScore(db, localId, visitanteId) {
+  try {
+    const a = localId.toString();
+    const b = visitanteId.toString();
+    const key = a < b ? `${a}__${b}` : `${b}__${a}`;
+    const doc = await db.collection('historial_enfrentamientos').findOne({ $or: [{ localId: a, visitanteId: b }, { localId: b, visitanteId: a }] });
+    if (!doc) return 50;
+    const total = (doc.victorias_local || 0) + (doc.victorias_visitante || 0) + (doc.empates || 0);
+    if (total === 0) return 50;
+    const wins = a === doc.localId ? (doc.victorias_local || 0) : (doc.victorias_visitante || 0);
+    const draws = doc.empates || 0;
+    const raw = ((wins * 3 + draws) / (total * 3)) * 100;
+    return Math.max(0, Math.min(100, raw));
+  } catch {
+    return 50;
+  }
+}
+
+async function computeRecentForm(db, seleccionId) {
+  try {
+    const oid = ObjectId.isValid(seleccionId) ? new ObjectId(seleccionId) : null;
+    if (!oid) return 50;
+    const partidos = await db.collection('partidos').find({
+      $or: [{ equipo_localId: oid }, { equipo_visitanteId: oid }]
+    }).sort({ fecha: -1 }).limit(10).toArray();
+
+    if (!partidos.length) return 50;
+
+    let pts = 0;
+    let gf = 0, gc = 0;
+    for (const p of partidos) {
+      const isLocal = p.equipo_localId.toString() === seleccionId;
+      const misGoles = isLocal ? (p.goles_local || 0) : (p.goles_visitante || 0);
+      const susGoles = isLocal ? (p.goles_visitante || 0) : (p.goles_local || 0);
+      gf += misGoles;
+      gc += susGoles;
+      if (misGoles > susGoles) pts += 3;
+      else if (misGoles === susGoles) pts += 1;
+    }
+
+    const maxPts = partidos.length * 3;
+    const puntosScore = (pts / Math.max(1, maxPts)) * 40;
+    const golesAnotadosScore = Math.min(20, (gf / Math.max(1, partidos.length * 3)) * 20);
+    const golesRecibidosScore = Math.max(0, 15 - (gc / Math.max(1, partidos.length * 3)) * 15);
+    const dif = gf - gc;
+    const difScore = Math.max(0, Math.min(15, (dif + 10) * 1.5));
+    const total = puntosScore + golesAnotadosScore + golesRecibidosScore + difScore;
+    return Math.max(0, Math.min(100, parseFloat(total.toFixed(2))));
+  } catch {
+    return 50;
+  }
+}
+
+async function computeExperienceScore(db, seleccionId, selDoc) {
+  try {
+    const oid = ObjectId.isValid(seleccionId) ? new ObjectId(seleccionId) : null;
+    if (!oid) return 50;
+
+    const partidos = await db.collection('partidos').find({
+      $or: [{ equipo_localId: oid }, { equipo_visitanteId: oid }]
+    }).toArray();
+
+    const partidosIntl = partidos.length;
+    const maxPartidos = 100;
+    const partidosScore = Math.min(35, (partidosIntl / maxPartidos) * 35);
+
+    const expMundiales = safeNum(selDoc.experiencia_mundiales, 0);
+    const maxMundiales = 15;
+    const mundialesScore = Math.min(35, (expMundiales / maxMundiales) * 35);
+
+    const edad = safeNum(selDoc.edad_promedio, 25);
+    let edadScore = 0;
+    if (edad >= 27 && edad <= 29) edadScore = 15;
+    else if ((edad >= 25 && edad <= 26) || (edad >= 30 && edad <= 31)) edadScore = 12;
+    else if ((edad >= 23 && edad <= 24) || (edad >= 32 && edad <= 33)) edadScore = 8;
+    else edadScore = 5;
+
+    const titulos = safeNum(selDoc.titulos_mundiales, 0) + safeNum(selDoc.subcampeonatos, 0);
+    const titulosScore = Math.min(15, titulos * 5);
+
+    const total = partidosScore + mundialesScore + edadScore + titulosScore;
+    return Math.max(0, Math.min(100, parseFloat(total.toFixed(2))));
+  } catch {
+    return 50;
+  }
+}
+
 function computeIFForSelection(selDoc, stats = {}, weights = null) {
-  // Default weights (from PDF example)
   const defaultWeights = {
-    ranking: 0.20,
-    historial_mundial: 0.15,
-    historial_rival: 0.10,
-    goles_anotados: 0.10,
-    goles_recibidos: 0.10,
-    diferencia_goles: 0.10,
-    partidos_ganados: 0.10,
+    elo: 0.20,
+    ranking: 0.10,
+    forma_reciente: 0.15,
+    historial_mundial: 0.10,
+    historial_rival: 0.05,
+    goles_anotados: 0.06,
+    goles_recibidos: 0.06,
+    diferencia_goles: 0.05,
+    partidos_ganados: 0.04,
     valor_plantilla: 0.05,
-    experiencia: 0.05
+    edad_promedio: 0.03,
+    experiencia: 0.03,
+    localia: 0.03,
+    fatiga: 0.02,
+    lesiones: 0.02,
+    clima: 0.01
   };
   const w = weights || defaultWeights;
 
-  // Normalize ranking: lower ranking number -> better. Use maxRank fallback
   const maxRank = 250;
   const rankingScore = ('ranking' in selDoc) ? ((maxRank - safeNum(selDoc.ranking, maxRank)) / maxRank) * 100 : 50;
+
+  const maxElo = 2000;
+  const minElo = 1500;
+  const eloScore = ('elo' in selDoc) ? ((safeNum(selDoc.elo, 1500) - minElo) / (maxElo - minElo)) * 100 : 50;
 
   const pj = safeNum(stats.pj, 0);
   const gf = safeNum(stats.gf, 0);
@@ -110,26 +229,68 @@ function computeIFForSelection(selDoc, stats = {}, weights = null) {
   const pg = safeNum(stats.pg, 0);
   const diferencia = gf - gc;
 
-  const golesAnotadosScore = pj > 0 ? Math.min(100, (gf / pj) * 40) : 20; // heuristic
+  const golesAnotadosScore = pj > 0 ? Math.min(100, (gf / pj) * 40) : 20;
   const golesRecibidosScore = pj > 0 ? Math.max(0, 100 - (gc / pj) * 40) : 50;
   const diferenciaScore = Math.max(0, Math.min(100, (diferencia + 10) * 5));
   const partidosGanadosScore = pj > 0 ? (pg / pj) * 100 : 20;
 
   const historialMundialScore = safeNum(selDoc.experiencia_mundiales, 0) > 0 ? Math.min(100, selDoc.experiencia_mundiales * 10) : 0;
-  const valorPlantillaScore = safeNum(selDoc.valor_plantilla, 0) > 0 ? Math.min(100, selDoc.valor_plantilla / 1_000_000) : 0;
 
-  const score = (rankingScore * w.ranking)
+  const formaScore = safeNum(stats.forma_reciente, 50);
+  const edadScore = (() => {
+    const edad = safeNum(selDoc.edad_promedio, 25);
+    if (edad >= 27 && edad <= 29) return 100;
+    if ((edad >= 25 && edad <= 26) || (edad >= 30 && edad <= 31)) return 80;
+    if ((edad >= 23 && edad <= 24) || (edad >= 32 && edad <= 33)) return 60;
+    return 40;
+  })();
+  const experienciaScore = safeNum(stats.experiencia_score, 50);
+  const localiaScore = safeNum(stats.localia_score, 0);
+  const fatigaScore = safeNum(stats.fatiga_score, 80);
+  const lesionesScore = safeNum(stats.lesiones_score, 90);
+  const climaScore = safeNum(stats.clima_score, 100);
+
+  const valorPlantillaScore = safeNum(stats.valor_plantilla_score, 0);
+
+  const score = (eloScore * w.elo)
+    + (rankingScore * w.ranking)
+    + (formaScore * w.forma_reciente)
     + (historialMundialScore * w.historial_mundial)
+    + (safeNum(stats.historial_rival, 50) * w.historial_rival)
     + (golesAnotadosScore * w.goles_anotados)
     + (golesRecibidosScore * w.goles_recibidos)
     + (diferenciaScore * w.diferencia_goles)
     + (partidosGanadosScore * w.partidos_ganados)
     + (valorPlantillaScore * w.valor_plantilla)
-    + (historialMundialScore * w.experiencia);
+    + (edadScore * w.edad_promedio)
+    + (experienciaScore * w.experiencia)
+    + (localiaScore * w.localia)
+    + (fatigaScore * w.fatiga)
+    + (lesionesScore * w.lesiones)
+    + (climaScore * w.clima);
 
-  // Clamp 0-100
   const IF = Math.max(0, Math.min(100, score));
-  return { IF: parseFloat(IF.toFixed(2)), components: { rankingScore, golesAnotadosScore, golesRecibidosScore, diferenciaScore, partidosGanadosScore, valorPlantillaScore, historialMundialScore } };
+  return {
+    IF: parseFloat(IF.toFixed(2)),
+    components: {
+      elo: parseFloat(eloScore.toFixed(2)),
+      ranking: parseFloat(rankingScore.toFixed(2)),
+      forma_reciente: parseFloat(formaScore.toFixed(2)),
+      historial_mundial: parseFloat(historialMundialScore.toFixed(2)),
+      historial_rival: parseFloat(safeNum(stats.historial_rival, 50).toFixed(2)),
+      goles_anotados: parseFloat(golesAnotadosScore.toFixed(2)),
+      goles_recibidos: parseFloat(golesRecibidosScore.toFixed(2)),
+      diferencia_goles: parseFloat(diferenciaScore.toFixed(2)),
+      partidos_ganados: parseFloat(partidosGanadosScore.toFixed(2)),
+      valor_plantilla: parseFloat(valorPlantillaScore.toFixed(2)),
+      edad_promedio: parseFloat(edadScore.toFixed(2)),
+      experiencia: parseFloat(experienciaScore.toFixed(2)),
+      localia: parseFloat(localiaScore.toFixed(2)),
+      fatiga: parseFloat(fatigaScore.toFixed(2)),
+      lesiones: parseFloat(lesionesScore.toFixed(2)),
+      clima: parseFloat(climaScore.toFixed(2))
+    }
+  };
 }
 
 async function getIFWeights(db) {
@@ -141,24 +302,22 @@ async function getIFWeights(db) {
   }
 }
 
-function probabilitiesFromIF(ifA, ifB, homeAdv = 0) {
-  // Apply home advantage
-  const A = Math.max(0.001, ifA + homeAdv);
-  const B = Math.max(0.001, ifB);
-  // Use Bradley-Terry style with a draw baseline
-  const skal = 10; // scale to soften differences
-  const ra = Math.exp(A / skal);
-  const rb = Math.exp(B / skal);
-  const pNoDrawA = ra / (ra + rb);
-  const pNoDrawB = rb / (ra + rb);
-  const baselineDraw = 0.18; // default draw probability
-  // Reduce draw slightly as disparity grows
-  const disparity = Math.abs(A - B) / 100;
-  const draw = Math.max(0.06, baselineDraw * (1 - disparity));
+function probabilitiesFromIF(ifA, ifB, homeAdv = 0, eloA = 1500, eloB = 1500) {
+  const pAelo = computeELOProbability(eloA, eloB);
+  const pBelo = 1 - pAelo;
+  const skew = (ifA - ifB) / 100;
+  const baseDraw = 0.18;
+  const disparity = Math.abs(ifA - ifB) / 100;
+  const draw = Math.max(0.06, baseDraw * (1 - disparity));
   const remaining = 1 - draw;
-  const pA = parseFloat((remaining * pNoDrawA).toFixed(4));
-  const pB = parseFloat((remaining * pNoDrawB).toFixed(4));
-  return { local: pA, draw, visitante: pB };
+  const eloWeight = 0.5;
+  const ifWeight = 0.5;
+  const pAraw = pAelo * eloWeight + (ifA / (ifA + ifB)) * ifWeight;
+  const pBraw = pBelo * eloWeight + (ifB / (ifA + ifB)) * ifWeight;
+  const total = pAraw + pBraw;
+  const pA = remaining * (pAraw / total);
+  const pB = remaining * (pBraw / total);
+  return { local: parseFloat(pA.toFixed(4)), draw: parseFloat(draw.toFixed(4)), visitante: parseFloat(pB.toFixed(4)) };
 }
 
 async function computeTeamStats(db, seleccionId) {
@@ -175,23 +334,51 @@ async function computeTeamStats(db, seleccionId) {
     if (!res || res.length === 0) return { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 };
     const r = res[0];
     const pp = (r.pj || 0) - (r.pg || 0) - (r.pe || 0);
-    return { pj: safeNum(r.pj, 0), pg: safeNum(r.pg, 0), pe: safeNum(r.pe, 0), pp: safeNum(pp, 0), gf: safeNum(r.gf, 0), gc: safeNum(r.gc, 0) };
+    const base = { pj: safeNum(r.pj, 0), pg: safeNum(r.pg, 0), pe: safeNum(r.pe, 0), pp: safeNum(pp, 0), gf: safeNum(r.gf, 0), gc: safeNum(r.gc, 0) };
+
+    const selDoc = await db.collection('selecciones').findOne({ _id: oid }).catch(() => null);
+    const maxVal = await getMaxSquadValue(db);
+    const forma = await computeRecentForm(db, seleccionId);
+    const expScore = await computeExperienceScore(db, seleccionId, selDoc || {});
+    const h2h = await getHeadToHeadScore(db, oid, oid); // placeholder, will be overridden in match
+
+    const valorPlantillaScore = safeNum(selDoc?.valor_plantilla, 0) > 0 ? Math.min(100, (selDoc.valor_plantilla / maxVal) * 100) : 0;
+    const localiaScore = safeNum(selDoc?.es_sede, 0) === 1 ? 100 : 0;
+    const fatigaScore = 80;
+    const lesionesScore = 90;
+    const climaScore = 100;
+
+    return {
+      ...base,
+      forma_reciente: forma,
+      historial_rival: h2h,
+      valor_plantilla_score: valorPlantillaScore,
+      experiencia_score: expScore,
+      localia_score: localiaScore,
+      fatiga_score: fatigaScore,
+      lesiones_score: lesionesScore,
+      clima_score: climaScore
+    };
   } catch (err) {
-    return { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 };
+    return { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, forma_reciente: 50, historial_rival: 50, valor_plantilla_score: 0, experiencia_score: 50, localia_score: 0, fatiga_score: 80, lesiones_score: 90, clima_score: 100 };
   }
 }
 
-async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, homeAdv = 5, weights = null) {
+async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, homeAdv = 5, weights = null, tournamentCtx = null) {
   const localDoc = await db.collection('selecciones').findOne({ _id: new ObjectId(localId) });
   const visitanteDoc = await db.collection('selecciones').findOne({ _id: new ObjectId(visitanteId) });
   const localStats = await computeTeamStats(db, localId);
   const visitanteStats = await computeTeamStats(db, visitanteId);
   const effectiveWeights = weights || await getIFWeights(db);
+
   const ifLocalObj = computeIFForSelection(localDoc || {}, localStats, effectiveWeights || undefined);
   const ifVisitObj = computeIFForSelection(visitanteDoc || {}, visitanteStats, effectiveWeights || undefined);
-  const probs = probabilitiesFromIF(ifLocalObj.IF, ifVisitObj.IF, homeAdv);
 
-  // Estimate expected goals (lambda) per team from historic avg and IF ratio
+  const eloLocal = safeNum(localDoc?.elo, 1500);
+  const eloVisit = safeNum(visitanteDoc?.elo, 1500);
+
+  const probs = probabilitiesFromIF(ifLocalObj.IF, ifVisitObj.IF, homeAdv, eloLocal, eloVisit);
+
   const avgLocal = localStats.pj > 0 ? (localStats.gf / localStats.pj) : 1.2;
   const avgVisit = visitanteStats.pj > 0 ? (visitanteStats.gf / visitanteStats.pj) : 0.9;
   const ratio = (ifLocalObj.IF + ifVisitObj.IF) > 0 ? (ifLocalObj.IF / (ifLocalObj.IF + ifVisitObj.IF)) : 0.5;
@@ -200,6 +387,9 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
 
   let localWins = 0, visitanteWins = 0, draws = 0; let totalGoalsLocal = 0, totalGoalsVisit = 0;
   const scoreMap = new Map();
+  let lastScoreLocal = 0;
+  let lastScoreVisit = 0;
+
   for (let i = 0; i < iterations; i++) {
     const gLocal = poissonSample(lambdaLocal);
     const gVisit = poissonSample(lambdaVisit);
@@ -207,22 +397,36 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
     const key = `${gLocal}-${gVisit}`;
     scoreMap.set(key, (scoreMap.get(key) || 0) + 1);
     if (gLocal > gVisit) localWins++; else if (gLocal < gVisit) visitanteWins++; else draws++;
+    lastScoreLocal = gLocal;
+    lastScoreVisit = gVisit;
   }
 
-  // Convert scoreMap to top outcomes
   const topScores = Array.from(scoreMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([score, cnt]) => ({ score, count: cnt, pct: parseFloat(((cnt / iterations) * 100).toFixed(2)) }));
   const resultObj = {
-    local: { id: localId, nombre: localDoc?.nombre || 'Local', IF: ifLocalObj.IF, promedio_goles_hist: avgLocal },
-    visitante: { id: visitanteId, nombre: visitanteDoc?.nombre || 'Visitante', IF: ifVisitObj.IF, promedio_goles_hist: avgVisit },
+    local: { id: localId, nombre: localDoc?.nombre || 'Local', IF: ifLocalObj.IF, elo: eloLocal, promedio_goles_hist: avgLocal },
+    visitante: { id: visitanteId, nombre: visitanteDoc?.nombre || 'Visitante', IF: ifVisitObj.IF, elo: eloVisit, promedio_goles_hist: avgVisit },
     probs,
     lambda: { local: parseFloat(lambdaLocal.toFixed(3)), visitante: parseFloat(lambdaVisit.toFixed(3)) },
     iterations,
     resultados: { localWins, visitanteWins, draws, pctLocal: parseFloat(((localWins / iterations) * 100).toFixed(2)), pctVisita: parseFloat(((visitanteWins / iterations) * 100).toFixed(2)), pctDraw: parseFloat(((draws / iterations) * 100).toFixed(2)) },
     avgGoals: { local: parseFloat((totalGoalsLocal / iterations).toFixed(3)), visitante: parseFloat((totalGoalsVisit / iterations).toFixed(3)) },
-    topScores
+    topScores,
+    components: {
+      local: ifLocalObj.components,
+      visitante: ifVisitObj.components
+    }
   };
 
-  // Persist simulation
+  if (tournamentCtx) {
+    const scoreLocal = lastScoreLocal > lastScoreVisit ? 1 : (lastScoreLocal < lastScoreVisit ? 0 : 0.5);
+    const scoreVisit = lastScoreVisit > lastScoreLocal ? 1 : (lastScoreVisit < lastScoreLocal ? 0 : 0.5);
+    const newElos = updateELO(eloLocal, eloVisit, scoreLocal, scoreVisit, 50);
+    tournamentCtx.eloUpdates = tournamentCtx.eloUpdates || {};
+    tournamentCtx.eloUpdates[localId] = newElos.eloA;
+    tournamentCtx.eloUpdates[visitanteId] = newElos.eloB;
+    resultObj.newElo = { local: newElos.eloA, visitante: newElos.eloB };
+  }
+
   try {
     await saveSimulationResult(db, { tipo: 'match', params: { localId, visitanteId, iterations, homeAdv }, weights: effectiveWeights, result: resultObj });
   } catch (e) { console.error('Error saving match simulation', e); }
@@ -232,13 +436,11 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
 
 
 async function simulateGroupMonteCarlo(db, groupId, iterations = 2000) {
-  // get teams in group
   const teams = await db.collection('selecciones').find({ grupoId: new ObjectId(groupId) }).toArray();
   if (!teams || teams.length === 0) return { error: 'Grupo no encontrado o sin selecciones' };
   const teamIds = teams.map(t => t._id.toString());
   const weights = await getIFWeights(db);
 
-  // Build matches (each pair once)
   const matches = [];
   for (let i = 0; i < teams.length; i++) {
     for (let j = i + 1; j < teams.length; j++) {
@@ -249,27 +451,50 @@ async function simulateGroupMonteCarlo(db, groupId, iterations = 2000) {
   const finishCounts = {};
   teamIds.forEach(id => finishCounts[id] = [0,0,0,0]);
   const totalPoints = {}; teamIds.forEach(id => totalPoints[id] = 0);
+  const totalGoalsFor = {}; teamIds.forEach(id => totalGoalsFor[id] = 0);
+  const totalGoalsAgainst = {}; teamIds.forEach(id => totalGoalsAgainst[id] = 0);
 
   for (let it = 0; it < iterations; it++) {
+    const tournamentCtx = { eloUpdates: {} };
     const points = {}; teamIds.forEach(id => points[id] = 0);
+    const goalsFor = {}; teamIds.forEach(id => goalsFor[id] = 0);
+    const goalsAgainst = {}; teamIds.forEach(id => goalsAgainst[id] = 0);
+
     for (const m of matches) {
       const localId = m.local._id.toString();
       const visitId = m.visitante._id.toString();
-      const mc = await monteCarloMatch(db, localId, visitId, 1, 5, weights);
-      // monteCarloMatch with 1 iteration returns a sampled outcome in topScores? Instead sample directly using lambdas
+      const mc = await monteCarloMatch(db, localId, visitId, 1, 5, weights, tournamentCtx);
       const lambdaL = mc.lambda.local; const lambdaV = mc.lambda.visitante;
       const gL = poissonSample(lambdaL);
       const gV = poissonSample(lambdaV);
+      goalsFor[localId] += gL; goalsFor[visitId] += gV;
+      goalsAgainst[localId] += gV; goalsAgainst[visitId] += gL;
       if (gL > gV) { points[localId] += 3; }
       else if (gL < gV) { points[visitId] += 3; }
       else { points[localId] += 1; points[visitId] += 1; }
     }
-    // compute ranking
-    const ranking = Object.keys(points).map(id => ({ id, pts: points[id] })).sort((a,b) => b.pts - a.pts);
-    ranking.forEach((r, idx) => { finishCounts[r.id][idx]++; totalPoints[r.id] += r.pts; });
+
+    const ranking = Object.keys(points).map(id => ({ id, pts: points[id], gf: goalsFor[id], gc: goalsAgainst[id] })).sort((a,b) => {
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      if ((b.gf - b.gc) !== (a.gf - a.gc)) return (b.gf - b.gc) - (a.gf - a.gc);
+      return b.gf - a.gf;
+    });
+    ranking.forEach((r, idx) => {
+      finishCounts[r.id][idx]++;
+      totalPoints[r.id] += r.pts;
+      totalGoalsFor[r.id] += r.gf;
+      totalGoalsAgainst[r.id] += r.gc;
+    });
   }
 
-  const result = teams.map(t => ({ id: t._id.toString(), nombre: t.nombre, avgPoints: parseFloat((totalPoints[t._id.toString()] / iterations).toFixed(3)), finishPct: finishCounts[t._id.toString()].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) }));
+  const result = teams.map(t => ({
+    id: t._id.toString(),
+    nombre: t.nombre,
+    avgPoints: parseFloat((totalPoints[t._id.toString()] / iterations).toFixed(3)),
+    avgGoalsFor: parseFloat((totalGoalsFor[t._id.toString()] / iterations).toFixed(3)),
+    avgGoalsAgainst: parseFloat((totalGoalsAgainst[t._id.toString()] / iterations).toFixed(3)),
+    finishPct: finishCounts[t._id.toString()].map(c => parseFloat(((c / iterations) * 100).toFixed(2)))
+  }));
   const out = { groupId, iterations, teams: result };
   try { await saveSimulationResult(db, { tipo: 'group', params: { groupId, iterations }, result: out }); } catch (e) { console.error('Error saving group simulation', e); }
   return out;
@@ -289,7 +514,6 @@ async function saveSimulationResult(db, doc) {
 }
 
 async function simulateTournamentMonteCarlo(db, iterations = 1000) {
-  // Simplified tournament: simulate group stages, take top 2 from each group, then random bracket elimination per iteration
   const grupos = await db.collection('grupos').find({}).toArray();
   if (!grupos || grupos.length === 0) return { error: 'No hay grupos definidos' };
 
@@ -300,69 +524,155 @@ async function simulateTournamentMonteCarlo(db, iterations = 1000) {
   }
 
   const championCounts = {};
-  const qualifyCounts = {}; // counts of finishing positions per team
+  const finalistCounts = {};
+  const semifinalistCounts = {};
+  const quarterfinalistCounts = {};
+  const round16Counts = {};
+  const qualifyCounts = {};
+
+  const totalGoalsFor = {};
+  const totalGoalsAgainst = {};
+  const scoreFinals = new Map();
+  const rivalCounts = {};
 
   for (let it = 0; it < iterations; it++) {
+    const tournamentCtx = { eloUpdates: {} };
     const qualified = [];
-    // group stage
+    const groupStats = {};
+
     for (const g of grupos) {
       const teams = teamDocsByGroup[g._id.toString()] || [];
       if (teams.length === 0) continue;
-      // simulate group by points
       const points = {};
       teams.forEach(t => { points[t._id.toString()] = 0; });
+      const gf = {}; teams.forEach(t => { gf[t._id.toString()] = 0; });
+      const gc = {}; teams.forEach(t => { gc[t._id.toString()] = 0; });
+
       for (let i = 0; i < teams.length; i++) {
         for (let j = i + 1; j < teams.length; j++) {
           const a = teams[i]; const b = teams[j];
-          // compute lambdas quickly reusing monteCarloMatch lambdas via single-run
-          const mc = await monteCarloMatch(db, a._id.toString(), b._id.toString(), 1, 5);
+          const mc = await monteCarloMatch(db, a._id.toString(), b._id.toString(), 1, 5, null, tournamentCtx);
           const gA = poissonSample(mc.lambda.local);
           const gB = poissonSample(mc.lambda.visitante);
+          gf[a._id.toString()] += gA; gc[a._id.toString()] += gB;
+          gf[b._id.toString()] += gB; gc[b._id.toString()] += gA;
           if (gA > gB) points[a._id.toString()] += 3;
           else if (gA < gB) points[b._id.toString()] += 3;
           else { points[a._id.toString()] += 1; points[b._id.toString()] += 1; }
         }
       }
-      const ranking = Object.keys(points).map(id => ({ id, pts: points[id] })).sort((x,y) => y.pts - x.pts);
-      // top 2 qualify
-      if (ranking[0]) qualified.push(ranking[0].id);
-      if (ranking[1]) qualified.push(ranking[1].id);
-      // track qualify counts per position
+
+      const ranking = Object.keys(points).map(id => ({ id, pts: points[id], gf: gf[id], gc: gc[id] })).sort((x,y) => {
+        if (y.pts !== x.pts) return y.pts - x.pts;
+        if ((y.gf - y.gc) !== (x.gf - x.gc)) return (y.gf - y.gc) - (x.gf - x.gc);
+        return y.gf - x.gf;
+      });
+      const top2 = [ranking[0]?.id, ranking[1]?.id].filter(Boolean);
+      top2.forEach(id => qualified.push(id));
       ranking.forEach((r, idx) => {
         qualifyCounts[r.id] = qualifyCounts[r.id] || [0,0,0,0];
         if (idx < 4) qualifyCounts[r.id][idx]++;
+        groupStats[r.id] = { pts: r.pts, gf: r.gf, gc: r.gc, pos: idx };
       });
     }
 
-    // knockout: shuffle qualified and eliminate
     let current = qualified.slice().sort(() => Math.random() - 0.5);
+    let roundName = 'dieciseisavos';
+    const roundRivals = {};
+
     while (current.length > 1) {
       const nextRound = [];
       for (let i = 0; i < current.length; i += 2) {
         const t1 = current[i];
         const t2 = current[i+1];
         if (!t2) { nextRound.push(t1); continue; }
-        const mc = await monteCarloMatch(db, t1, t2, 1, 0);
+        const mc = await monteCarloMatch(db, t1, t2, 1, 0, null, tournamentCtx);
         const g1 = poissonSample(mc.lambda.local);
         const g2 = poissonSample(mc.lambda.visitante);
-        if (g1 > g2) nextRound.push(t1); else if (g2 > g1) nextRound.push(t2); else {
-          // tie-breaker by IF
+
+        if (!roundRivals[t1]) roundRivals[t1] = {};
+        if (!roundRivals[t2]) roundRivals[t2] = {};
+        roundRivals[t1][roundName] = (roundRivals[t1][roundName] || []).concat([t2]);
+        roundRivals[t2][roundName] = (roundRivals[t2][roundName] || []).concat([t1]);
+
+        if (g1 > g2) {
+          nextRound.push(t1);
+          totalGoalsFor[t1] = (totalGoalsFor[t1] || 0) + g1;
+          totalGoalsAgainst[t1] = (totalGoalsAgainst[t1] || 0) + g2;
+          totalGoalsFor[t2] = (totalGoalsFor[t2] || 0) + g2;
+          totalGoalsAgainst[t2] = (totalGoalsAgainst[t2] || 0) + g1;
+        } else if (g2 > g1) {
+          nextRound.push(t2);
+          totalGoalsFor[t2] = (totalGoalsFor[t2] || 0) + g2;
+          totalGoalsAgainst[t2] = (totalGoalsAgainst[t2] || 0) + g1;
+          totalGoalsFor[t1] = (totalGoalsFor[t1] || 0) + g1;
+          totalGoalsAgainst[t1] = (totalGoalsAgainst[t1] || 0) + g2;
+        } else {
           const if1 = mc.local?.IF ?? 0; const if2 = mc.visitante?.IF ?? 0;
-          nextRound.push(if1 >= if2 ? t1 : t2);
+          const winner = if1 >= if2 ? t1 : t2;
+          nextRound.push(winner);
+          totalGoalsFor[winner] = (totalGoalsFor[winner] || 0) + g1;
+          totalGoalsAgainst[winner] = (totalGoalsAgainst[winner] || 0) + g2;
+          const loser = winner === t1 ? t2 : t1;
+          totalGoalsFor[loser] = (totalGoalsFor[loser] || 0) + (winner === t1 ? g2 : g1);
+          totalGoalsAgainst[loser] = (totalGoalsAgainst[loser] || 0) + (winner === t1 ? g1 : g2);
         }
       }
       current = nextRound;
+
+      if (roundName === 'dieciseisavos') {
+        current.forEach(id => { round16Counts[id] = (round16Counts[id] || 0) + 1; });
+        roundName = 'octavos';
+      } else if (roundName === 'octavos') {
+        current.forEach(id => { quarterfinalistCounts[id] = (quarterfinalistCounts[id] || 0) + 1; });
+        roundName = 'cuartos';
+      } else if (roundName === 'cuartos') {
+        current.forEach(id => { semifinalistCounts[id] = (semifinalistCounts[id] || 0) + 1; });
+        roundName = 'semifinales';
+      } else if (roundName === 'semifinales') {
+        current.forEach(id => { finalistCounts[id] = (finalistCounts[id] || 0) + 1; });
+        roundName = 'final';
+      }
     }
     const champ = current[0];
-    if (champ) championCounts[champ] = (championCounts[champ] || 0) + 1;
+    if (champ) {
+      championCounts[champ] = (championCounts[champ] || 0) + 1;
+      scoreFinals.set(champ, (scoreFinals.get(champ) || 0) + 1);
+    }
   }
 
-  // build summary
-  const champions = Object.keys(championCounts).map(id => ({ id, pct: parseFloat(((championCounts[id] / iterations) * 100).toFixed(2)) })).sort((a,b) => b.pct - a.pct);
-  const qualifies = Object.keys(qualifyCounts).map(id => ({ id, posCounts: qualifyCounts[id].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) }));
+  const buildPct = (counts, total) => Object.keys(counts).map(id => ({ id, pct: parseFloat(((counts[id] / total) * 100).toFixed(2)) })).sort((a,b) => b.pct - a.pct);
 
-  const summary = { iterations, champions, qualifies };
-  // Save summary
+  const buildRivals = (roundRivals) => {
+    const out = {};
+    for (const team in roundRivals) {
+      const rivals = roundRivals[team];
+      for (const round in rivals) {
+        const counts = {};
+        rivals[round].forEach(r => { counts[r] = (counts[r] || 0) + 1; });
+        const sorted = Object.keys(counts).map(r => ({ id: r, count: counts[r] })).sort((a,b) => b.count - a.count);
+        if (!out[team]) out[team] = {};
+        out[team][round] = sorted[0] || null;
+      }
+    }
+    return out;
+  };
+
+  const mostCommonChampion = scoreFinals.size > 0 ? Array.from(scoreFinals.entries()).sort((a,b) => b[1] - a[1])[0] : null;
+
+  const summary = {
+    iterations,
+    champions: buildPct(championCounts, iterations),
+    finalists: buildPct(finalistCounts, iterations),
+    semifinalists: buildPct(semifinalistCounts, iterations),
+    quarterfinalists: buildPct(quarterfinalistCounts, iterations),
+    round16: buildPct(round16Counts, iterations),
+    qualifies: Object.keys(qualifyCounts).map(id => ({ id, posCounts: qualifyCounts[id].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) })),
+    avgGoals: Object.keys(totalGoalsFor).map(id => ({ id, avgFor: parseFloat(((totalGoalsFor[id] || 0) / iterations).toFixed(3)), avgAgainst: parseFloat(((totalGoalsAgainst[id] || 0) / iterations).toFixed(3)) })),
+    mostCommonChampion: mostCommonChampion ? { id: mostCommonChampion[0], count: mostCommonChampion[1] } : null,
+    rivals: buildRivals(roundRivals || {})
+  };
+
   await saveSimulationResult(db, { tipo: 'tournament', iterations, summary });
   return { ok: true, summary };
 }
@@ -684,6 +994,7 @@ const server = http.createServer(async (req, res) => {
               banderaUrl: 1,
               latitud: 1,
               longitud: 1,
+              elo: 1,
               confederacion: '$continente.confederacion',
               continente: '$continente.nombre',
               grupo: '$grupo.nombre'
@@ -696,6 +1007,19 @@ const server = http.createServer(async (req, res) => {
           ...item,
           id: item._id.toString(),
           _id: undefined
+        }));
+        sendJson(res, 200, payload);
+        return;
+      }
+
+      if (url.pathname === '/api/simulacion/elo') {
+        const selecciones = await db.collection('selecciones').find({}, { projection: { nombre: 1, elo: 1, ranking: 1, banderaUrl: 1 } }).sort({ elo: -1 }).toArray();
+        const payload = selecciones.map((item) => ({
+          id: item._id.toString(),
+          nombre: item.nombre,
+          elo: safeNum(item.elo, 1500),
+          ranking: safeNum(item.ranking, 0),
+          bandera: normalizeBandera(item.nombre, item.banderaUrl)
         }));
         sendJson(res, 200, payload);
         return;
@@ -1281,7 +1605,7 @@ const server = http.createServer(async (req, res) => {
           for (const s of selecciones) {
             const stats = await computeTeamStats(db, s._id.toString());
             const ifObj = computeIFForSelection(s, stats);
-            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, components: ifObj.components });
+            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, elo: safeNum(s.elo, 1500), components: ifObj.components });
           }
           results.sort((a, b) => b.IF - a.IF);
           sendJson(res, 200, results);
@@ -1315,6 +1639,19 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
+        if (tipo === '15') {
+          const selecciones = await db.collection('selecciones').find({}, { projection: { nombre: 1, elo: 1, ranking: 1, banderaUrl: 1 } }).sort({ elo: -1 }).toArray();
+          const payload = selecciones.map((item) => ({
+            id: item._id.toString(),
+            nombre: item.nombre,
+            elo: safeNum(item.elo, 1500),
+            ranking: safeNum(item.ranking, 0),
+            bandera: normalizeBandera(item.nombre, item.banderaUrl)
+          }));
+          sendJson(res, 200, payload);
+          return;
+        }
+
         // --- Nuevo: calcular IF para todas las selecciones (consulta=11) ---
         if (tipo === '11') {
           const selecciones = await db.collection('selecciones').find({}).toArray();
@@ -1322,7 +1659,7 @@ const server = http.createServer(async (req, res) => {
           for (const s of selecciones) {
             const stats = await computeTeamStats(db, s._id.toString());
             const ifObj = computeIFForSelection(s, stats);
-            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, components: ifObj.components });
+            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, elo: safeNum(s.elo, 1500), components: ifObj.components });
           }
           results.sort((a, b) => b.IF - a.IF);
           sendJson(res, 200, results);
@@ -1542,7 +1879,7 @@ const server = http.createServer(async (req, res) => {
 
       if (url.pathname === '/api/admin/selecciones') {
         const body = await parseJsonBody(req);
-        const { nombre, pais, continenteId, grupoId, historia, ventajas, desventajas, ranking, banderaUrl, latitud, longitud } = body;
+        const { nombre, pais, continenteId, grupoId, historia, ventajas, desventajas, ranking, banderaUrl, latitud, longitud, elo, valor_plantilla, edad_promedio, experiencia_mundiales, titulos_mundiales, subcampeonatos, es_sede } = body;
         if (!nombre || !pais || !continenteId || !grupoId) {
           sendJson(res, 400, { error: 'Faltan campos obligatorios: nombre, pais, continenteId, grupoId' });
           return;
@@ -1558,7 +1895,14 @@ const server = http.createServer(async (req, res) => {
           ranking: Number(ranking || 0),
           banderaUrl: banderaUrl || '',
           latitud: Number(latitud || 0),
-          longitud: Number(longitud || 0)
+          longitud: Number(longitud || 0),
+          elo: Number(elo || 1500),
+          valor_plantilla: Number(valor_plantilla || 0),
+          edad_promedio: Number(edad_promedio || 25),
+          experiencia_mundiales: Number(experiencia_mundiales || 0),
+          titulos_mundiales: Number(titulos_mundiales || 0),
+          subcampeonatos: Number(subcampeonatos || 0),
+          es_sede: Number(es_sede || 0)
         });
         sendJson(res, 201, { id: result.insertedId.toString(), message: 'Selección creada' });
         return;
@@ -1664,6 +2008,13 @@ const server = http.createServer(async (req, res) => {
         if (body.banderaUrl !== undefined) updateFields.banderaUrl = body.banderaUrl;
         if (body.latitud !== undefined) updateFields.latitud = Number(body.latitud);
         if (body.longitud !== undefined) updateFields.longitud = Number(body.longitud);
+        if (body.elo !== undefined) updateFields.elo = Number(body.elo);
+        if (body.valor_plantilla !== undefined) updateFields.valor_plantilla = Number(body.valor_plantilla);
+        if (body.edad_promedio !== undefined) updateFields.edad_promedio = Number(body.edad_promedio);
+        if (body.experiencia_mundiales !== undefined) updateFields.experiencia_mundiales = Number(body.experiencia_mundiales);
+        if (body.titulos_mundiales !== undefined) updateFields.titulos_mundiales = Number(body.titulos_mundiales);
+        if (body.subcampeonatos !== undefined) updateFields.subcampeonatos = Number(body.subcampeonatos);
+        if (body.es_sede !== undefined) updateFields.es_sede = Number(body.es_sede);
 
         if (!ObjectId.isValid(seleccionId)) {
           sendJson(res, 400, { error: 'ID de selección inválido' });

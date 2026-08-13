@@ -719,7 +719,8 @@ function renderAdminSelecciones(selecciones) {
         item.innerHTML = `
             <div>
                 <div class="admin-item-title">${sel.nombre}</div>
-                <div class="admin-item-meta">${sel.pais} · ${sel.continente || ''} · Grupo ${sel.grupo || ''} · Ranking ${sel.ranking ?? '-'}</div>
+                <div class="admin-item-meta">${sel.pais} · ${sel.continente || ''} · Grupo ${sel.grupo || ''} · Ranking ${sel.ranking ?? '-'} · ELO ${sel.elo != null ? sel.elo.toFixed(2) : '-'}</div>
+                <div class="admin-item-meta">Valor plantilla: ${sel.valor_plantilla ?? '-'} · Edad prom: ${sel.edad_promedio ?? '-'} · Exp mundial: ${sel.experiencia_mundiales ?? '-'} · Títulos: ${sel.titulos_mundiales ?? '-'} · Sub: ${sel.subcampeonatos ?? '-'} · Sede: ${sel.es_sede ? 'Sí' : 'No'}</div>
             </div>
             <div class="admin-item-actions">
                 <button class="btn-edit" data-id="${sel.id}">Editar</button>
@@ -745,6 +746,13 @@ function renderAdminSelecciones(selecciones) {
             document.getElementById('seleccion-bandera').value = sel.banderaUrl || '';
             document.getElementById('seleccion-latitud').value = sel.latitud ?? '';
             document.getElementById('seleccion-longitud').value = sel.longitud ?? '';
+            document.getElementById('seleccion-elo').value = sel.elo ?? '';
+            document.getElementById('seleccion-valor-plantilla').value = sel.valor_plantilla ?? '';
+            document.getElementById('seleccion-edad-promedio').value = sel.edad_promedio ?? '';
+            document.getElementById('seleccion-experiencia-mundiales').value = sel.experiencia_mundiales ?? '';
+            document.getElementById('seleccion-titulos-mundiales').value = sel.titulos_mundiales ?? '';
+            document.getElementById('seleccion-subcampeonatos').value = sel.subcampeonatos ?? '';
+            document.getElementById('seleccion-es-sede').value = sel.es_sede ? '1' : '0';
             if (opcionesSelect.continentes.length) document.getElementById('seleccion-continente').value = sel.continente || '';
             if (opcionesSelect.grupos.length) document.getElementById('seleccion-grupo').value = sel.grupo || '';
             showAdminTab('selecciones');
@@ -776,7 +784,14 @@ document.getElementById('form-seleccion').addEventListener('submit', async (e) =
         desventajas: document.getElementById('seleccion-desventajas').value,
         banderaUrl: document.getElementById('seleccion-bandera').value,
         latitud: document.getElementById('seleccion-latitud').value,
-        longitud: document.getElementById('seleccion-longitud').value
+        longitud: document.getElementById('seleccion-longitud').value,
+        elo: document.getElementById('seleccion-elo').value,
+        valor_plantilla: document.getElementById('seleccion-valor-plantilla').value,
+        edad_promedio: document.getElementById('seleccion-edad-promedio').value,
+        experiencia_mundiales: document.getElementById('seleccion-experiencia-mundiales').value,
+        titulos_mundiales: document.getElementById('seleccion-titulos-mundiales').value,
+        subcampeonatos: document.getElementById('seleccion-subcampeonatos').value,
+        es_sede: document.getElementById('seleccion-es-sede').value
     };
 
     const method = id ? 'PATCH' : 'POST';
@@ -1156,11 +1171,12 @@ const CONSULTAS = [
     { numero: 8, titulo: 'Precio promedio de boletos por estadio', descripcion: 'Precio promedio, precio más caro, precio más barato, zona de boletos, partidos.', requiereSeleccion: false },
     { numero: 9, titulo: 'Ranking por continente', descripcion: 'Ranking FIFA, continente, selección, bandera, valor plantilla, edad promedio.', requiereSeleccion: false },
     { numero: 10, titulo: 'Consulta maestra para el simulador', descripcion: 'Partido, local, visitante, grupo, ranking, goles promedio, posesión, historial, victorias, empates, estadio.', requiereSeleccion: false }
-    ,{ numero: 11, titulo: 'Índice de Fuerza (IF) de selecciones', descripcion: 'Lista de IF calculados para cada selección.', requiereSeleccion: false }
+    ,{ numero: 11, titulo: 'Índice de Fuerza (IF) de selecciones', descripcion: 'Lista de IF calculados con ELO, forma reciente, experiencia, etc.', requiereSeleccion: false }
     ,{ numero: 12, titulo: 'Simulación Monte Carlo (partido)', descripcion: 'Simula un partido entre dos selecciones usando Monte Carlo y Poisson.', requiereSeleccion: true, tipo: 'match' }
     ,{ numero: 13, titulo: 'Simulación Monte Carlo (grupo)', descripcion: 'Simula una fase de grupo completa por Monte Carlo.', requiereSeleccion: true, tipo: 'group' }
-    ,{ numero: 14, titulo: 'Simulación Monte Carlo (torneo)', descripcion: 'Simula el torneo completo y probabilidades de campeón.', requiereSeleccion: true, tipo: 'tournament' }
-];
+    ,{ numero: 14, titulo: 'Simulación Monte Carlo (torneo)', descripcion: 'Simula el torneo completo: campeón, finalistas, semifinalistas, cuartos, octavos, promedios de goles y rival probable por fase.', requiereSeleccion: true, tipo: 'tournament' }
+    ,{ numero: 15, titulo: 'Ranking ELO de selecciones', descripcion: 'Clasificación por rating ELO de cada selección.', requiereSeleccion: false }
+  ];
 
 let consultaSeleccionada = null;
 
@@ -1391,6 +1407,158 @@ function mostrarResultados(titulo, datos) {
     simulacionTablaContainer.appendChild(table);
 }
 
+function mostrarResultadosELO(titulo, datos) {
+    simulacionTitulo.textContent = titulo;
+    simulacionResultados.classList.remove('hidden');
+    simulacionLoading.classList.add('hidden');
+    simulacionTablaContainer.innerHTML = '';
+
+    if (!Array.isArray(datos) || datos.length === 0) {
+        simulacionTablaContainer.innerHTML = '<p>No hay datos disponibles.</p>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+    const columns = ['Selección', 'Bandera', 'ELO', 'Ranking FIFA'];
+
+    const headerRow = document.createElement('tr');
+    columns.forEach(col => { const th = document.createElement('th'); th.textContent = col; headerRow.appendChild(th); });
+    thead.appendChild(headerRow);
+
+    datos.forEach(fila => {
+        const row = document.createElement('tr');
+        const tdNombre = document.createElement('td'); tdNombre.textContent = fila.nombre;
+        const tdBandera = document.createElement('td');
+        if (fila.bandera) { const img = document.createElement('img'); img.src = fila.bandera; img.alt = fila.nombre; img.className = 'tabla-bandera'; img.loading = 'lazy'; img.onerror = function() { this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3Zy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZjFmOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTQwNDA0IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0Ij5PPC90ZXh0Pjwvc3ZnPg=='; this.alt = 'Sin bandera'; }; tdBandera.appendChild(img); }
+        const tdELO = document.createElement('td'); tdELO.textContent = fila.elo != null ? fila.elo.toFixed(2) : '-';
+        const tdRanking = document.createElement('td'); tdRanking.textContent = fila.ranking != null ? fila.ranking : '-';
+        row.appendChild(tdNombre); row.appendChild(tdBandera); row.appendChild(tdELO); row.appendChild(tdRanking);
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    simulacionTablaContainer.appendChild(table);
+}
+
+function mostrarResultadosIF(titulo, datos) {
+    simulacionTitulo.textContent = titulo;
+    simulacionResultados.classList.remove('hidden');
+    simulacionLoading.classList.add('hidden');
+    simulacionTablaContainer.innerHTML = '';
+
+    if (!Array.isArray(datos) || datos.length === 0) {
+        simulacionTablaContainer.innerHTML = '<p>No hay datos disponibles.</p>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+    const columns = ['Selección', 'IF', 'ELO', 'Ranking', 'Forma Reciente', 'Historial Mundial', 'Historial Rival', 'Goles Anotados', 'Goles Recibidos', 'Dif. Goles', 'Partidos Ganados', 'Valor Plantilla', 'Edad', 'Experiencia', 'Localía', 'Fatiga', 'Lesiones', 'Clima'];
+
+    const headerRow = document.createElement('tr');
+    columns.forEach(col => { const th = document.createElement('th'); th.textContent = col; headerRow.appendChild(th); });
+    thead.appendChild(headerRow);
+
+    datos.forEach(fila => {
+        const row = document.createElement('tr');
+        const comp = fila.components || {};
+        const vals = [
+            fila.nombre,
+            fila.IF != null ? fila.IF.toFixed(2) : '-',
+            fila.elo != null ? fila.elo.toFixed(2) : '-',
+            comp.ranking != null ? comp.ranking.toFixed(2) : '-',
+            comp.forma_reciente != null ? comp.forma_reciente.toFixed(2) : '-',
+            comp.historial_mundial != null ? comp.historial_mundial.toFixed(2) : '-',
+            comp.historial_rival != null ? comp.historial_rival.toFixed(2) : '-',
+            comp.goles_anotados != null ? comp.goles_anotados.toFixed(2) : '-',
+            comp.goles_recibidos != null ? comp.goles_recibidos.toFixed(2) : '-',
+            comp.diferencia_goles != null ? comp.diferencia_goles.toFixed(2) : '-',
+            comp.partidos_ganados != null ? comp.partidos_ganados.toFixed(2) : '-',
+            comp.valor_plantilla != null ? comp.valor_plantilla.toFixed(2) : '-',
+            comp.edad_promedio != null ? comp.edad_promedio.toFixed(2) : '-',
+            comp.experiencia != null ? comp.experiencia.toFixed(2) : '-',
+            comp.localia != null ? comp.localia.toFixed(2) : '-',
+            comp.fatiga != null ? comp.fatiga.toFixed(2) : '-',
+            comp.lesiones != null ? comp.lesiones.toFixed(2) : '-',
+            comp.clima != null ? comp.clima.toFixed(2) : '-'
+        ];
+        vals.forEach(v => { const td = document.createElement('td'); td.textContent = v; row.appendChild(td); });
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    simulacionTablaContainer.appendChild(table);
+}
+
+function mostrarResultadosTorneo(titulo, datos) {
+    simulacionTitulo.textContent = titulo;
+    simulacionResultados.classList.remove('hidden');
+    simulacionLoading.classList.add('hidden');
+    simulacionTablaContainer.innerHTML = '';
+
+    if (!Array.isArray(datos) || datos.length === 0) {
+        simulacionTablaContainer.innerHTML = '<p>No hay datos disponibles.</p>';
+        return;
+    }
+
+    const summary = datos[0];
+    if (!summary || !summary.champions) {
+        mostrarResultados(titulo, datos);
+        return;
+    }
+
+    const container = document.createElement('div');
+    container.style.cssText = 'display:grid; gap:16px;';
+
+    const buildSection = (heading, items, renderItem) => {
+        const section = document.createElement('div');
+        section.innerHTML = `<h3 style="margin:0 0 8px; color:#1a252f;">${heading}</h3>`;
+        if (!items || items.length === 0) { section.innerHTML += '<p>Sin datos.</p>'; container.appendChild(section); return; }
+        const table = document.createElement('table');
+        table.style.cssText = 'width:100%; border-collapse:collapse; font-size:0.92rem;';
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+        const columns = Object.keys(items[0]);
+        const headerRow = document.createElement('tr');
+        columns.forEach(col => { const th = document.createElement('th'); th.textContent = col; th.style.cssText = 'text-align:left; padding:6px; background:#f8fafc; border-bottom:1px solid #e5e7eb;'; headerRow.appendChild(th); });
+        thead.appendChild(headerRow);
+        items.forEach(item => {
+            const row = document.createElement('tr');
+            columns.forEach(col => { const td = document.createElement('td'); td.textContent = typeof item[col] === 'number' ? (Number.isInteger(item[col]) ? item[col] : item[col].toFixed(2)) : (item[col] ?? '-'); td.style.cssText = 'padding:6px; border-bottom:1px solid #e5e7eb;'; row.appendChild(td); });
+            tbody.appendChild(row);
+        });
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        section.appendChild(table);
+        container.appendChild(section);
+    };
+
+    if (summary.champions) buildSection('Probabilidad de campeón', summary.champions);
+    if (summary.finalists) buildSection('Probabilidad de finalista', summary.finalists);
+    if (summary.semifinalists) buildSection('Probabilidad de semifinalista', summary.semifinalists);
+    if (summary.quarterfinalists) buildSection('Probabilidad de cuartofinalista', summary.quarterfinalists);
+    if (summary.round16) buildSection('Probabilidad de pasar a dieciseisavos', summary.round16);
+    if (summary.qualifies) buildSection('Distribución de posiciones en grupo', summary.qualifies);
+    if (summary.avgGoals) buildSection('Promedio de goles (a favor / en contra)', summary.avgGoals);
+    if (summary.rivals) {
+        const rivalRows = Object.keys(summary.rivals).map(id => ({ id, ...summary.rivals[id] }));
+        buildSection('Rival más probable por fase', rivalRows);
+    }
+    if (summary.mostCommonChampion) {
+        const section = document.createElement('div');
+        section.innerHTML = `<h3 style="margin:0 0 8px; color:#1a252f;">Campeón más frecuente</h3><p><strong>ID:</strong> ${summary.mostCommonChampion.id} · <strong>Veces:</strong> ${summary.mostCommonChampion.count}</p>`;
+        container.appendChild(section);
+    }
+
+    simulacionTablaContainer.appendChild(container);
+}
+
+
 async function ejecutarConsulta(numero) {
     simulacionResultados.classList.remove('hidden');
     simulacionLoading.classList.remove('hidden');
@@ -1407,7 +1575,11 @@ async function ejecutarConsulta(numero) {
         const data = await resp.json();
         simulacionLoading.classList.add('hidden');
         const titulo = CONSULTAS.find(c => c.numero === numero)?.titulo || `Consulta ${numero}`;
-        mostrarResultados(titulo, Array.isArray(data) ? data : [data]);
+
+        if (numero === 15) mostrarResultadosELO(titulo, data);
+        else if (numero === 14) mostrarResultadosTorneo(titulo, data);
+        else if (numero === 11) mostrarResultadosIF(titulo, data);
+        else mostrarResultados(titulo, Array.isArray(data) ? data : [data]);
     } catch (err) {
         console.error(err);
         simulacionLoading.classList.add('hidden');
