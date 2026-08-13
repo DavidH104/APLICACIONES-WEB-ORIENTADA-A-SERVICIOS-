@@ -98,6 +98,8 @@
             <button class="admin-tab" data-tab="estadios">Estadios</button>
             <button class="admin-tab" data-tab="clasificaciones">Tablas</button>
             <button class="admin-tab" data-tab="fases">Fases</button>
+            <button class="admin-tab" data-tab="simulaciones">Simulaciones</button>
+            <button class="admin-tab" data-tab="if-pesos">Pesos IF</button>
         </div>
 
         <section id="admin-tab-partidos" class="admin-tab-content">
@@ -151,6 +153,26 @@
                 </form>
             </div>
             <div id="admin-partidos-lista" class="admin-list"></div>
+        </section>
+
+        <section id="admin-tab-simulaciones" class="admin-tab-content hidden">
+            <div class="admin-card">
+                <h3>Simulaciones guardadas</h3>
+                <p class="admin-note">Lista de simulaciones ejecutadas. Puedes descargar el JSON completo de cada simulación.</p>
+                <div class="admin-form-actions"><button id="btn-refresh-simulaciones" class="btn-primary" type="button">Actualizar lista</button></div>
+            </div>
+            <div id="admin-simulaciones-lista" class="admin-list"></div>
+        </section>
+
+        <section id="admin-tab-if-pesos" class="admin-tab-content hidden">
+            <div class="admin-card">
+                <h3>Editor de pesos IF</h3>
+                <p class="admin-note">Ajusta los pesos usados para calcular el Índice de Fuerza (IF).</p>
+                <form id="form-if-pesos" class="admin-form">
+                    <div id="if-pesos-fields"></div>
+                    <div class="admin-form-actions"><button id="btn-guardar-if-pesos" type="submit" class="btn-primary">Guardar pesos</button></div>
+                </form>
+            </div>
         </section>
 
         <section id="admin-tab-selecciones" class="admin-tab-content hidden">

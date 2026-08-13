@@ -991,7 +991,7 @@ async function showAdminPanel() {
     adminPanel.classList.remove('hidden');
     adminLoggedIn = true;
     await cargarOpcionesAdmin();
-    await Promise.all([loadAdminPartidos(), loadAdminSelecciones(), loadAdminEstadios(), loadAdminClasificaciones(), loadAdminFases(), loadResults()]);
+    await Promise.all([loadAdminPartidos(), loadAdminSelecciones(), loadAdminEstadios(), loadAdminClasificaciones(), loadAdminFases(), loadResults(), loadSimulaciones(), loadIFWeights()]);
 }
 
 function hideAdminPanel() {
@@ -1003,6 +1003,93 @@ function hideAdminModal() {
     adminModal.classList.add('hidden');
     adminLoginForm.reset();
 }
+
+// --- Simulaciones admin ---
+async function loadSimulaciones() {
+    const container = document.getElementById('admin-simulaciones-lista');
+    const btn = document.getElementById('btn-refresh-simulaciones');
+    if (btn) { btn.disabled = true; btn.textContent = 'Cargando...'; }
+    try {
+        const resp = await fetch('/api/admin/simulaciones?limit=200');
+        if (!resp.ok) throw new Error('Error cargando simulaciones');
+        const lista = await resp.json();
+        renderSimulaciones(lista);
+    } catch (err) {
+        console.error('loadSimulaciones', err);
+        if (container) container.innerHTML = '<div class="admin-item">No se pudieron cargar las simulaciones.</div>';
+    } finally { if (btn) { btn.disabled = false; btn.textContent = 'Actualizar lista'; } }
+}
+
+function renderSimulaciones(lista) {
+    const container = document.getElementById('admin-simulaciones-lista');
+    container.innerHTML = '';
+    if (!Array.isArray(lista) || lista.length === 0) { container.innerHTML = '<div class="admin-item">No hay simulaciones guardadas.</div>'; return; }
+    lista.forEach(s => {
+        const item = document.createElement('div'); item.className = 'admin-item';
+        const when = s.createdAt ? new Date(s.createdAt).toLocaleString() : '';
+        item.innerHTML = `<div><div class="admin-item-title">${s.tipo || 'simulación'}</div><div class="admin-item-meta">${when} · ${JSON.stringify(s.params || {})}</div></div><div class="admin-item-actions"><button class="btn-view" data-id="${s.id}">Descargar</button></div>`;
+        container.appendChild(item);
+    });
+    container.querySelectorAll('.btn-view').forEach(btn => btn.addEventListener('click', async () => {
+        const id = btn.dataset.id; try {
+            const resp = await fetch(`/api/admin/simulaciones/${id}`);
+            if (!resp.ok) throw new Error('No encontrado');
+            const doc = await resp.json();
+            const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `simulacion_${id}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        } catch (err) { alert('No se pudo descargar la simulación'); console.error(err); }
+    }));
+}
+
+// --- IF pesos editor ---
+async function loadIFWeights() {
+    try {
+        const resp = await fetch('/api/admin/if-pesos');
+        if (!resp.ok) throw new Error('No se pudo cargar IF weights');
+        const data = await resp.json();
+        const weights = data?.weights || data || null;
+        renderIFWeightsEditor(weights);
+    } catch (err) { console.error('loadIFWeights', err); renderIFWeightsEditor(null); }
+}
+
+function renderIFWeightsEditor(weights) {
+    const container = document.getElementById('if-pesos-fields');
+    container.innerHTML = '';
+    const defaults = {
+        ranking: 0.20,
+        historial_mundial: 0.15,
+        historial_rival: 0.10,
+        goles_anotados: 0.10,
+        goles_recibidos: 0.10,
+        diferencia_goles: 0.10,
+        partidos_ganados: 0.10,
+        valor_plantilla: 0.05,
+        experiencia: 0.05
+    };
+    const src = (weights && typeof weights === 'object') ? weights : defaults;
+    Object.keys(defaults).forEach(k => {
+        const val = src[k] !== undefined ? src[k] : defaults[k];
+        const row = document.createElement('div'); row.className = 'form-row';
+        row.innerHTML = `<div class="form-group"><label>${k.replace(/_/g,' ')}<input type="number" step="0.01" min="0" max="1" data-key="${k}" value="${val}"></label></div>`;
+        container.appendChild(row);
+    });
+}
+
+document.getElementById('form-if-pesos').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fields = document.querySelectorAll('#if-pesos-fields input[data-key]');
+    const payload = {};
+    fields.forEach(inp => { payload[inp.dataset.key] = parseFloat(inp.value) || 0; });
+    try {
+        const resp = await fetch('/api/admin/if-pesos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!resp.ok) throw new Error('Error saving');
+        alert('Pesos IF guardados');
+        await loadIFWeights();
+    } catch (err) { console.error('save IF weights', err); alert('No se pudo guardar los pesos'); }
+});
+
+document.getElementById('btn-refresh-simulaciones').addEventListener('click', loadSimulaciones);
 
 function showAdminModal() {
     adminModal.classList.remove('hidden');
@@ -1069,6 +1156,10 @@ const CONSULTAS = [
     { numero: 8, titulo: 'Precio promedio de boletos por estadio', descripcion: 'Precio promedio, precio más caro, precio más barato, zona de boletos, partidos.', requiereSeleccion: false },
     { numero: 9, titulo: 'Ranking por continente', descripcion: 'Ranking FIFA, continente, selección, bandera, valor plantilla, edad promedio.', requiereSeleccion: false },
     { numero: 10, titulo: 'Consulta maestra para el simulador', descripcion: 'Partido, local, visitante, grupo, ranking, goles promedio, posesión, historial, victorias, empates, estadio.', requiereSeleccion: false }
+    ,{ numero: 11, titulo: 'Índice de Fuerza (IF) de selecciones', descripcion: 'Lista de IF calculados para cada selección.', requiereSeleccion: false }
+    ,{ numero: 12, titulo: 'Simulación Monte Carlo (partido)', descripcion: 'Simula un partido entre dos selecciones usando Monte Carlo y Poisson.', requiereSeleccion: true, tipo: 'match' }
+    ,{ numero: 13, titulo: 'Simulación Monte Carlo (grupo)', descripcion: 'Simula una fase de grupo completa por Monte Carlo.', requiereSeleccion: true, tipo: 'group' }
+    ,{ numero: 14, titulo: 'Simulación Monte Carlo (torneo)', descripcion: 'Simula el torneo completo y probabilidades de campeón.', requiereSeleccion: true, tipo: 'tournament' }
 ];
 
 let consultaSeleccionada = null;
@@ -1113,20 +1204,58 @@ function seleccionarConsulta(consulta) {
 
 async function cargarSeleccionesParaSelector() {
     try {
-        const resp = await fetch(`/api/simulacion?consulta=${consultaSeleccionada.numero}`);
-        console.log('cargarSeleccionesParaSelector', consultaSeleccionada.numero, resp.status, resp.statusText);
-        const data = await resp.json();
-        console.log('data selecciones', data);
-        if (data.requiereSeleccion && Array.isArray(data.selecciones)) {
-            simulacionSelectEquipo.innerHTML = '<option value="">Selecciona una selección...</option>';
-            data.selecciones.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.id;
-                opt.textContent = s.nombre;
-                simulacionSelectEquipo.appendChild(opt);
+        // Use /api/selecciones to populate teams and groups
+        const resp = await fetch('/api/selecciones');
+        const teams = await resp.json();
+        if (!Array.isArray(teams)) throw new Error('Respuesta de selecciones inválida');
+        // Build UI depending on consulta type
+        if (consultaSeleccionada.tipo === 'match') {
+            // build two selects and iter input
+            simulacionSelector.innerHTML = `
+                <h3>Selecciona el partido</h3>
+                <div class="simulacion-row"><label>Local</label><select id="simulacion-select-local"></select></div>
+                <div class="simulacion-row"><label>Visitante</label><select id="simulacion-select-visitante"></select></div>
+                <div class="simulacion-row"><label>Iteraciones</label><input id="simulacion-iter" type="number" value="2000" min="100" step="100" /></div>
+                <div class="simulacion-row"><button id="btn-ejecutar-con-select" class="btn-ejecutar" type="button">Iniciar simulación</button></div>
+            `;
+            const selLocal = document.getElementById('simulacion-select-local');
+            const selVisit = document.getElementById('simulacion-select-visitante');
+            selLocal.innerHTML = '<option value="">Selecciona local...</option>';
+            selVisit.innerHTML = '<option value="">Selecciona visitante...</option>';
+            teams.forEach(s => {
+                const o1 = document.createElement('option'); o1.value = s.id; o1.textContent = s.nombre; selLocal.appendChild(o1);
+                const o2 = document.createElement('option'); o2.value = s.id; o2.textContent = s.nombre; selVisit.appendChild(o2);
             });
+            document.getElementById('btn-ejecutar-con-select').addEventListener('click', handleBtnEjecutar);
+        } else if (consultaSeleccionada.tipo === 'group') {
+            // extract unique groups by name
+            const groups = {};
+            teams.forEach(s => { if (s.grupo) groups[s.grupo] = true; });
+            simulacionSelector.innerHTML = `
+                <h3>Selecciona un grupo</h3>
+                <div class="simulacion-row"><label>Grupo</label><select id="simulacion-select-grupo"></select></div>
+                <div class="simulacion-row"><label>Iteraciones</label><input id="simulacion-iter" type="number" value="2000" min="100" step="100" /></div>
+                <div class="simulacion-row"><button id="btn-ejecutar-con-select" class="btn-ejecutar" type="button">Iniciar simulación</button></div>
+            `;
+            const selGrupo = document.getElementById('simulacion-select-grupo');
+            selGrupo.innerHTML = '<option value="">Selecciona un grupo...</option>';
+            Object.keys(groups).forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.textContent = g; selGrupo.appendChild(opt); });
+            document.getElementById('btn-ejecutar-con-select').addEventListener('click', handleBtnEjecutar);
+            } else if (consultaSeleccionada.tipo === 'tournament') {
+                // Tournament runner: just iterations and start
+                simulacionSelector.innerHTML = `
+                    <h3>Simulación de torneo</h3>
+                    <div class="simulacion-row"><label>Iteraciones</label><input id="simulacion-iter" type="number" value="1000" min="10" step="10" /></div>
+                    <div class="simulacion-row"><button id="btn-ejecutar-con-select" class="btn-ejecutar" type="button">Iniciar simulación torneo</button></div>
+                `;
+                document.getElementById('btn-ejecutar-con-select').addEventListener('click', handleBtnEjecutar);
         } else {
-            simulacionTablaContainer.innerHTML = '<p>No se pudieron cargar las selecciones.</p>';
+            // default single team selector
+            simulacionSelector.innerHTML = `<h3>Selecciona una selección</h3><select id="simulacion-select-equipo"></select><button id="btn-ejecutar-con-select" class="btn-ejecutar" type="button">Iniciar simulación</button>`;
+            const sel = document.getElementById('simulacion-select-equipo');
+            sel.innerHTML = '<option value="">Selecciona una selección...</option>';
+            teams.forEach(s => { const opt = document.createElement('option'); opt.value = s.id; opt.textContent = s.nombre; sel.appendChild(opt); });
+            document.getElementById('btn-ejecutar-con-select').addEventListener('click', handleBtnEjecutar);
         }
     } catch (err) {
         console.error('Error cargando selecciones:', err);
@@ -1134,15 +1263,47 @@ async function cargarSeleccionesParaSelector() {
     }
 }
 
-btnEjecutarConSelect.addEventListener('click', async () => {
-    const sid = simulacionSelectEquipo.value;
-    console.log('Ejecutar consulta 2 con seleccionId:', sid);
-    if (!sid) {
-        simulacionTablaContainer.innerHTML = `<p style="color: #ef4444; font-weight: 700;">Selecciona una selección válida.</p>`;
-        return;
+async function handleBtnEjecutar() {
+    if (!consultaSeleccionada) return;
+    try {
+        if (consultaSeleccionada.tipo === 'match') {
+            const local = document.getElementById('simulacion-select-local').value;
+            const visit = document.getElementById('simulacion-select-visitante').value;
+            const iter = document.getElementById('simulacion-iter').value || 2000;
+            if (!local || !visit) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona local y visitante válidos.</p>'; return; }
+            if (local === visit) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">El local y el visitante deben ser distintos.</p>'; return; }
+            simulacionLoading.classList.remove('hidden');
+            const resp = await fetch(`/api/simulacion?consulta=12&localId=${encodeURIComponent(local)}&visitanteId=${encodeURIComponent(visit)}&iter=${encodeURIComponent(iter)}`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            mostrarResultados(consultaSeleccionada.titulo, [data]);
+        } else if (consultaSeleccionada.tipo === 'group') {
+            const group = document.getElementById('simulacion-select-grupo').value;
+            const iter = document.getElementById('simulacion-iter').value || 2000;
+            if (!group) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona un grupo válido.</p>'; return; }
+            simulacionLoading.classList.remove('hidden');
+            const resp = await fetch(`/api/simulacion?consulta=13&groupId=${encodeURIComponent(group)}&iter=${encodeURIComponent(iter)}`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            mostrarResultados(consultaSeleccionada.titulo, [data]);
+        } else if (consultaSeleccionada.tipo === 'tournament') {
+            const iter = document.getElementById('simulacion-iter').value || 1000;
+            simulacionLoading.classList.remove('hidden');
+            const resp = await fetch(`/api/simulacion?consulta=14&iter=${encodeURIComponent(iter)}`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            mostrarResultados(consultaSeleccionada.titulo, [data]);
+        } else {
+            const sid = document.getElementById('simulacion-select-equipo')?.value;
+            if (!sid) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona una selección válida.</p>'; return; }
+            await ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
+        }
+    } catch (err) {
+        console.error('Error ejecutando simulación:', err);
+        simulacionLoading.classList.add('hidden');
+        simulacionTablaContainer.innerHTML = `<p style="color:#ef4444; font-weight: 700;">Error ejecutando simulación: ${err.message}</p>`;
     }
-    await ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
-});
+}
 
 function mostrarResultados(titulo, datos) {
     simulacionTitulo.textContent = titulo;
@@ -1155,6 +1316,45 @@ function mostrarResultados(titulo, datos) {
         return;
     }
 
+    // If this looks like a Monte Carlo match result, render summary
+    const first = datos[0];
+    if (first && (first.probs || first.lambda || first.resultados)) {
+        const box = document.createElement('div');
+        box.className = 'mc-summary';
+        const localName = first.local?.nombre || 'Local';
+        const visitName = first.visitante?.nombre || 'Visitante';
+        // Probabilities
+        const probs = first.probs || {};
+        const probsHtml = `<div class="mc-probs"><strong>Probabilidades</strong><div>${localName}: ${probs.local ?? '-'} | Empate: ${probs.draw ?? '-'} | ${visitName}: ${probs.visitante ?? '-'}</div></div>`;
+        // Lambdas
+        const lambda = first.lambda || {};
+        const lambdaHtml = `<div class="mc-lambdas"><strong>Goles esperados (λ)</strong><div>${localName}: ${lambda.local ?? '-'} | ${visitName}: ${lambda.visitante ?? '-'}</div></div>`;
+        // Results summary
+        const res = first.resultados || {};
+        const resHtml = `<div class="mc-res"><strong>Resultados</strong><div>${localName} wins: ${res.pctLocal ?? '-'}% | Empates: ${res.pctDraw ?? '-'}% | ${visitName} wins: ${res.pctVisita ?? '-'}%</div></div>`;
+        box.innerHTML = probsHtml + lambdaHtml + resHtml;
+        // Top scores table
+        if (Array.isArray(first.topScores) && first.topScores.length) {
+            const t = document.createElement('table');
+            t.className = 'mc-top-scores';
+            t.innerHTML = '<thead><tr><th>Marcador</th><th>Veces</th><th>%</th></tr></thead>';
+            const tb = document.createElement('tbody');
+            first.topScores.forEach(s => {
+                const tr = document.createElement('tr');
+                const td1 = document.createElement('td'); td1.textContent = s.score; tr.appendChild(td1);
+                const td2 = document.createElement('td'); td2.textContent = s.count; tr.appendChild(td2);
+                const td3 = document.createElement('td'); td3.textContent = s.pct + '%'; tr.appendChild(td3);
+                tb.appendChild(tr);
+            });
+            t.appendChild(tb);
+            box.appendChild(document.createElement('hr'));
+            box.appendChild(t);
+        }
+        simulacionTablaContainer.appendChild(box);
+        return;
+    }
+
+    // Fallback: generic table renderer
     const table = document.createElement('table');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
@@ -1169,18 +1369,15 @@ function mostrarResultados(titulo, datos) {
         columns.forEach(col => {
             const td = document.createElement('td');
             const valor = fila[col];
-            const esImagen = typeof valor === 'string' && /^(https?:\/\/|\.\/|\.\.\/).+\.(png|jpg|jpeg|gif|webp|svg)(\?.*)?$/i.test(valor.trim());
+            const esImagen = typeof valor === 'string' && /^(https?:\/\/|\.\/|\.\.\/).+\.(png|jpg|jpeg|gif|webp|svg)(\?.*)?$/i.test(String(valor).trim());
             if (valor === null || valor === undefined) td.textContent = '-';
             else if (esImagen) {
                 const img = document.createElement('img');
-                img.src = valor.trim();
+                img.src = String(valor).trim();
                 img.alt = col;
                 img.className = 'tabla-bandera';
                 img.loading = 'lazy';
-                img.onerror = function() {
-                    this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZjFmOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTQwNDA0IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0Ij5PPC90ZXh0Pjwvc3ZnPg==';
-                    this.alt = 'Sin bandera';
-                };
+                img.onerror = function() { this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZjFmOCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTQwNDA0IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0Ij5PPC90ZXh0Pjwvc3ZnPg=='; this.alt = 'Sin bandera'; };
                 td.appendChild(img);
             } else if (typeof valor === 'object') td.textContent = JSON.stringify(valor);
             else td.textContent = valor;

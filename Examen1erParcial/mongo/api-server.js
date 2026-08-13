@@ -211,8 +211,7 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
 
   // Convert scoreMap to top outcomes
   const topScores = Array.from(scoreMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([score, cnt]) => ({ score, count: cnt, pct: parseFloat(((cnt / iterations) * 100).toFixed(2)) }));
-
-  return {
+  const resultObj = {
     local: { id: localId, nombre: localDoc?.nombre || 'Local', IF: ifLocalObj.IF, promedio_goles_hist: avgLocal },
     visitante: { id: visitanteId, nombre: visitanteDoc?.nombre || 'Visitante', IF: ifVisitObj.IF, promedio_goles_hist: avgVisit },
     probs,
@@ -222,7 +221,15 @@ async function monteCarloMatch(db, localId, visitanteId, iterations = 5000, home
     avgGoals: { local: parseFloat((totalGoalsLocal / iterations).toFixed(3)), visitante: parseFloat((totalGoalsVisit / iterations).toFixed(3)) },
     topScores
   };
+
+  // Persist simulation
+  try {
+    await saveSimulationResult(db, { tipo: 'match', params: { localId, visitanteId, iterations, homeAdv }, weights: effectiveWeights, result: resultObj });
+  } catch (e) { console.error('Error saving match simulation', e); }
+
+  return resultObj;
 }
+
 
 async function simulateGroupMonteCarlo(db, groupId, iterations = 2000) {
   // get teams in group
@@ -263,7 +270,101 @@ async function simulateGroupMonteCarlo(db, groupId, iterations = 2000) {
   }
 
   const result = teams.map(t => ({ id: t._id.toString(), nombre: t.nombre, avgPoints: parseFloat((totalPoints[t._id.toString()] / iterations).toFixed(3)), finishPct: finishCounts[t._id.toString()].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) }));
-  return { groupId, iterations, teams: result };
+  const out = { groupId, iterations, teams: result };
+  try { await saveSimulationResult(db, { tipo: 'group', params: { groupId, iterations }, result: out }); } catch (e) { console.error('Error saving group simulation', e); }
+  return out;
+}
+
+async function saveSimulationResult(db, doc) {
+  try {
+    const crypto = await import('crypto');
+    const seed = doc.seed || crypto.randomBytes(8).toString('hex');
+    const payload = { ...doc, seed, createdAt: new Date() };
+    const r = await db.collection('simulaciones').insertOne(payload);
+    return { ok: true, id: r.insertedId.toString() };
+  } catch (err) {
+    console.error('Error saving simulation:', err);
+    return { ok: false, error: err.message };
+  }
+}
+
+async function simulateTournamentMonteCarlo(db, iterations = 1000) {
+  // Simplified tournament: simulate group stages, take top 2 from each group, then random bracket elimination per iteration
+  const grupos = await db.collection('grupos').find({}).toArray();
+  if (!grupos || grupos.length === 0) return { error: 'No hay grupos definidos' };
+
+  const teamDocsByGroup = {};
+  for (const g of grupos) {
+    const teams = await db.collection('selecciones').find({ grupoId: g._id }).toArray();
+    teamDocsByGroup[g._id.toString()] = teams;
+  }
+
+  const championCounts = {};
+  const qualifyCounts = {}; // counts of finishing positions per team
+
+  for (let it = 0; it < iterations; it++) {
+    const qualified = [];
+    // group stage
+    for (const g of grupos) {
+      const teams = teamDocsByGroup[g._id.toString()] || [];
+      if (teams.length === 0) continue;
+      // simulate group by points
+      const points = {};
+      teams.forEach(t => { points[t._id.toString()] = 0; });
+      for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+          const a = teams[i]; const b = teams[j];
+          // compute lambdas quickly reusing monteCarloMatch lambdas via single-run
+          const mc = await monteCarloMatch(db, a._id.toString(), b._id.toString(), 1, 5);
+          const gA = poissonSample(mc.lambda.local);
+          const gB = poissonSample(mc.lambda.visitante);
+          if (gA > gB) points[a._id.toString()] += 3;
+          else if (gA < gB) points[b._id.toString()] += 3;
+          else { points[a._id.toString()] += 1; points[b._id.toString()] += 1; }
+        }
+      }
+      const ranking = Object.keys(points).map(id => ({ id, pts: points[id] })).sort((x,y) => y.pts - x.pts);
+      // top 2 qualify
+      if (ranking[0]) qualified.push(ranking[0].id);
+      if (ranking[1]) qualified.push(ranking[1].id);
+      // track qualify counts per position
+      ranking.forEach((r, idx) => {
+        qualifyCounts[r.id] = qualifyCounts[r.id] || [0,0,0,0];
+        if (idx < 4) qualifyCounts[r.id][idx]++;
+      });
+    }
+
+    // knockout: shuffle qualified and eliminate
+    let current = qualified.slice().sort(() => Math.random() - 0.5);
+    while (current.length > 1) {
+      const nextRound = [];
+      for (let i = 0; i < current.length; i += 2) {
+        const t1 = current[i];
+        const t2 = current[i+1];
+        if (!t2) { nextRound.push(t1); continue; }
+        const mc = await monteCarloMatch(db, t1, t2, 1, 0);
+        const g1 = poissonSample(mc.lambda.local);
+        const g2 = poissonSample(mc.lambda.visitante);
+        if (g1 > g2) nextRound.push(t1); else if (g2 > g1) nextRound.push(t2); else {
+          // tie-breaker by IF
+          const if1 = mc.local?.IF ?? 0; const if2 = mc.visitante?.IF ?? 0;
+          nextRound.push(if1 >= if2 ? t1 : t2);
+        }
+      }
+      current = nextRound;
+    }
+    const champ = current[0];
+    if (champ) championCounts[champ] = (championCounts[champ] || 0) + 1;
+  }
+
+  // build summary
+  const champions = Object.keys(championCounts).map(id => ({ id, pct: parseFloat(((championCounts[id] / iterations) * 100).toFixed(2)) })).sort((a,b) => b.pct - a.pct);
+  const qualifies = Object.keys(qualifyCounts).map(id => ({ id, posCounts: qualifyCounts[id].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) }));
+
+  const summary = { iterations, champions, qualifies };
+  // Save summary
+  await saveSimulationResult(db, { tipo: 'tournament', iterations, summary });
+  return { ok: true, summary };
 }
 
 // --- Estadísticas y historial helpers ---
@@ -515,6 +616,26 @@ const server = http.createServer(async (req, res) => {
         const docs = await db.collection('estadisticas_seleccion').find({}).toArray();
         const payload = docs.map(serializeObjectId);
         sendJson(res, 200, payload);
+        return;
+      }
+
+      // Admin: listar simulaciones
+      if (url.pathname === '/api/admin/simulaciones') {
+        const limit = Math.min(200, parseInt(url.searchParams.get('limit') || '100', 10));
+        const sims = await db.collection('simulaciones').find({}).sort({ createdAt: -1 }).limit(limit).toArray();
+        const payload = sims.map(s => ({ id: s._id.toString(), tipo: s.tipo, createdAt: s.createdAt, params: s.params || null }));
+        sendJson(res, 200, payload);
+        return;
+      }
+
+      // Admin: obtener simulacion por id
+      const simMatch = url.pathname.match(/^\/api\/admin\/simulaciones\/([^/]+)$/);
+      if (simMatch) {
+        const simId = simMatch[1];
+        if (!ObjectId.isValid(simId)) { sendJson(res, 400, { error: 'ID inválido' }); return; }
+        const sim = await db.collection('simulaciones').findOne({ _id: new ObjectId(simId) });
+        if (!sim) { sendJson(res, 404, { error: 'No encontrado' }); return; }
+        sendJson(res, 200, sim);
         return;
       }
 
@@ -973,6 +1094,8 @@ const server = http.createServer(async (req, res) => {
           const sel = await db.collection('selecciones').aggregate([
             { $lookup: { from: 'continentes', localField: 'continenteId', foreignField: '_id', as: 'continente' } },
             { $unwind: { path: '$continente', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'estadisticas_seleccion', localField: '_id', foreignField: 'seleccionId', as: 'estadisticas' } },
+            { $unwind: { path: '$estadisticas', preserveNullAndEmptyArrays: true } },
             {
               $lookup: {
                 from: 'partidos',
@@ -985,7 +1108,7 @@ const server = http.createServer(async (req, res) => {
               }
             },
             { $unwind: { path: '$stats', preserveNullAndEmptyArrays: true } },
-            { $project: { _id: 0, seleccion: '$nombre', bandera: '$banderaUrl', ranking: 1, continente: '$continente.nombre', promedio_goles: { $cond: [{ $gt: [{ $ifNull: ['$stats.partidos', 0] }, 0] }, { $divide: ['$stats.goles', '$stats.partidos'] }, 0] }, partidos: { $ifNull: ['$stats.partidos', 0] } } },
+            { $project: { _id: 0, seleccion: '$nombre', bandera: '$banderaUrl', ranking: 1, continente: '$continente.nombre', promedio_goles: { $cond: [{ $gt: [{ $ifNull: ['$stats.partidos', 0] }, 0] }, { $divide: ['$stats.goles', '$stats.partidos'] }, 0] }, partidos: { $ifNull: ['$stats.partidos', 0] }, promedio_tiros: { $ifNull: ['$estadisticas.tiros_porteria', 0] }, posesion: { $ifNull: ['$estadisticas.posesion_promedio', 0] } } },
             { $sort: { promedio_goles: -1 } }
           ]).toArray();
           sendJson(res, 200, sel.map(item => ({ ...item, bandera: normalizeBandera(item.seleccion, item.bandera) })));
@@ -1080,14 +1203,19 @@ const server = http.createServer(async (req, res) => {
             { $unwind: { path: '$clasif_local', preserveNullAndEmptyArrays: true } },
             { $lookup: { from: 'clasificaciones', localField: 'equipo_visitanteId', foreignField: 'seleccionId', as: 'clasif_visitante' } },
             { $unwind: { path: '$clasif_visitante', preserveNullAndEmptyArrays: true } },
-            { $project: { _id: 0, id: '$_id', fecha: 1, goles_local: 1, goles_visitante: 1, equipo_local: '$local.nombre', equipo_visitante: '$visitante.nombre', ranking_local: '$local.ranking', ranking_visitante: '$visitante.ranking', gf_local: { $ifNull: ['$clasif_local.gf', 0] }, gc_local: { $ifNull: ['$clasif_local.gc', 0] }, pj_local: { $ifNull: ['$clasif_local.pj', 0] }, gf_visitante: { $ifNull: ['$clasif_visitante.gf', 0] }, gc_visitante: { $ifNull: ['$clasif_visitante.gc', 0] }, pj_visitante: { $ifNull: ['$clasif_visitante.pj', 0] } } },
+            { $lookup: { from: 'estadisticas_seleccion', localField: 'equipo_localId', foreignField: 'seleccionId', as: 'estat_local' } },
+            { $unwind: { path: '$estat_local', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'estadisticas_seleccion', localField: 'equipo_visitanteId', foreignField: 'seleccionId', as: 'estat_visit' } },
+            { $unwind: { path: '$estat_visit', preserveNullAndEmptyArrays: true } },
+            { $project: { _id: 0, id: '$_id', fecha: 1, goles_local: 1, goles_visitante: 1, equipo_local: '$local.nombre', equipo_visitante: '$visitante.nombre', ranking_local: '$local.ranking', ranking_visitante: '$visitante.ranking', gf_local: { $ifNull: ['$clasif_local.gf', 0] }, gc_local: { $ifNull: ['$clasif_local.gc', 0] }, pj_local: { $ifNull: ['$clasif_local.pj', 0] }, gf_visitante: { $ifNull: ['$clasif_visitante.gf', 0] }, gc_visitante: { $ifNull: ['$clasif_visitante.gc', 0] }, pj_visitante: { $ifNull: ['$clasif_visitante.pj', 0] }, posesion_local: { $ifNull: ['$estat_local.posesion_promedio', 0] }, posesion_visitante: { $ifNull: ['$estat_visit.posesion_promedio', 0] } } },
             { $sort: { fecha: 1 } }
           ]).toArray();
           const resultado = partidos.map(p => {
             const promGolesLocal = p.pj_local > 0 ? (p.gf_local / p.pj_local) : 0;
             const promGolesVisitante = p.pj_visitante > 0 ? (p.gf_visitante / p.pj_visitante) : 0;
-            const fuerzaLocal = p.ranking_local + promGolesLocal + (p.gc_local > 0 ? -p.gc_local : 0);
-            const fuerzaVisitante = p.ranking_visitante + promGolesVisitante + (p.gc_visitante > 0 ? -p.gc_visitante : 0);
+            // Fuerza = Ranking + Promedio goles + Posesión - Goles recibidos
+            const fuerzaLocal = safeNum(p.ranking_local, 0) + parseFloat(promGolesLocal.toFixed(2)) + safeNum(p.posesion_local, 0) - safeNum(p.gc_local, 0);
+            const fuerzaVisitante = safeNum(p.ranking_visitante, 0) + parseFloat(promGolesVisitante.toFixed(2)) + safeNum(p.posesion_visitante, 0) - safeNum(p.gc_visitante, 0);
             const suma = fuerzaLocal + fuerzaVisitante;
             const probLocal = suma > 0 ? parseFloat(((fuerzaLocal / suma) * 100).toFixed(2)) : 50;
             const probVisitante = suma > 0 ? parseFloat(((fuerzaVisitante / suma) * 100).toFixed(2)) : 50;
@@ -1176,6 +1304,13 @@ const server = http.createServer(async (req, res) => {
           const iter = Math.max(100, parseInt(params.get('iter') || '2000', 10));
           if (!groupId || !ObjectId.isValid(groupId)) { sendJson(res, 400, { error: 'groupId inválido' }); return; }
           const resultado = await simulateGroupMonteCarlo(db, groupId, iter);
+          sendJson(res, 200, resultado);
+          return;
+        }
+
+        if (tipo === '14') {
+          const iter = Math.max(10, parseInt(params.get('iter') || '1000', 10));
+          const resultado = await simulateTournamentMonteCarlo(db, iter);
           sendJson(res, 200, resultado);
           return;
         }
