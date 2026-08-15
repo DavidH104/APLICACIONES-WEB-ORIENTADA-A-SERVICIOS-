@@ -1072,15 +1072,10 @@ function renderIFWeightsEditor(weights) {
     const container = document.getElementById('if-pesos-fields');
     container.innerHTML = '';
     const defaults = {
-        ranking: 0.20,
-        historial_mundial: 0.15,
-        historial_rival: 0.10,
-        goles_anotados: 0.10,
-        goles_recibidos: 0.10,
-        diferencia_goles: 0.10,
-        partidos_ganados: 0.10,
-        valor_plantilla: 0.05,
-        experiencia: 0.05
+        elo: 0.20, ranking: 0.10, forma_reciente: 0.15, historial_mundial: 0.10, historial_rival: 0.05,
+        goles_anotados: 0.06, goles_recibidos: 0.06, diferencia_goles: 0.05, partidos_ganados: 0.04,
+        valor_plantilla: 0.05, edad_promedio: 0.03, experiencia: 0.03, localia: 0.03,
+        fatiga: 0.02, lesiones: 0.02, clima: 0.01
     };
     const src = (weights && typeof weights === 'object') ? weights : defaults;
     Object.keys(defaults).forEach(k => {
@@ -1308,7 +1303,12 @@ async function handleBtnEjecutar() {
             const resp = await fetch(`/api/simulacion?consulta=14&iter=${encodeURIComponent(iter)}`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const data = await resp.json();
-            mostrarResultados(consultaSeleccionada.titulo, [data]);
+            const summary = data?.summary || data;
+            if (summary && (summary.champions || summary.finalists || summary.semifinalists)) {
+                mostrarResultadosTorneo(consultaSeleccionada.titulo, [summary]);
+            } else {
+                mostrarResultados(consultaSeleccionada.titulo, [data]);
+            }
         } else {
             const sid = document.getElementById('simulacion-select-equipo')?.value;
             if (!sid) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona una selección válida.</p>'; return; }
@@ -1495,7 +1495,7 @@ function mostrarResultadosIF(titulo, datos) {
     simulacionTablaContainer.appendChild(table);
 }
 
-function mostrarResultadosTorneo(titulo, datos) {
+async function mostrarResultadosTorneo(titulo, datos) {
     simulacionTitulo.textContent = titulo;
     simulacionResultados.classList.remove('hidden');
     simulacionLoading.classList.add('hidden');
@@ -1512,10 +1512,21 @@ function mostrarResultadosTorneo(titulo, datos) {
         return;
     }
 
+    let nombreMap = {};
+    try {
+        const r = await fetch('/api/selecciones');
+        if (r.ok) {
+            const selecciones = await r.json();
+            (selecciones || []).forEach(s => { nombreMap[s.id] = s.nombre; });
+        }
+    } catch (e) {
+        console.error('Error cargando nombres de selecciones:', e);
+    }
+
     const container = document.createElement('div');
     container.style.cssText = 'display:grid; gap:16px;';
 
-    const buildSection = (heading, items, renderItem) => {
+    const buildSection = (heading, items, options = {}) => {
         const section = document.createElement('div');
         section.innerHTML = `<h3 style="margin:0 0 8px; color:#1a252f;">${heading}</h3>`;
         if (!items || items.length === 0) { section.innerHTML += '<p>Sin datos.</p>'; container.appendChild(section); return; }
@@ -1523,13 +1534,23 @@ function mostrarResultadosTorneo(titulo, datos) {
         table.style.cssText = 'width:100%; border-collapse:collapse; font-size:0.92rem;';
         const thead = document.createElement('thead');
         const tbody = document.createElement('tbody');
-        const columns = Object.keys(items[0]);
+        const columns = options.columns || Object.keys(items[0]);
         const headerRow = document.createElement('tr');
-        columns.forEach(col => { const th = document.createElement('th'); th.textContent = col; th.style.cssText = 'text-align:left; padding:6px; background:#f8fafc; border-bottom:1px solid #e5e7eb;'; headerRow.appendChild(th); });
+        columns.forEach(col => { const th = document.createElement('th'); th.textContent = options.headers?.[col] || col; th.style.cssText = 'text-align:left; padding:6px; background:#f8fafc; border-bottom:1px solid #e5e7eb;'; headerRow.appendChild(th); });
         thead.appendChild(headerRow);
         items.forEach(item => {
             const row = document.createElement('tr');
-            columns.forEach(col => { const td = document.createElement('td'); td.textContent = typeof item[col] === 'number' ? (Number.isInteger(item[col]) ? item[col] : item[col].toFixed(2)) : (item[col] ?? '-'); td.style.cssText = 'padding:6px; border-bottom:1px solid #e5e7eb;'; row.appendChild(td); });
+            columns.forEach(col => {
+                const raw = item[col];
+                let valor = raw;
+                if (col === 'id') valor = nombreMap[raw] || raw;
+                else if (typeof raw === 'number') valor = Number.isInteger(raw) ? raw : raw.toFixed(2);
+                else valor = raw ?? '-';
+                const td = document.createElement('td');
+                td.textContent = valor;
+                td.style.cssText = 'padding:6px; border-bottom:1px solid #e5e7eb;';
+                row.appendChild(td);
+            });
             tbody.appendChild(row);
         });
         table.appendChild(thead);
@@ -1538,20 +1559,20 @@ function mostrarResultadosTorneo(titulo, datos) {
         container.appendChild(section);
     };
 
-    if (summary.champions) buildSection('Probabilidad de campeón', summary.champions);
-    if (summary.finalists) buildSection('Probabilidad de finalista', summary.finalists);
-    if (summary.semifinalists) buildSection('Probabilidad de semifinalista', summary.semifinalists);
-    if (summary.quarterfinalists) buildSection('Probabilidad de cuartofinalista', summary.quarterfinalists);
-    if (summary.round16) buildSection('Probabilidad de pasar a dieciseisavos', summary.round16);
-    if (summary.qualifies) buildSection('Distribución de posiciones en grupo', summary.qualifies);
-    if (summary.avgGoals) buildSection('Promedio de goles (a favor / en contra)', summary.avgGoals);
+    if (summary.champions) buildSection('Probabilidad de campeón', summary.champions, { headers: { id: 'Selección', pct: '%' } });
+    if (summary.finalists) buildSection('Probabilidad de finalista', summary.finalists, { headers: { id: 'Selección', pct: '%' } });
+    if (summary.semifinalists) buildSection('Probabilidad de semifinalista', summary.semifinalists, { headers: { id: 'Selección', pct: '%' } });
+    if (summary.quarterfinalists) buildSection('Probabilidad de cuartofinalista', summary.quarterfinalists, { headers: { id: 'Selección', pct: '%' } });
+    if (summary.round16) buildSection('Probabilidad de pasar a dieciseisavos', summary.round16, { headers: { id: 'Selección', pct: '%' } });
+    if (summary.qualifies) buildSection('Distribución de posiciones en grupo', summary.qualifies, { headers: { id: 'Selección', posCounts: '% 1º | % 2º | % 3º | % 4º' }, columns: ['id', 'posCounts'] });
+    if (summary.avgGoals) buildSection('Promedio de goles (a favor / en contra)', summary.avgGoals, { headers: { id: 'Selección', avgFor: 'GF', avgAgainst: 'GC' } });
     if (summary.rivals) {
-        const rivalRows = Object.keys(summary.rivals).map(id => ({ id, ...summary.rivals[id] }));
-        buildSection('Rival más probable por fase', rivalRows);
+        const rivalRows = Object.keys(summary.rivals).map(id => ({ id, rival: summary.rivals[id]?.rival || null, round: summary.rivals[id]?.round || '' }));
+        buildSection('Rival más probable por fase', rivalRows, { headers: { id: 'Selección', rival: 'Rival probable', round: 'Fase' } });
     }
     if (summary.mostCommonChampion) {
         const section = document.createElement('div');
-        section.innerHTML = `<h3 style="margin:0 0 8px; color:#1a252f;">Campeón más frecuente</h3><p><strong>ID:</strong> ${summary.mostCommonChampion.id} · <strong>Veces:</strong> ${summary.mostCommonChampion.count}</p>`;
+        section.innerHTML = `<h3 style="margin:0 0 8px; color:#1a252f;">Campeón más frecuente</h3><p><strong>Selección:</strong> ${nombreMap[summary.mostCommonChampion.id] || summary.mostCommonChampion.id} · <strong>Veces:</strong> ${summary.mostCommonChampion.count}</p>`;
         container.appendChild(section);
     }
 
@@ -1576,8 +1597,8 @@ async function ejecutarConsulta(numero) {
         simulacionLoading.classList.add('hidden');
         const titulo = CONSULTAS.find(c => c.numero === numero)?.titulo || `Consulta ${numero}`;
 
-        if (numero === 15) mostrarResultadosELO(titulo, data);
-        else if (numero === 14) mostrarResultadosTorneo(titulo, data);
+        if (numero === 15) await mostrarResultadosELO(titulo, data);
+        else if (numero === 14) await mostrarResultadosTorneo(titulo, data);
         else if (numero === 11) mostrarResultadosIF(titulo, data);
         else mostrarResultados(titulo, Array.isArray(data) ? data : [data]);
     } catch (err) {

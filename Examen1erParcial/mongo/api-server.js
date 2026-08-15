@@ -62,6 +62,12 @@ function normalizeBandera(paisNombre, urlActual) {
 // --- SIMULACION: Índice de Fuerza (IF), probabilidades, Poisson, Monte Carlo ---
 function safeNum(v, def = 0) { return (v === undefined || v === null || Number.isNaN(Number(v))) ? def : Number(v); }
 
+function computeELOFromRanking(ranking) {
+  const r = safeNum(ranking, 0);
+  if (r <= 0) return 1500;
+  return Math.max(1500, Math.min(2000, 2000 - (r * 5)));
+}
+
 function poissonPmf(lambda, k) {
   return Math.exp(-lambda) * Math.pow(lambda, k) / (factorial(k));
 }
@@ -534,6 +540,8 @@ async function simulateTournamentMonteCarlo(db, iterations = 1000) {
   const totalGoalsAgainst = {};
   const scoreFinals = new Map();
   const rivalCounts = {};
+  let lastEloUpdates = {};
+  const roundRivals = {};
 
   for (let it = 0; it < iterations; it++) {
     const tournamentCtx = { eloUpdates: {} };
@@ -578,7 +586,6 @@ async function simulateTournamentMonteCarlo(db, iterations = 1000) {
 
     let current = qualified.slice().sort(() => Math.random() - 0.5);
     let roundName = 'dieciseisavos';
-    const roundRivals = {};
 
     while (current.length > 1) {
       const nextRound = [];
@@ -639,6 +646,7 @@ async function simulateTournamentMonteCarlo(db, iterations = 1000) {
       championCounts[champ] = (championCounts[champ] || 0) + 1;
       scoreFinals.set(champ, (scoreFinals.get(champ) || 0) + 1);
     }
+    lastEloUpdates = { ...tournamentCtx.eloUpdates };
   }
 
   const buildPct = (counts, total) => Object.keys(counts).map(id => ({ id, pct: parseFloat(((counts[id] / total) * 100).toFixed(2)) })).sort((a,b) => b.pct - a.pct);
@@ -670,10 +678,17 @@ async function simulateTournamentMonteCarlo(db, iterations = 1000) {
     qualifies: Object.keys(qualifyCounts).map(id => ({ id, posCounts: qualifyCounts[id].map(c => parseFloat(((c / iterations) * 100).toFixed(2))) })),
     avgGoals: Object.keys(totalGoalsFor).map(id => ({ id, avgFor: parseFloat(((totalGoalsFor[id] || 0) / iterations).toFixed(3)), avgAgainst: parseFloat(((totalGoalsAgainst[id] || 0) / iterations).toFixed(3)) })),
     mostCommonChampion: mostCommonChampion ? { id: mostCommonChampion[0], count: mostCommonChampion[1] } : null,
-    rivals: buildRivals(roundRivals || {})
+    rivals: buildRivals(roundRivals || {}),
+    eloUpdates: lastEloUpdates
   };
 
   await saveSimulationResult(db, { tipo: 'tournament', iterations, summary });
+  try {
+    if (Object.keys(lastEloUpdates).length) {
+      const bulk = Object.entries(lastEloUpdates).map(([id, elo]) => ({ updateOne: { filter: { _id: new ObjectId(id) }, update: { $set: { elo: Number(elo) } } } }));
+      if (bulk.length) await db.collection('selecciones').bulkWrite(bulk);
+    }
+  } catch (e) { console.error('Error persisting ELO updates', e); }
   return { ok: true, summary };
 }
 
@@ -960,7 +975,14 @@ const server = http.createServer(async (req, res) => {
       // Admin: obtener pesos IF (config)
       if (url.pathname === '/api/admin/if-pesos') {
         const cfg = await db.collection('config').findOne({ key: 'if_weights' });
-        sendJson(res, 200, { weights: cfg ? cfg.value : null });
+        const defaults = {
+          elo: 0.20, ranking: 0.10, forma_reciente: 0.15, historial_mundial: 0.10, historial_rival: 0.05,
+          goles_anotados: 0.06, goles_recibidos: 0.06, diferencia_goles: 0.05, partidos_ganados: 0.04,
+          valor_plantilla: 0.05, edad_promedio: 0.03, experiencia: 0.03, localia: 0.03,
+          fatiga: 0.02, lesiones: 0.02, clima: 0.01
+        };
+        const weights = cfg?.value ? { ...defaults, ...cfg.value } : defaults;
+        sendJson(res, 200, { weights });
         return;
       }
       if (url.pathname === '/api/selecciones') {
@@ -1017,7 +1039,7 @@ const server = http.createServer(async (req, res) => {
         const payload = selecciones.map((item) => ({
           id: item._id.toString(),
           nombre: item.nombre,
-          elo: safeNum(item.elo, 1500),
+          elo: safeNum(item.elo, computeELOFromRanking(item.ranking)),
           ranking: safeNum(item.ranking, 0),
           bandera: normalizeBandera(item.nombre, item.banderaUrl)
         }));
@@ -1599,19 +1621,6 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        if (tipo === '11') {
-          const selecciones = await db.collection('selecciones').find({}).toArray();
-          const results = [];
-          for (const s of selecciones) {
-            const stats = await computeTeamStats(db, s._id.toString());
-            const ifObj = computeIFForSelection(s, stats);
-            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, elo: safeNum(s.elo, 1500), components: ifObj.components });
-          }
-          results.sort((a, b) => b.IF - a.IF);
-          sendJson(res, 200, results);
-          return;
-        }
-
         if (tipo === '12') {
           const localId = params.get('localId') || params.get('equipo_localId') || params.get('home');
           const visitanteId = params.get('visitanteId') || params.get('equipo_visitanteId') || params.get('away');
@@ -1644,7 +1653,7 @@ const server = http.createServer(async (req, res) => {
           const payload = selecciones.map((item) => ({
             id: item._id.toString(),
             nombre: item.nombre,
-            elo: safeNum(item.elo, 1500),
+            elo: safeNum(item.elo, computeELOFromRanking(item.ranking)),
             ranking: safeNum(item.ranking, 0),
             bandera: normalizeBandera(item.nombre, item.banderaUrl)
           }));
@@ -1659,7 +1668,8 @@ const server = http.createServer(async (req, res) => {
           for (const s of selecciones) {
             const stats = await computeTeamStats(db, s._id.toString());
             const ifObj = computeIFForSelection(s, stats);
-            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, elo: safeNum(s.elo, 1500), components: ifObj.components });
+            const elo = safeNum(s.elo, computeELOFromRanking(s.ranking));
+            results.push({ id: s._id.toString(), nombre: s.nombre, IF: ifObj.IF, elo, components: ifObj.components });
           }
           results.sort((a, b) => b.IF - a.IF);
           sendJson(res, 200, results);
@@ -1708,6 +1718,18 @@ const server = http.createServer(async (req, res) => {
           const doc = { ...body, updatedAt: new Date() };
           await db.collection('config').updateOne({ key: 'if_weights' }, { $set: { value: doc } }, { upsert: true });
           sendJson(res, 200, { ok: true, message: 'Pesos IF guardados' });
+        } catch (err) { console.error(err); sendJson(res, 500, { ok: false, error: err.message }); }
+        return;
+      }
+
+      if (url.pathname === '/api/admin/elo/update') {
+        const body = await parseJsonBody(req).catch(() => ({}));
+        try {
+          const updates = body?.updates || body;
+          if (!updates || typeof updates !== 'object') { sendJson(res, 400, { error: 'Se requiere updates con pares id->elo' }); return; }
+          const bulk = Object.entries(updates).map(([id, elo]) => ({ updateOne: { filter: { _id: new ObjectId(id) }, update: { $set: { elo: Number(elo) } } } }));
+          if (bulk.length) await db.collection('selecciones').bulkWrite(bulk);
+          sendJson(res, 200, { ok: true, updated: bulk.length });
         } catch (err) { console.error(err); sendJson(res, 500, { ok: false, error: err.message }); }
         return;
       }
@@ -1859,20 +1881,6 @@ const server = http.createServer(async (req, res) => {
         } catch (err) {
           console.error('Error poblando historial:', err);
           sendJson(res, 500, { error: 'Error poblando historial' });
-        }
-        return;
-      }
-
-      // Admin: set IF weights
-      if (url.pathname === '/api/admin/if-pesos') {
-        try {
-          const body = await parseJsonBody(req).catch(() => ({}));
-          if (!body || typeof body !== 'object') { sendJson(res, 400, { error: 'Payload inválido' }); return; }
-          await db.collection('config').updateOne({ key: 'if_weights' }, { $set: { key: 'if_weights', value: body } }, { upsert: true });
-          sendJson(res, 200, { message: 'Pesos IF guardados' });
-        } catch (err) {
-          console.error('Error guardando IF weights:', err);
-          sendJson(res, 500, { error: 'Error guardando pesos' });
         }
         return;
       }
