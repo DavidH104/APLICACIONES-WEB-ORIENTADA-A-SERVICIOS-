@@ -920,9 +920,11 @@ const server = http.createServer(async (req, res) => {
         };
         const contentType = map[ext] || 'application/octet-stream';
         const data = await fs.readFile(filePath);
+        const isAppJs = ext === '.js' && path.basename(filePath) === 'app.js';
         res.writeHead(200, {
           'Content-Type': contentType,
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          ...(isAppJs ? { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } : {})
         });
         res.end(data);
       } catch (err) {
@@ -1633,9 +1635,17 @@ const server = http.createServer(async (req, res) => {
         }
 
         if (tipo === '13') {
-          const groupId = params.get('groupId') || params.get('grupoId');
+          const groupParam = params.get('groupId') || params.get('grupoId');
           const iter = Math.max(100, parseInt(params.get('iter') || '2000', 10));
-          if (!groupId || !ObjectId.isValid(groupId)) { sendJson(res, 400, { error: 'groupId inválido' }); return; }
+          if (!groupParam) { sendJson(res, 400, { error: 'Falta groupId o nombre de grupo' }); return; }
+
+          let groupId = groupParam;
+          if (!ObjectId.isValid(groupParam)) {
+            const grupo = await db.collection('grupos').findOne({ nombre: groupParam });
+            if (!grupo) { sendJson(res, 404, { error: 'Grupo no encontrado', received: groupParam }); return; }
+            groupId = grupo._id.toString();
+          }
+
           const resultado = await simulateGroupMonteCarlo(db, groupId, iter);
           sendJson(res, 200, resultado);
           return;

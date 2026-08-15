@@ -1252,7 +1252,7 @@ async function cargarSeleccionesParaSelector() {
             selGrupo.innerHTML = '<option value="">Selecciona un grupo...</option>';
             Object.keys(groups).forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.textContent = g; selGrupo.appendChild(opt); });
             document.getElementById('btn-ejecutar-con-select').addEventListener('click', handleBtnEjecutar);
-            } else if (consultaSeleccionada.tipo === 'tournament') {
+        } else if (consultaSeleccionada.tipo === 'tournament') {
                 // Tournament runner: just iterations and start
                 simulacionSelector.innerHTML = `
                     <h3>Simulación de torneo</h3>
@@ -1275,12 +1275,17 @@ async function cargarSeleccionesParaSelector() {
 }
 
 async function handleBtnEjecutar() {
+    console.log('handleBtnEjecutar called', consultaSeleccionada?.tipo);
     if (!consultaSeleccionada) return;
     try {
         if (consultaSeleccionada.tipo === 'match') {
-            const local = document.getElementById('simulacion-select-local').value;
-            const visit = document.getElementById('simulacion-select-visitante').value;
-            const iter = document.getElementById('simulacion-iter').value || 2000;
+            const selLocal = document.getElementById('simulacion-select-local');
+            const selVisit = document.getElementById('simulacion-select-visitante');
+            const inpIter = document.getElementById('simulacion-iter');
+            if (!selLocal || !selVisit || !inpIter) throw new Error('Faltan controles para la simulación de partido.');
+            const local = selLocal.value;
+            const visit = selVisit.value;
+            const iter = inpIter.value || 2000;
             if (!local || !visit) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona local y visitante válidos.</p>'; return; }
             if (local === visit) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">El local y el visitante deben ser distintos.</p>'; return; }
             simulacionLoading.classList.remove('hidden');
@@ -1289,35 +1294,49 @@ async function handleBtnEjecutar() {
             const data = await resp.json();
             mostrarResultados(consultaSeleccionada.titulo, [data]);
         } else if (consultaSeleccionada.tipo === 'group') {
-            const group = document.getElementById('simulacion-select-grupo').value;
-            const iter = document.getElementById('simulacion-iter').value || 2000;
-            if (!group) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona un grupo válido.</p>'; return; }
+            const selGrupo = document.getElementById('simulacion-select-grupo');
+            const inpIter = document.getElementById('simulacion-iter');
+            if (!selGrupo || !inpIter) throw new Error('Faltan controles para la simulación de grupo.');
+            const group = selGrupo.value;
+            const iter = inpIter.value || 2000;
+            if (!group) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona un grupo válido.</p>'; simulacionLoading.classList.add('hidden'); return; }
             simulacionLoading.classList.remove('hidden');
             const resp = await fetch(`/api/simulacion?consulta=13&groupId=${encodeURIComponent(group)}&iter=${encodeURIComponent(iter)}`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const data = await resp.json();
-            mostrarResultados(consultaSeleccionada.titulo, [data]);
+            const teams = Array.isArray(data?.teams) ? data.teams : [];
+            simulacionLoading.classList.add('hidden');
+            if (!teams.length) {
+                simulacionTablaContainer.innerHTML = '<p>No hay datos para este grupo.</p>';
+            } else {
+                mostrarResultados(consultaSeleccionada.titulo, teams);
+            }
         } else if (consultaSeleccionada.tipo === 'tournament') {
-            const iter = document.getElementById('simulacion-iter').value || 1000;
+            const inpIter = document.getElementById('simulacion-iter');
+            if (!inpIter) throw new Error('Faltan controles para la simulación de torneo.');
+            const iter = inpIter.value || 1000;
             simulacionLoading.classList.remove('hidden');
             const resp = await fetch(`/api/simulacion?consulta=14&iter=${encodeURIComponent(iter)}`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const data = await resp.json();
             const summary = data?.summary || data;
             if (summary && (summary.champions || summary.finalists || summary.semifinalists)) {
-                mostrarResultadosTorneo(consultaSeleccionada.titulo, [summary]);
+                await mostrarResultadosTorneo(consultaSeleccionada.titulo, [summary]);
             } else {
                 mostrarResultados(consultaSeleccionada.titulo, [data]);
             }
         } else {
-            const sid = document.getElementById('simulacion-select-equipo')?.value;
-            if (!sid) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona una selección válida.</p>'; return; }
+            const sel = document.getElementById('simulacion-select-equipo');
+            if (!sel) throw new Error('Faltan controles para la simulación.');
+            const sid = sel.value;
+            if (!sid) { simulacionTablaContainer.innerHTML = '<p style="color:#ef4444">Selecciona una selección válida.</p>'; simulacionLoading.classList.add('hidden'); return; }
             await ejecutarConsultaConSeleccion(consultaSeleccionada.numero, sid);
         }
     } catch (err) {
         console.error('Error ejecutando simulación:', err);
+        simulacionTablaContainer.innerHTML = `<p style="color:#ef4444; font-weight:700;">Error ejecutando simulación: ${err.message}</p>`;
+    } finally {
         simulacionLoading.classList.add('hidden');
-        simulacionTablaContainer.innerHTML = `<p style="color:#ef4444; font-weight: 700;">Error ejecutando simulación: ${err.message}</p>`;
     }
 }
 
