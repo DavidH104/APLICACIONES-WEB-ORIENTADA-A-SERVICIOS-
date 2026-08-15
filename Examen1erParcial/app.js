@@ -1564,11 +1564,36 @@ async function mostrarResultadosTorneo(titulo, datos) {
     if (summary.semifinalists) buildSection('Probabilidad de semifinalista', summary.semifinalists, { headers: { id: 'Selección', pct: '%' } });
     if (summary.quarterfinalists) buildSection('Probabilidad de cuartofinalista', summary.quarterfinalists, { headers: { id: 'Selección', pct: '%' } });
     if (summary.round16) buildSection('Probabilidad de pasar a dieciseisavos', summary.round16, { headers: { id: 'Selección', pct: '%' } });
-    if (summary.qualifies) buildSection('Distribución de posiciones en grupo', summary.qualifies, { headers: { id: 'Selección', posCounts: '% 1º | % 2º | % 3º | % 4º' }, columns: ['id', 'posCounts'] });
+    if (summary.qualifies) {
+        const qualifyRows = summary.qualifies.map(q => ({ 
+            id: q.id, 
+            pos1: (q.posCounts?.[0] || 0).toFixed(2) + '%',
+            pos2: (q.posCounts?.[1] || 0).toFixed(2) + '%',
+            pos3: (q.posCounts?.[2] || 0).toFixed(2) + '%',
+            pos4: (q.posCounts?.[3] || 0).toFixed(2) + '%'
+        }));
+        buildSection('Distribución de posiciones en grupo', qualifyRows, { headers: { id: 'Selección', pos1: '% 1º', pos2: '% 2º', pos3: '% 3º', pos4: '% 4º' }, columns: ['id', 'pos1', 'pos2', 'pos3', 'pos4'] });
+    }
     if (summary.avgGoals) buildSection('Promedio de goles (a favor / en contra)', summary.avgGoals, { headers: { id: 'Selección', avgFor: 'GF', avgAgainst: 'GC' } });
-    if (summary.rivals) {
-        const rivalRows = Object.keys(summary.rivals).map(id => ({ id, rival: summary.rivals[id]?.rival || null, round: summary.rivals[id]?.round || '' }));
-        buildSection('Rival más probable por fase', rivalRows, { headers: { id: 'Selección', rival: 'Rival probable', round: 'Fase' } });
+    if (summary.rivals && Object.keys(summary.rivals).length > 0) {
+        const rivalRows = [];
+        for (const teamId in summary.rivals) {
+            const rivals = summary.rivals[teamId];
+            for (const phase in rivals) {
+                const rival = rivals[phase];
+                if (rival && rival.id) {
+                    rivalRows.push({ 
+                        id: teamId, 
+                        rival: rival.id, 
+                        fase: phase,
+                        veces: rival.count || 0
+                    });
+                }
+            }
+        }
+        if (rivalRows.length > 0) {
+            buildSection('Rival más probable por fase', rivalRows, { headers: { id: 'Selección', rival: 'Rival probable', fase: 'Fase', veces: 'Veces' }, columns: ['id', 'rival', 'fase', 'veces'] });
+        }
     }
     if (summary.mostCommonChampion) {
         const section = document.createElement('div');

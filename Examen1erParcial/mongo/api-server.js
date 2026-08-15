@@ -2143,7 +2143,8 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 8080;
+server.setTimeout(300000); // 5 minutos de timeout para operaciones pesadas como consulta 14
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`API escuchando en http://0.0.0.0:${PORT}`);
+  console.log(`API escuchando en http://localhost:${PORT}`);
 });
