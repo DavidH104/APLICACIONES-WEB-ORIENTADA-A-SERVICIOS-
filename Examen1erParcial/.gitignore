@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+dist/
+installer/build/
+installer/cache/
+installer/tools/
+installer/test-profile*/
+installer/test-install/

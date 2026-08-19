@@ -1,0 +1,151 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "nombre": "Fase de grupos",
+    "clasificados": [
+      "1A",
+      "2A",
+      "1B",
+      "2B",
+      "1C",
+      "2C",
+      "1D",
+      "2D",
+      "1E",
+      "2E",
+      "1F",
+      "2F",
+      "1G",
+      "2G",
+      "1H",
+      "2H",
+      "1I",
+      "2I",
+      "1J",
+      "2J",
+      "1K",
+      "2K",
+      "1L",
+      "2L"
+    ],
+    "partidos": {
+      "$numberInt": "72"
+    },
+    "sede": "Varias sedes",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781200800000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "nombre": "Dieciseisavos de final",
+    "clasificados": [
+      "Ganadores fase de grupos y mejores terceros"
+    ],
+    "partidos": {
+      "$numberInt": "16"
+    },
+    "sede": "Varias sedes",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783101600000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "nombre": "Octavos de final",
+    "clasificados": [
+      "Ganadores dieciseisavos"
+    ],
+    "partidos": {
+      "$numberInt": "8"
+    },
+    "sede": "Varias sedes",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783706400000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c1"
+    },
+    "nombre": "Cuartos de final",
+    "clasificados": [
+      "Ganadores octavos"
+    ],
+    "partidos": {
+      "$numberInt": "4"
+    },
+    "sede": "Varias sedes",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784052000000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c2"
+    },
+    "nombre": "Semifinal",
+    "clasificados": [
+      "Ganadores cuartos"
+    ],
+    "partidos": {
+      "$numberInt": "2"
+    },
+    "sede": "Varias sedes",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784142000000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c3"
+    },
+    "nombre": "Tercer puesto",
+    "clasificados": [
+      "Perdedores semifinales"
+    ],
+    "partidos": {
+      "$numberInt": "1"
+    },
+    "sede": "Hard Rock Stadium",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784394000000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c4"
+    },
+    "nombre": "Final",
+    "clasificados": [
+      "Ganadores semifinales"
+    ],
+    "partidos": {
+      "$numberInt": "1"
+    },
+    "sede": "MetLife Stadium",
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784473200000"
+      }
+    }
+  }
+]

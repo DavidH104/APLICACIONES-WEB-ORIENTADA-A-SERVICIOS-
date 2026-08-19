@@ -1,0 +1,42 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7d264da6de0f737ce143e6"
+    },
+    "key": "if_weights",
+    "value": {
+      "ranking": {
+        "$numberDouble": "0.2"
+      },
+      "historial_mundial": {
+        "$numberDouble": "0.15"
+      },
+      "historial_rival": {
+        "$numberDouble": "0.1"
+      },
+      "goles_anotados": {
+        "$numberDouble": "0.1"
+      },
+      "goles_recibidos": {
+        "$numberDouble": "0.1"
+      },
+      "diferencia_goles": {
+        "$numberDouble": "0.1"
+      },
+      "partidos_ganados": {
+        "$numberDouble": "0.1"
+      },
+      "valor_plantilla": {
+        "$numberDouble": "0.05"
+      },
+      "experiencia": {
+        "$numberDouble": "0.05"
+      },
+      "updatedAt": {
+        "$date": {
+          "$numberLong": "1786586701130"
+        }
+      }
+    }
+  }
+]

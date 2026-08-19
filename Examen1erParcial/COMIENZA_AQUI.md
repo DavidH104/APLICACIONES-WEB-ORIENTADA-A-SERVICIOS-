@@ -1,3 +1,5 @@
+> **Instalador actualizado:** para entregar el proyecto usa `dist\Mundial2026-Setup.exe`. Los scripts `install.bat` y `start.bat` quedan únicamente para desarrollo.
+
 # 🎯 RESUMEN - Cómo Instalar y Compartir tu Proyecto
 
 ## ⚡ EN 30 SEGUNDOS

@@ -4,8 +4,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const MONGO_URI = 'mongodb://127.0.0.1:27017';
-const DB_NAME = 'mundial2026';
+const MONGO_URI = process.env.MUNDIAL_MONGO_URI || 'mongodb://127.0.0.1:27017';
+const DB_NAME = process.env.MUNDIAL_DB_NAME || 'mundial2026';
+const HOST = process.env.MUNDIAL_HOST || '127.0.0.1';
+const SHUTDOWN_TOKEN = process.env.MUNDIAL_SHUTDOWN_TOKEN || '';
 
 const client = new MongoClient(MONGO_URI);
 
@@ -20,7 +22,7 @@ function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, POST',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, POST, DELETE',
     'Access-Control-Allow-Headers': 'Content-Type'
   });
   res.end(JSON.stringify(payload));
@@ -873,7 +875,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, POST',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, POST, DELETE',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end();
@@ -882,12 +884,30 @@ const server = http.createServer(async (req, res) => {
 
   const url = new URL(req.url, 'http://localhost');
 
-  if (req.method !== 'GET' && req.method !== 'PATCH' && req.method !== 'POST') {
+  if (req.method !== 'GET' && req.method !== 'PATCH' && req.method !== 'POST' && req.method !== 'DELETE') {
     sendJson(res, 405, { error: 'Método no permitido' });
     return;
   }
 
   try {
+    if (req.method === 'POST' && url.pathname === '/api/internal/shutdown') {
+      const suppliedToken = req.headers['x-mundial-shutdown-token'];
+      if (!SHUTDOWN_TOKEN || suppliedToken !== SHUTDOWN_TOKEN) {
+        sendJson(res, 404, { error: 'Ruta no encontrada' });
+        return;
+      }
+      sendJson(res, 200, { ok: true, message: 'Cerrando servidor' });
+      setImmediate(() => shutdown('launcher'));
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/health') {
+      const db = await getDb();
+      await db.command({ ping: 1 });
+      sendJson(res, 200, { ok: true, database: DB_NAME });
+      return;
+    }
+
     // Serve static files for non-API GET requests from the project root
     if (req.method === 'GET' && !url.pathname.startsWith('/api/')) {
       try {
@@ -897,7 +917,8 @@ const server = http.createServer(async (req, res) => {
         let requestedPath = decodeURIComponent(url.pathname);
         if (requestedPath === '/' || requestedPath === '') requestedPath = '/index.html';
         const filePath = path.normalize(path.join(publicRoot, requestedPath));
-        if (!filePath.startsWith(publicRoot)) {
+        const relativePath = path.relative(publicRoot, filePath);
+        if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
           sendJson(res, 403, { error: 'Acceso prohibido' });
           return;
         }
@@ -2153,8 +2174,28 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT || 8080);
 server.setTimeout(300000); // 5 minutos de timeout para operaciones pesadas como consulta 14
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`API escuchando en http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`API escuchando en http://${HOST}:${PORT}`);
 });
+
+server.on('error', (error) => {
+  console.error('No se pudo iniciar el servidor:', error);
+  process.exitCode = 1;
+});
+
+let shuttingDown = false;
+async function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`Cerrando servidor (${signal})...`);
+  server.close(async () => {
+    await client.close().catch(() => {});
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(1), 5000).unref();
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));

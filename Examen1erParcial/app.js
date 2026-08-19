@@ -16,6 +16,7 @@ class EquipoNFL extends Equipo { constructor(...args){ super(...args); this.depo
 class EquipoNBA extends Equipo { constructor(...args){ super(...args); this.deporte = 'NBA'; } }
 
 let map, stadiumMarker, userMarker, routingControl;
+let mapAvailable = false;
 let equiposInstanciados = [];
 let promocionesData = {};
 let noticiasData = [];
@@ -60,6 +61,12 @@ const GEO_USA = { "type":"FeatureCollection","features":[{"type":"Feature","prop
 const GEO_CANADA = { "type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Canadá"},"geometry":{"type":"Polygon","coordinates":[[[-141,60],[-130,60],[-120,58],[-110,56],[-100,56],[-95,55],[-85,55],[-75,54],[-70,52],[-66,50],[-64,58],[-70,65],[-80,68],[-95,70],[-120,72],[-141,60]]]}}]};
 
 function initMap(){
+    if (typeof L === 'undefined') {
+        const mapElement = document.getElementById('map');
+        if (mapElement) mapElement.innerHTML = '<p style="padding:2rem;text-align:center;font-weight:700;">El mapa necesita conexión a internet. El resto de la aplicación sigue disponible.</p>';
+        if (btnTrazarRuta) btnTrazarRuta.disabled = true;
+        return false;
+    }
     map = L.map('map').setView([39.8283, -98.5795], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     map.createPane('pane-canada'); map.getPane('pane-canada').style.zIndex = 200;
@@ -87,6 +94,8 @@ function initMap(){
     canadaPoly.on('mouseover', function(){ this.setStyle({ fillOpacity:0.5, weight:3 }); this.bringToFront(); });
     canadaPoly.on('mouseout', function(){ this.setStyle({ fillOpacity:0.28, weight:1.6 }); });
     canadaPoly.addTo(map).bindTooltip('Canadá');
+    mapAvailable = true;
+    return true;
 }
 
 const API_BASE = window.location.protocol === 'file:' ? '' : '';
@@ -260,9 +269,9 @@ function setShareButtons(equipo) {
 selectEquipo.addEventListener('change', (e)=>{
     const id = e.target.value; equipoSeleccionado = equiposInstanciados.find(eq => eq.id === id);
     if (!equipoSeleccionado) return;
-    mostrarMarcadorEstadio(equipoSeleccionado);
+    if (mapAvailable) mostrarMarcadorEstadio(equipoSeleccionado);
     mostrarInfoEquipo(equipoSeleccionado);
-    btnTrazarRuta.disabled = false;
+    btnTrazarRuta.disabled = !mapAvailable;
 });
 
 async function fetchClasificaciones() {
@@ -288,7 +297,7 @@ async function loadStandings() {
     await loadResults();
 }
 
-function mostrarMarcadorEstadio(equipo){ const lat = equipo.getLat(), lng = equipo.getLng(); if (stadiumMarker) map.removeLayer(stadiumMarker); stadiumMarker = L.marker([lat,lng]).addTo(map).bindPopup(`<b>${equipo.nombre}</b><br>${equipo.ciudad}`).openPopup(); map.setView([lat,lng],14); }
+function mostrarMarcadorEstadio(equipo){ if (!mapAvailable || !map) return; const lat = equipo.getLat(), lng = equipo.getLng(); if (stadiumMarker) map.removeLayer(stadiumMarker); stadiumMarker = L.marker([lat,lng]).addTo(map).bindPopup(`<b>${equipo.nombre}</b><br>${equipo.ciudad}`).openPopup(); map.setView([lat,lng],14); }
 
 function renderStadiumCards(stadiums) {
     stadiumCards.innerHTML = '';
@@ -1682,4 +1691,11 @@ async function ejecutarConsultaConSeleccion(numero, sid) {
     }
 }
 
-window.onload = () => { initMap(); cargarServicios(); };
+window.onload = async () => {
+    initMap();
+    try {
+        await cargarServicios();
+    } catch (error) {
+        console.error('No se pudieron cargar todos los servicios:', error);
+    }
+};

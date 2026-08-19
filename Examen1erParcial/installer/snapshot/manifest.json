@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "snapshotVersion": "2026.08.18.1",
+  "database": "mundial2026",
+  "exportedAt": "2026-08-19T01:40:20.086Z",
+  "sourceMongoVersion": "7.0.30",
+  "collections": [
+    {
+      "name": "admin",
+      "file": "admin.json",
+      "count": 1,
+      "sha256": "e88bc128c248096cfae4676098e9b8564bf613a7e296e731c1a74af3da11955f"
+    },
+    {
+      "name": "clasificaciones",
+      "file": "clasificaciones.json",
+      "count": 48,
+      "sha256": "15b2aeada68a5edf3dbb44059d9df6a8f377105c7ece4319231845a63e07a5b8"
+    },
+    {
+      "name": "config",
+      "file": "config.json",
+      "count": 1,
+      "sha256": "5dedcc997c9bfa22b398a077ceb37787b13053a47c5fd94fec7e7bb03c49aa6a"
+    },
+    {
+      "name": "continentes",
+      "file": "continentes.json",
+      "count": 6,
+      "sha256": "3c5fd5c8457cd557d07a37803a08eda9348fa592f757edd0c59bef161fbcca34"
+    },
+    {
+      "name": "estadios",
+      "file": "estadios.json",
+      "count": 12,
+      "sha256": "5280dcbc25f917f35e105a89b85e22164f2ddf182ba743a3013e4f3ad20135ac"
+    },
+    {
+      "name": "fase_final",
+      "file": "fase_final.json",
+      "count": 7,
+      "sha256": "7b12a0c4e35a454c927c030b0f7959f0518be1c2199cfe677616b830ff3c833f"
+    },
+    {
+      "name": "grupos",
+      "file": "grupos.json",
+      "count": 12,
+      "sha256": "402c2bbb6e4d07ae8bb430ad38f2a3c02f018b36c4ff80e22bea7d2e4d0d9414"
+    },
+    {
+      "name": "partidos",
+      "file": "partidos.json",
+      "count": 76,
+      "sha256": "3ea1822e1674c79d92a3881b03cc81b359279bff8490c617884b48994a5aaacb"
+    },
+    {
+      "name": "selecciones",
+      "file": "selecciones.json",
+      "count": 48,
+      "sha256": "9427e58602f23d7a9702e150000df48caed36bf28c0035c1210da62978f3a106"
+    },
+    {
+      "name": "usuarios",
+      "file": "usuarios.json",
+      "count": 1,
+      "sha256": "171f4064c02ef42e1173f5ada640e60d7fb26b81e530464b2c0ecfce8c76ec74"
+    }
+  ],
+  "excluded": {
+    "simulaciones": 329495,
+    "reason": "Historial regenerable; se omite para reducir el instalador y evitar referencias antiguas."
+  }
+}

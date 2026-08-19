@@ -1,0 +1,16 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7ec0b4a6de0f737ce20811"
+    },
+    "usuario": "admin@mundial.local",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1786692026979"
+      }
+    },
+    "passwordHash": "82387d2ad821418ce3b011dd99ea109bbe9ac429a66a28f0f446e03d402e4e4dd38d4cdf891a7360e954c8fcafdee405711a42b26c6babb6a442bbc75f31719a",
+    "role": "admin",
+    "salt": "74c9979457396740ccba42c9afd57c3e"
+  }
+]

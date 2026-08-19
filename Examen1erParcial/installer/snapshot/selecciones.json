@@ -1,0 +1,1682 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08e"
+    },
+    "nombre": "México",
+    "pais": "México",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe076"
+    },
+    "historia": "Gran tradición mundialista",
+    "ventajas": "Afición numerosa",
+    "desventajas": "Presión local",
+    "ranking": {
+      "$numberInt": "15"
+    },
+    "banderaUrl": "https://example.com/mexico.png",
+    "latitud": {
+      "$numberDouble": "19.432608"
+    },
+    "longitud": {
+      "$numberDouble": "-99.133209"
+    },
+    "elo": {
+      "$numberDouble": "1606.67"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08f"
+    },
+    "nombre": "Inglaterra",
+    "pais": "Inglaterra",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe076"
+    },
+    "historia": "Tradición histórica",
+    "ventajas": "Jugadores de élite",
+    "desventajas": "Expectativa",
+    "ranking": {
+      "$numberInt": "5"
+    },
+    "banderaUrl": "https://example.com/england.png",
+    "latitud": {
+      "$numberDouble": "51.507351"
+    },
+    "longitud": {
+      "$numberDouble": "-0.127758"
+    },
+    "elo": {
+      "$numberDouble": "1639.85"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe090"
+    },
+    "nombre": "Senegal",
+    "pais": "Senegal",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe076"
+    },
+    "historia": "Equipo rápido",
+    "ventajas": "Atléticos",
+    "desventajas": "Falta de profundidad",
+    "ranking": {
+      "$numberInt": "20"
+    },
+    "banderaUrl": "https://example.com/senegal.png",
+    "latitud": {
+      "$numberDouble": "14.497401"
+    },
+    "longitud": {
+      "$numberDouble": "-14.452362"
+    },
+    "elo": {
+      "$numberDouble": "1650.98"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe091"
+    },
+    "nombre": "Australia",
+    "pais": "Australia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe076"
+    },
+    "historia": "Fuerte físico",
+    "ventajas": "Velocidad aérea",
+    "desventajas": "Viajes largos",
+    "ranking": {
+      "$numberInt": "24"
+    },
+    "banderaUrl": "https://example.com/australia.png",
+    "latitud": {
+      "$numberDouble": "-33.86882"
+    },
+    "longitud": {
+      "$numberDouble": "151.209296"
+    },
+    "elo": {
+      "$numberDouble": "1691.13"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe092"
+    },
+    "nombre": "Estados Unidos",
+    "pais": "Estados Unidos",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe077"
+    },
+    "historia": "Potencia emergente",
+    "ventajas": "Recursos",
+    "desventajas": "Presión mediática",
+    "ranking": {
+      "$numberInt": "12"
+    },
+    "banderaUrl": "https://example.com/usa.png",
+    "latitud": {
+      "$numberDouble": "38.907192"
+    },
+    "longitud": {
+      "$numberDouble": "-77.036871"
+    },
+    "elo": {
+      "$numberDouble": "1678.72"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe093"
+    },
+    "nombre": "Alemania",
+    "pais": "Alemania",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe077"
+    },
+    "historia": "Fuerza táctica",
+    "ventajas": "Organización",
+    "desventajas": "Reestructuración",
+    "ranking": {
+      "$numberInt": "6"
+    },
+    "banderaUrl": "https://example.com/germany.png",
+    "latitud": {
+      "$numberDouble": "52.520008"
+    },
+    "longitud": {
+      "$numberDouble": "13.404954"
+    },
+    "elo": {
+      "$numberDouble": "1734.72"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe094"
+    },
+    "nombre": "Marruecos",
+    "pais": "Marruecos",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe077"
+    },
+    "historia": "Buena defensa",
+    "ventajas": "Solidaridad",
+    "desventajas": "Presión física",
+    "ranking": {
+      "$numberInt": "22"
+    },
+    "banderaUrl": "https://example.com/morocco.png",
+    "latitud": {
+      "$numberDouble": "31.63"
+    },
+    "longitud": {
+      "$numberDouble": "-8.008889"
+    },
+    "elo": {
+      "$numberDouble": "1560.01"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe095"
+    },
+    "nombre": "Japón",
+    "pais": "Japón",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe077"
+    },
+    "historia": "Máquina organizada",
+    "ventajas": "Disciplina",
+    "desventajas": "Menor físico",
+    "ranking": {
+      "$numberInt": "23"
+    },
+    "banderaUrl": "https://example.com/japan.png",
+    "latitud": {
+      "$numberDouble": "35.6762"
+    },
+    "longitud": {
+      "$numberDouble": "139.6503"
+    },
+    "elo": {
+      "$numberInt": "1702"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe096"
+    },
+    "nombre": "Canadá",
+    "pais": "Canadá",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe078"
+    },
+    "historia": "Crecimiento constante",
+    "ventajas": "Organización",
+    "desventajas": "Menor experiencia",
+    "ranking": {
+      "$numberInt": "50"
+    },
+    "banderaUrl": "https://example.com/canada.png",
+    "latitud": {
+      "$numberDouble": "45.42153"
+    },
+    "longitud": {
+      "$numberDouble": "-75.697193"
+    },
+    "elo": {
+      "$numberDouble": "1780.24"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe097"
+    },
+    "nombre": "Francia",
+    "pais": "Francia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe078"
+    },
+    "historia": "Campeón mundial",
+    "ventajas": "Talento joven",
+    "desventajas": "Presión mental",
+    "ranking": {
+      "$numberInt": "3"
+    },
+    "banderaUrl": "https://example.com/france.png",
+    "latitud": {
+      "$numberDouble": "48.856613"
+    },
+    "longitud": {
+      "$numberDouble": "2.352222"
+    },
+    "elo": {
+      "$numberDouble": "1874.18"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe098"
+    },
+    "nombre": "Egipto",
+    "pais": "Egipto",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe078"
+    },
+    "historia": "Buen técnico",
+    "ventajas": "Velocidad",
+    "desventajas": "Falta de experiencia",
+    "ranking": {
+      "$numberInt": "45"
+    },
+    "banderaUrl": "https://example.com/egypt.png",
+    "latitud": {
+      "$numberDouble": "30.04442"
+    },
+    "longitud": {
+      "$numberDouble": "31.235712"
+    },
+    "elo": {
+      "$numberDouble": "1609.75"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe099"
+    },
+    "nombre": "Irán",
+    "pais": "Irán",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe078"
+    },
+    "historia": "Juega compacto",
+    "ventajas": "Bloque defensivo",
+    "desventajas": "Creatividad limitada",
+    "ranking": {
+      "$numberInt": "34"
+    },
+    "banderaUrl": "https://example.com/iran.png",
+    "latitud": {
+      "$numberDouble": "35.6892"
+    },
+    "longitud": {
+      "$numberDouble": "51.389"
+    },
+    "elo": {
+      "$numberDouble": "1577.68"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09a"
+    },
+    "nombre": "Costa Rica",
+    "pais": "Costa Rica",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe079"
+    },
+    "historia": "Equipo sólido",
+    "ventajas": "Resistencia",
+    "desventajas": "Menos recursos",
+    "ranking": {
+      "$numberInt": "30"
+    },
+    "banderaUrl": "https://example.com/costarica.png",
+    "latitud": {
+      "$numberDouble": "9.748917"
+    },
+    "longitud": {
+      "$numberDouble": "-83.753428"
+    },
+    "elo": {
+      "$numberDouble": "1550.35"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09b"
+    },
+    "nombre": "España",
+    "pais": "España",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe079"
+    },
+    "historia": "Juego de posesión",
+    "ventajas": "Control de balón",
+    "desventajas": "Presión alta",
+    "ranking": {
+      "$numberInt": "7"
+    },
+    "banderaUrl": "https://example.com/spain.png",
+    "latitud": {
+      "$numberDouble": "40.416775"
+    },
+    "longitud": {
+      "$numberDouble": "-3.70379"
+    },
+    "elo": {
+      "$numberDouble": "1874.78"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09c"
+    },
+    "nombre": "Ghana",
+    "pais": "Ghana",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe079"
+    },
+    "historia": "Fuerza física",
+    "ventajas": "Atletismo",
+    "desventajas": "Menos técnica",
+    "ranking": {
+      "$numberInt": "60"
+    },
+    "banderaUrl": "https://example.com/ghana.png",
+    "latitud": {
+      "$numberDouble": "5.603716"
+    },
+    "longitud": {
+      "$numberDouble": "-0.186964"
+    },
+    "elo": {
+      "$numberDouble": "1403.96"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09d"
+    },
+    "nombre": "Catar",
+    "pais": "Catar",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe079"
+    },
+    "historia": "Organizador 2022",
+    "ventajas": "Infraestructura",
+    "desventajas": "Poca tradición",
+    "ranking": {
+      "$numberInt": "40"
+    },
+    "banderaUrl": "https://example.com/qatar.png",
+    "latitud": {
+      "$numberDouble": "25.354826"
+    },
+    "longitud": {
+      "$numberDouble": "51.183884"
+    },
+    "elo": {
+      "$numberDouble": "1707.35"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09e"
+    },
+    "nombre": "Panamá",
+    "pais": "Panamá",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07a"
+    },
+    "historia": "Últimos años de ascenso",
+    "ventajas": "Físico",
+    "desventajas": "Menor consistencia",
+    "ranking": {
+      "$numberInt": "55"
+    },
+    "banderaUrl": "https://example.com/panama.png",
+    "latitud": {
+      "$numberDouble": "8.9824"
+    },
+    "longitud": {
+      "$numberDouble": "-79.5199"
+    },
+    "elo": {
+      "$numberDouble": "1603.7"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09f"
+    },
+    "nombre": "Portugal",
+    "pais": "Portugal",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07a"
+    },
+    "historia": "Calidad ofensiva",
+    "ventajas": "Jugadores top",
+    "desventajas": "Presión de resultados",
+    "ranking": {
+      "$numberInt": "8"
+    },
+    "banderaUrl": "https://example.com/portugal.png",
+    "latitud": {
+      "$numberDouble": "38.7223"
+    },
+    "longitud": {
+      "$numberDouble": "-9.1393"
+    },
+    "elo": {
+      "$numberDouble": "1807.62"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a0"
+    },
+    "nombre": "Nigeria",
+    "pais": "Nigeria",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07a"
+    },
+    "historia": "Talento joven",
+    "ventajas": "Velocidad",
+    "desventajas": "Inconstancia",
+    "ranking": {
+      "$numberInt": "40"
+    },
+    "banderaUrl": "https://example.com/nigeria.png",
+    "latitud": {
+      "$numberDouble": "9.0765"
+    },
+    "longitud": {
+      "$numberDouble": "7.3986"
+    },
+    "elo": {
+      "$numberDouble": "1531.94"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a1"
+    },
+    "nombre": "Uzbekistán",
+    "pais": "Uzbekistán",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07a"
+    },
+    "historia": "Crecimiento continental",
+    "ventajas": "Estructura",
+    "desventajas": "Menor experiencia",
+    "ranking": {
+      "$numberInt": "85"
+    },
+    "banderaUrl": "https://example.com/uzbekistan.png",
+    "latitud": {
+      "$numberDouble": "41.2995"
+    },
+    "longitud": {
+      "$numberDouble": "69.2401"
+    },
+    "elo": {
+      "$numberDouble": "1563.08"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a2"
+    },
+    "nombre": "Honduras",
+    "pais": "Honduras",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07b"
+    },
+    "historia": "Gran garra",
+    "ventajas": "Físico",
+    "desventajas": "Menos técnica",
+    "ranking": {
+      "$numberInt": "60"
+    },
+    "banderaUrl": "https://example.com/honduras.png",
+    "latitud": {
+      "$numberDouble": "15.2"
+    },
+    "longitud": {
+      "$numberDouble": "-86.2419"
+    },
+    "elo": {
+      "$numberDouble": "1643.38"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a3"
+    },
+    "nombre": "Países Bajos",
+    "pais": "Países Bajos",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07b"
+    },
+    "historia": "Fútbol total",
+    "ventajas": "Ofensiva",
+    "desventajas": "Inconstancia",
+    "ranking": {
+      "$numberInt": "9"
+    },
+    "banderaUrl": "https://example.com/netherlands.png",
+    "latitud": {
+      "$numberDouble": "52.1326"
+    },
+    "longitud": {
+      "$numberDouble": "5.2913"
+    },
+    "elo": {
+      "$numberDouble": "1823.08"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a4"
+    },
+    "nombre": "Camerún",
+    "pais": "Camerún",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07b"
+    },
+    "historia": "Orgullo africano",
+    "ventajas": "Físico",
+    "desventajas": "Orden táctico",
+    "ranking": {
+      "$numberInt": "30"
+    },
+    "banderaUrl": "https://example.com/cameroon.png",
+    "latitud": {
+      "$numberDouble": "3.848"
+    },
+    "longitud": {
+      "$numberDouble": "11.5021"
+    },
+    "elo": {
+      "$numberDouble": "1533.69"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a5"
+    },
+    "nombre": "Corea del Sur",
+    "pais": "Corea del Sur",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07b"
+    },
+    "historia": "Juego veloz",
+    "ventajas": "Disciplina",
+    "desventajas": "Creatividad conservadora",
+    "ranking": {
+      "$numberInt": "28"
+    },
+    "banderaUrl": "https://example.com/korea.png",
+    "latitud": {
+      "$numberDouble": "37.5665"
+    },
+    "longitud": {
+      "$numberDouble": "126.978"
+    },
+    "elo": {
+      "$numberDouble": "1755.73"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a6"
+    },
+    "nombre": "Jamaica",
+    "pais": "Jamaica",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07c"
+    },
+    "historia": "Caribe vibrante",
+    "ventajas": "Atlético",
+    "desventajas": "Menos experiencia",
+    "ranking": {
+      "$numberInt": "45"
+    },
+    "banderaUrl": "https://example.com/jamaica.png",
+    "latitud": {
+      "$numberDouble": "18.1096"
+    },
+    "longitud": {
+      "$numberDouble": "-77.2975"
+    },
+    "elo": {
+      "$numberDouble": "1586.12"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a7"
+    },
+    "nombre": "Bélgica",
+    "pais": "Bélgica",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07c"
+    },
+    "historia": "Generación dorada",
+    "ventajas": "Técnica",
+    "desventajas": "Transición generacional",
+    "ranking": {
+      "$numberInt": "11"
+    },
+    "banderaUrl": "https://example.com/belgica.png",
+    "latitud": {
+      "$numberDouble": "50.8503"
+    },
+    "longitud": {
+      "$numberDouble": "4.3517"
+    },
+    "elo": {
+      "$numberDouble": "1860.9"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a8"
+    },
+    "nombre": "Argelia",
+    "pais": "Argelia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07c"
+    },
+    "historia": "Fútbol sólido",
+    "ventajas": "Ofensiva rápida",
+    "desventajas": "Defensa inconsistente",
+    "ranking": {
+      "$numberInt": "50"
+    },
+    "banderaUrl": "https://example.com/algeria.png",
+    "latitud": {
+      "$numberDouble": "36.7538"
+    },
+    "longitud": {
+      "$numberDouble": "3.0588"
+    },
+    "elo": {
+      "$numberDouble": "1645.49"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a9"
+    },
+    "nombre": "Emiratos Árabes Unidos",
+    "pais": "Emiratos Árabes Unidos",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07c"
+    },
+    "historia": "Recursos altos",
+    "ventajas": "Organización",
+    "desventajas": "Menor experiencia",
+    "ranking": {
+      "$numberInt": "70"
+    },
+    "banderaUrl": "https://example.com/uae.png",
+    "latitud": {
+      "$numberDouble": "25.276987"
+    },
+    "longitud": {
+      "$numberDouble": "55.296249"
+    },
+    "elo": {
+      "$numberDouble": "1586.88"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0aa"
+    },
+    "nombre": "El Salvador",
+    "pais": "El Salvador",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07d"
+    },
+    "historia": "Pupas históricas",
+    "ventajas": "Velocidad",
+    "desventajas": "Menos recursos",
+    "ranking": {
+      "$numberInt": "65"
+    },
+    "banderaUrl": "https://example.com/elsalvador.png",
+    "latitud": {
+      "$numberDouble": "13.6929"
+    },
+    "longitud": {
+      "$numberDouble": "-89.2182"
+    },
+    "elo": {
+      "$numberDouble": "1494.76"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ab"
+    },
+    "nombre": "Croacia",
+    "pais": "Croacia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07d"
+    },
+    "historia": "Finalista reciente",
+    "ventajas": "Técnica colectiva",
+    "desventajas": "Plantilla corta",
+    "ranking": {
+      "$numberInt": "14"
+    },
+    "banderaUrl": "https://example.com/croacia.png",
+    "latitud": {
+      "$numberDouble": "45.815"
+    },
+    "longitud": {
+      "$numberDouble": "15.9819"
+    },
+    "elo": {
+      "$numberDouble": "1733.28"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ac"
+    },
+    "nombre": "Túnez",
+    "pais": "Túnez",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07d"
+    },
+    "historia": "Fútbol organizado",
+    "ventajas": "Disciplina",
+    "desventajas": "Menos talento individual",
+    "ranking": {
+      "$numberInt": "35"
+    },
+    "banderaUrl": "https://example.com/tunisia.png",
+    "latitud": {
+      "$numberDouble": "33.8869"
+    },
+    "longitud": {
+      "$numberDouble": "9.5375"
+    },
+    "elo": {
+      "$numberDouble": "1674.14"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ad"
+    },
+    "nombre": "Colombia",
+    "pais": "Colombia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07d"
+    },
+    "historia": "Juego técnico",
+    "ventajas": "Creatividad",
+    "desventajas": "Inconstancia",
+    "ranking": {
+      "$numberInt": "16"
+    },
+    "banderaUrl": "https://example.com/colombia.png",
+    "latitud": {
+      "$numberDouble": "4.711"
+    },
+    "longitud": {
+      "$numberDouble": "-74.0721"
+    },
+    "elo": {
+      "$numberDouble": "1632.18"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ae"
+    },
+    "nombre": "Uruguay",
+    "pais": "Uruguay",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07e"
+    },
+    "historia": "Ganador histórico",
+    "ventajas": "Fuerza grupal",
+    "desventajas": "Poca rotación",
+    "ranking": {
+      "$numberInt": "17"
+    },
+    "banderaUrl": "https://example.com/uruguay.png",
+    "latitud": {
+      "$numberDouble": "-34.901112"
+    },
+    "longitud": {
+      "$numberDouble": "-56.164532"
+    },
+    "elo": {
+      "$numberDouble": "1593.51"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0af"
+    },
+    "nombre": "Italia",
+    "pais": "Italia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07e"
+    },
+    "historia": "Campeón europeo",
+    "ventajas": "Táctica",
+    "desventajas": "Inconstancia",
+    "ranking": {
+      "$numberInt": "10"
+    },
+    "banderaUrl": "https://example.com/italia.png",
+    "latitud": {
+      "$numberDouble": "41.9028"
+    },
+    "longitud": {
+      "$numberDouble": "12.4964"
+    },
+    "elo": {
+      "$numberDouble": "1473.24"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b0"
+    },
+    "nombre": "Costa de Marfil",
+    "pais": "Costa de Marfil",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07e"
+    },
+    "historia": "Potencia africana",
+    "ventajas": "Talento ofensivo",
+    "desventajas": "Defensa física",
+    "ranking": {
+      "$numberInt": "32"
+    },
+    "banderaUrl": "https://example.com/ivorycoast.png",
+    "latitud": {
+      "$numberDouble": "5.6037"
+    },
+    "longitud": {
+      "$numberDouble": "-0.187"
+    },
+    "elo": {
+      "$numberDouble": "1869.69"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b1"
+    },
+    "nombre": "Arabia Saudita",
+    "pais": "Arabia Saudita",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07e"
+    },
+    "historia": "Creciente en confederación",
+    "ventajas": "Físico",
+    "desventajas": "Menor creatividad",
+    "ranking": {
+      "$numberInt": "25"
+    },
+    "banderaUrl": "https://example.com/arabia.png",
+    "latitud": {
+      "$numberDouble": "24.7136"
+    },
+    "longitud": {
+      "$numberDouble": "46.6753"
+    },
+    "elo": {
+      "$numberDouble": "1632.79"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b2"
+    },
+    "nombre": "Ecuador",
+    "pais": "Ecuador",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07f"
+    },
+    "historia": "Juego agresivo",
+    "ventajas": "Altura",
+    "desventajas": "Defensa abierta",
+    "ranking": {
+      "$numberInt": "18"
+    },
+    "banderaUrl": "https://example.com/ecuador.png",
+    "latitud": {
+      "$numberDouble": "-0.1807"
+    },
+    "longitud": {
+      "$numberDouble": "-78.4678"
+    },
+    "elo": {
+      "$numberDouble": "1503.95"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b3"
+    },
+    "nombre": "Suiza",
+    "pais": "Suiza",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07f"
+    },
+    "historia": "Fútbol ordenado",
+    "ventajas": "Defensa compacta",
+    "desventajas": "Mentalidad conservadora",
+    "ranking": {
+      "$numberInt": "13"
+    },
+    "banderaUrl": "https://example.com/suiza.png",
+    "latitud": {
+      "$numberDouble": "46.8182"
+    },
+    "longitud": {
+      "$numberDouble": "8.2275"
+    },
+    "elo": {
+      "$numberDouble": "1753.52"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b4"
+    },
+    "nombre": "Escocia",
+    "pais": "Escocia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07f"
+    },
+    "historia": "Selección histórica",
+    "ventajas": "Pasión",
+    "desventajas": "Menos talento ofensivo",
+    "ranking": {
+      "$numberInt": "21"
+    },
+    "banderaUrl": "https://example.com/scotland.png",
+    "latitud": {
+      "$numberDouble": "56.4907"
+    },
+    "longitud": {
+      "$numberDouble": "-4.2026"
+    },
+    "elo": {
+      "$numberDouble": "1556.7"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b5"
+    },
+    "nombre": "Nueva Zelanda",
+    "pais": "Nueva Zelanda",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe075"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe07f"
+    },
+    "historia": "Equipo ordenado",
+    "ventajas": "Comunicación",
+    "desventajas": "Menos nivel global",
+    "ranking": {
+      "$numberInt": "100"
+    },
+    "banderaUrl": "https://example.com/nz.png",
+    "latitud": {
+      "$numberDouble": "-36.84846"
+    },
+    "longitud": {
+      "$numberDouble": "174.763332"
+    },
+    "elo": {
+      "$numberDouble": "1703.38"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b6"
+    },
+    "nombre": "Perú",
+    "pais": "Perú",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe080"
+    },
+    "historia": "Fútbol técnico",
+    "ventajas": "Toque",
+    "desventajas": "Menos físico",
+    "ranking": {
+      "$numberInt": "20"
+    },
+    "banderaUrl": "https://example.com/peru.png",
+    "latitud": {
+      "$numberDouble": "-12.0464"
+    },
+    "longitud": {
+      "$numberDouble": "-77.0428"
+    },
+    "elo": {
+      "$numberDouble": "1788.03"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b7"
+    },
+    "nombre": "Dinamarca",
+    "pais": "Dinamarca",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe080"
+    },
+    "historia": "Fútbol inteligente",
+    "ventajas": "Organización",
+    "desventajas": "Ofensiva inconsistente",
+    "ranking": {
+      "$numberInt": "16"
+    },
+    "banderaUrl": "https://example.com/dinamarca.png",
+    "latitud": {
+      "$numberDouble": "56.2639"
+    },
+    "longitud": {
+      "$numberDouble": "9.5018"
+    },
+    "elo": {
+      "$numberDouble": "1830.91"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b8"
+    },
+    "nombre": "Polonia",
+    "pais": "Polonia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe080"
+    },
+    "historia": "Ataque directo",
+    "ventajas": "Potencia aérea",
+    "desventajas": "Defensa variable",
+    "ranking": {
+      "$numberInt": "25"
+    },
+    "banderaUrl": "https://example.com/polonia.png",
+    "latitud": {
+      "$numberDouble": "51.9194"
+    },
+    "longitud": {
+      "$numberDouble": "19.1451"
+    },
+    "elo": {
+      "$numberDouble": "1747.33"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b9"
+    },
+    "nombre": "Argentina",
+    "pais": "Argentina",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe080"
+    },
+    "historia": "Campeón reciente",
+    "ventajas": "Estilo ofensivo",
+    "desventajas": "Lesiones",
+    "ranking": {
+      "$numberInt": "2"
+    },
+    "banderaUrl": "https://example.com/argentina.png",
+    "latitud": {
+      "$numberDouble": "-34.603722"
+    },
+    "longitud": {
+      "$numberDouble": "-58.381592"
+    },
+    "elo": {
+      "$numberDouble": "1851.05"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ba"
+    },
+    "nombre": "Brasil",
+    "pais": "Brasil",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe081"
+    },
+    "historia": "Cinco veces campeón",
+    "ventajas": "Talento individual",
+    "desventajas": "Presión histórica",
+    "ranking": {
+      "$numberInt": "1"
+    },
+    "banderaUrl": "https://example.com/brasil.png",
+    "latitud": {
+      "$numberDouble": "-15.793889"
+    },
+    "longitud": {
+      "$numberDouble": "-47.882778"
+    },
+    "elo": {
+      "$numberDouble": "1788.16"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bb"
+    },
+    "nombre": "Gales",
+    "pais": "Gales",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe081"
+    },
+    "historia": "Equipo compacto",
+    "ventajas": "Fortaleza mental",
+    "desventajas": "Pocas figuras",
+    "ranking": {
+      "$numberInt": "19"
+    },
+    "banderaUrl": "https://example.com/gales.png",
+    "latitud": {
+      "$numberDouble": "51.4816"
+    },
+    "longitud": {
+      "$numberDouble": "-3.1791"
+    },
+    "elo": {
+      "$numberDouble": "1818.21"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bc"
+    },
+    "nombre": "Serbia",
+    "pais": "Serbia",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe081"
+    },
+    "historia": "Fútbol físico",
+    "ventajas": "Atlético",
+    "desventajas": "Menos creatividad",
+    "ranking": {
+      "$numberInt": "19"
+    },
+    "banderaUrl": "https://example.com/serbia.png",
+    "latitud": {
+      "$numberDouble": "44.0165"
+    },
+    "longitud": {
+      "$numberDouble": "21.0059"
+    },
+    "elo": {
+      "$numberDouble": "1689.56"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bd"
+    },
+    "nombre": "Austria",
+    "pais": "Austria",
+    "continenteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "grupoId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe081"
+    },
+    "historia": "Juego sólido",
+    "ventajas": "Estructura",
+    "desventajas": "Menos talento individual",
+    "ranking": {
+      "$numberInt": "27"
+    },
+    "banderaUrl": "https://example.com/austria.png",
+    "latitud": {
+      "$numberDouble": "47.5162"
+    },
+    "longitud": {
+      "$numberDouble": "14.5501"
+    },
+    "elo": {
+      "$numberDouble": "1769.69"
+    },
+    "valor_plantilla": null,
+    "edad_promedio": null,
+    "experiencia_mundiales": null,
+    "titulos_mundiales": null,
+    "subcampeonatos": null,
+    "es_sede": null
+  }
+]

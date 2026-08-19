@@ -1,0 +1,2206 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c5"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08e"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe090"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781208000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c6"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08f"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe091"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781287200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c7"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe092"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe093"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781200800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c8"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe094"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe095"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781294400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c9"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe096"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe097"
+    },
+    "goles_local": {
+      "$numberInt": "4"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781373600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ca"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe098"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe099"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781467200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0cb"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09a"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09b"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781380800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0cc"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09c"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09d"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781460000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0cd"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09e"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09f"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781546400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe088"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ce"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a0"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a1"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781632800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe088"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0cf"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a2"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a3"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781553600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d0"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a4"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a5"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781640000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d1"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a6"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a7"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781719200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d2"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a8"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a9"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781805600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d3"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0aa"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ab"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781726400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d4"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ac"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ad"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781812800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d5"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ae"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0af"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781892000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d6"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b0"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b1"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781978400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d7"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b2"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b3"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781899200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08c"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d8"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b4"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b5"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781985600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08c"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0d9"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b6"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b7"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782064800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08d"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0da"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b8"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b9"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782151200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08d"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0db"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ba"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bb"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "4"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782072000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe085"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0dc"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bc"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bd"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782158400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe085"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0dd"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08e"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08f"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781640000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0de"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe090"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe091"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781719200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0df"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe092"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe094"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781632800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e0"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe093"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe095"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781726400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e1"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe096"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe098"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781805600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e2"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe097"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe099"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781899200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e3"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09a"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09c"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781812800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e4"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09b"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09d"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781892000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e5"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09e"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a0"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781978400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe088"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e6"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09f"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a1"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782064800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe088"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e7"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a2"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a4"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1781985600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e8"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a3"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a5"
+    },
+    "goles_local": {
+      "$numberInt": "3"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782072000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0e9"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a6"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a8"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782151200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ea"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a7"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a9"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782237600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0eb"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0aa"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ac"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782158400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ec"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ab"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ad"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782244800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ed"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ae"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b0"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782324000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ee"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0af"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b1"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782410400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ef"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b2"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b4"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782331200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08c"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f0"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b3"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b5"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782417600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08c"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f1"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b6"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b8"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782496800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08d"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f2"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b7"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b9"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782583200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08d"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f3"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ba"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bc"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782504000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe085"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f4"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0be"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bb"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bd"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1782590400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe085"
+    },
+    "horario": "20:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f5"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08e"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe091"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783101600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f6"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08f"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe090"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783116000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f7"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe092"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe097"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783188000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f8"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe093"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe098"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783202400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0f9"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe096"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe099"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783274400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0fa"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe095"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe094"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783288800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0fb"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09a"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09f"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783360800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0fc"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09b"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a0"
+    },
+    "goles_local": {
+      "$numberInt": "3"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783375200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0fd"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a3"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a1"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783447200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0fe"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a4"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a5"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783461600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ff"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a8"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a7"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783533600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe100"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a9"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ad"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783548000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe101"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ab"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b0"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783620000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe102"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ac"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b1"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783634400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe103"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b9"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b8"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783706400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe104"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bf"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ba"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0bd"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783720800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe105"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08e"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08f"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783792800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe106"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe097"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe093"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783807200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe107"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe096"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe095"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783879200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe108"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09f"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09b"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783893600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe109"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a3"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a5"
+    },
+    "goles_local": {
+      "$numberInt": "2"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783965600000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe10a"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a7"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ad"
+    },
+    "goles_local": {
+      "$numberInt": "3"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1783980000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe10b"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ab"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b1"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "0"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784052000000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe10c"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c0"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b9"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ba"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "1"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784066400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe10d"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c1"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08f"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe097"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784138400000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe10e"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c1"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe096"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe09b"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "3"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784152800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "horario": "22:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe10f"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c1"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a3"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0a7"
+    },
+    "goles_local": {
+      "$numberInt": "1"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784224800000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "18:00"
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe110"
+    },
+    "faseId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0c1"
+    },
+    "equipo_localId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0ab"
+    },
+    "equipo_visitanteId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe0b9"
+    },
+    "goles_local": {
+      "$numberInt": "0"
+    },
+    "goles_visitante": {
+      "$numberInt": "2"
+    },
+    "fecha": {
+      "$date": {
+        "$numberLong": "1784239200000"
+      }
+    },
+    "estadioId": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "horario": "22:00"
+  }
+]

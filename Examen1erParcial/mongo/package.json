@@ -10,9 +10,13 @@
     "view": "node view.js",
     "test-insert": "node insert-test.js",
     "queries": "node queries.js",
-    "api": "node api-server.js"
+    "api": "node api-server.js",
+    "export-installer-snapshot": "node export-installer-snapshot.js"
   },
   "dependencies": {
-    "mongodb": "^7.3.0"
+    "mongodb": "7.3.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   }
 }

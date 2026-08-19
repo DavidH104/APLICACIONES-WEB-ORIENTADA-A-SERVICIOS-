@@ -1,0 +1,166 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe070"
+    },
+    "nombre": "América",
+    "confederacion": "CONMEBOL",
+    "paises_incluidos": [
+      "Brasil",
+      "Argentina",
+      "Colombia",
+      "Ecuador",
+      "Perú",
+      "Uruguay"
+    ],
+    "paises": [
+      "Brasil",
+      "Argentina",
+      "Colombia",
+      "Ecuador",
+      "Perú",
+      "Uruguay"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe071"
+    },
+    "nombre": "Norteamérica",
+    "confederacion": "CONCACAF",
+    "paises_incluidos": [
+      "México",
+      "Estados Unidos",
+      "Canadá",
+      "Panamá",
+      "Costa Rica",
+      "Jamaica",
+      "Honduras",
+      "El Salvador"
+    ],
+    "paises": [
+      "México",
+      "Estados Unidos",
+      "Canadá",
+      "Panamá",
+      "Costa Rica",
+      "Jamaica",
+      "Honduras",
+      "El Salvador"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe072"
+    },
+    "nombre": "Europa",
+    "confederacion": "UEFA",
+    "paises_incluidos": [
+      "Inglaterra",
+      "Alemania",
+      "Francia",
+      "España",
+      "Portugal",
+      "Países Bajos",
+      "Bélgica",
+      "Croacia",
+      "Suiza",
+      "Escocia",
+      "Serbia",
+      "Austria",
+      "Dinamarca",
+      "Polonia",
+      "Gales",
+      "Italia"
+    ],
+    "paises": [
+      "Inglaterra",
+      "Alemania",
+      "Francia",
+      "España",
+      "Portugal",
+      "Países Bajos",
+      "Bélgica",
+      "Croacia",
+      "Suiza",
+      "Escocia",
+      "Serbia",
+      "Austria",
+      "Dinamarca",
+      "Polonia",
+      "Gales",
+      "Italia"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe073"
+    },
+    "nombre": "África",
+    "confederacion": "CAF",
+    "paises_incluidos": [
+      "Sudáfrica",
+      "Marruecos",
+      "Egipto",
+      "Ghana",
+      "Senegal",
+      "Argelia",
+      "Túnez",
+      "Costa de Marfil",
+      "Nigeria",
+      "Camerún"
+    ],
+    "paises": [
+      "Sudáfrica",
+      "Marruecos",
+      "Egipto",
+      "Ghana",
+      "Senegal",
+      "Argelia",
+      "Túnez",
+      "Costa de Marfil",
+      "Nigeria",
+      "Camerún"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe074"
+    },
+    "nombre": "Asia",
+    "confederacion": "AFC",
+    "paises_incluidos": [
+      "Corea del Sur",
+      "Japón",
+      "Uzbekistán",
+      "Arabia Saudita",
+      "Australia",
+      "Catar",
+      "Emiratos Árabes Unidos",
+      "Irán"
+    ],
+    "paises": [
+      "Corea del Sur",
+      "Japón",
+      "Uzbekistán",
+      "Arabia Saudita",
+      "Australia",
+      "Catar",
+      "Emiratos Árabes Unidos",
+      "Irán"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe075"
+    },
+    "nombre": "Oceanía",
+    "confederacion": "OFC",
+    "paises_incluidos": [
+      "Nueva Zelanda"
+    ],
+    "paises": [
+      "Nueva Zelanda"
+    ]
+  }
+]

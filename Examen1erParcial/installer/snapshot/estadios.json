@@ -1,0 +1,206 @@
+[
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe082"
+    },
+    "nombre": "Estadio Azteca",
+    "ciudad": "Ciudad de México",
+    "pais": "México",
+    "latitud": {
+      "$numberDouble": "19.302861"
+    },
+    "longitud": {
+      "$numberDouble": "-99.150527"
+    },
+    "capacidad": {
+      "$numberInt": "87000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe083"
+    },
+    "nombre": "MetLife Stadium",
+    "ciudad": "East Rutherford",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "40.81284"
+    },
+    "longitud": {
+      "$numberDouble": "-74.074208"
+    },
+    "capacidad": {
+      "$numberInt": "82500"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe084"
+    },
+    "nombre": "BC Place",
+    "ciudad": "Vancouver",
+    "pais": "Canadá",
+    "latitud": {
+      "$numberDouble": "49.2777"
+    },
+    "longitud": {
+      "$numberDouble": "-123.1087"
+    },
+    "capacidad": {
+      "$numberInt": "54000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe085"
+    },
+    "nombre": "Estadio BBVA",
+    "ciudad": "Monterrey",
+    "pais": "México",
+    "latitud": {
+      "$numberDouble": "25.682"
+    },
+    "longitud": {
+      "$numberDouble": "-100.309"
+    },
+    "capacidad": {
+      "$numberInt": "51000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe086"
+    },
+    "nombre": "SoFi Stadium",
+    "ciudad": "Inglewood",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "33.953"
+    },
+    "longitud": {
+      "$numberDouble": "-118.339"
+    },
+    "capacidad": {
+      "$numberInt": "70000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe087"
+    },
+    "nombre": "AT&T Stadium",
+    "ciudad": "Arlington",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "32.7473"
+    },
+    "longitud": {
+      "$numberDouble": "-97.0945"
+    },
+    "capacidad": {
+      "$numberInt": "80000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe088"
+    },
+    "nombre": "Mercedes-Benz Stadium",
+    "ciudad": "Atlanta",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "33.755"
+    },
+    "longitud": {
+      "$numberDouble": "-84.4008"
+    },
+    "capacidad": {
+      "$numberInt": "71000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe089"
+    },
+    "nombre": "Hard Rock Stadium",
+    "ciudad": "Miami Gardens",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "25.958"
+    },
+    "longitud": {
+      "$numberDouble": "-80.238"
+    },
+    "capacidad": {
+      "$numberInt": "65000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08a"
+    },
+    "nombre": "NRG Stadium",
+    "ciudad": "Houston",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "29.6847"
+    },
+    "longitud": {
+      "$numberDouble": "-95.4107"
+    },
+    "capacidad": {
+      "$numberInt": "72000"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08b"
+    },
+    "nombre": "Gillette Stadium",
+    "ciudad": "Foxborough",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "42.0909"
+    },
+    "longitud": {
+      "$numberDouble": "-71.2643"
+    },
+    "capacidad": {
+      "$numberInt": "65878"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08c"
+    },
+    "nombre": "Levi's Stadium",
+    "ciudad": "Santa Clara",
+    "pais": "Estados Unidos",
+    "latitud": {
+      "$numberDouble": "37.403"
+    },
+    "longitud": {
+      "$numberDouble": "-121.97"
+    },
+    "capacidad": {
+      "$numberInt": "68300"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a7ec1ba9f2c15c41edfe08d"
+    },
+    "nombre": "BMO Field",
+    "ciudad": "Toronto",
+    "pais": "Canadá",
+    "latitud": {
+      "$numberDouble": "43.633"
+    },
+    "longitud": {
+      "$numberDouble": "-79.397"
+    },
+    "capacidad": {
+      "$numberInt": "30000"
+    }
+  }
+]
